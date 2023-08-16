@@ -9,14 +9,27 @@ contract WebAuthnRecover {
 
     //public key
     bytes32[] public pubkey;
+    string public credentialId;
 
-    function addWebAuthnRecover(bytes32[] memory _pubkey) public {
+    function addWebAuthnRecover(
+        bytes32[] memory _pubkey,
+        string memory _credentialId
+    ) public {
+        require(!isWebAuthnRecoverEnabled, "ALREADY_ENABLED");
         pubkey = _pubkey;
+        credentialId = _credentialId;
         isWebAuthnRecoverEnabled = true;
     }
 
     function removeWebAuthnRecover() public {
         require(isWebAuthnRecoverEnabled, "NOT_ENABLED");
+        isWebAuthnRecoverEnabled = false;
+    }
+
+    function _computeMessage(
+        bytes memory _webAuthnInputs
+    ) internal pure returns (bytes32) {
+        WebAuthnHelper.computeMessage(_webAuthnInputs);
     }
 
     function getPublicInputWebAuthn(

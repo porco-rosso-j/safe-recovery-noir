@@ -57,10 +57,11 @@ contract NoirHelper is Inputs, Test {
     }
 
     function readProof(
+        string memory path,
         string memory fileName
     ) public view returns (bytes memory) {
         string memory file = vm.readFile(
-            string.concat("circuits/proofs/", fileName, ".proof")
+            string.concat("circuits/", path, "/proofs/", fileName, ".proof")
         );
         return vm.parseBytes(file);
     }

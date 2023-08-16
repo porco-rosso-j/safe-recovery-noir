@@ -66,10 +66,17 @@ abstract contract BasePlugin is ISafeProtocolPlugin {
 
     string public name;
     string public version;
-    bool public immutable requiresRootAccess;
-    bytes32 public immutable metadataHash;
+    bool public requiresRootAccess;
+    bytes32 public metadataHash;
 
-    constructor(PluginMetadata memory metadata) {
+    // constructor(PluginMetadata memory metadata) {
+    //     name = metadata.name;
+    //     version = metadata.version;
+    //     requiresRootAccess = metadata.requiresRootAccess;
+    //     metadataHash = keccak256(metadata.encode());
+    // }
+
+    function _initializeBasePlugin(PluginMetadata memory metadata) internal {
         name = metadata.name;
         version = metadata.version;
         requiresRootAccess = metadata.requiresRootAccess;
@@ -83,17 +90,24 @@ abstract contract BasePluginWithStoredMetadata is
 {
     using PluginMetadataOps for PluginMetadata;
 
-    bytes private encodedMetadata;
+    bytes private _encodedMetadata;
 
-    constructor(PluginMetadata memory metadata) BasePlugin(metadata) {
-        encodedMetadata = metadata.encode();
+    // constructor(PluginMetadata memory metadata) BasePlugin(metadata) {
+    //     _encodedMetadata = metadata.encode();
+    // }
+
+    function _initializeBasePluginWithStoredMetadata(
+        PluginMetadata memory metadata
+    ) internal {
+        _encodedMetadata = metadata.encode();
+        _initializeBasePlugin(metadata);
     }
 
     function retrieveMetadata(
         bytes32 _metadataHash
     ) external view override returns (bytes memory metadata) {
         require(metadataHash == _metadataHash, "Cannot retrieve metadata");
-        return encodedMetadata;
+        return _encodedMetadata;
     }
 
     function metadataProvider()
@@ -112,8 +126,15 @@ abstract contract BasePluginWithEventMetadata is BasePlugin {
 
     event Metadata(bytes32 indexed metadataHash, bytes data);
 
-    constructor(PluginMetadata memory metadata) BasePlugin(metadata) {
+    // constructor(PluginMetadata memory metadata) BasePlugin(metadata) {
+    //     emit Metadata(metadataHash, metadata.encode());
+    // }
+
+    function _initializeBasePluginWithEventMetadata(
+        PluginMetadata memory metadata
+    ) internal {
         emit Metadata(metadataHash, metadata.encode());
+        _initializeBasePlugin(metadata);
     }
 
     function metadataProvider()
