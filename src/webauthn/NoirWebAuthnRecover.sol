@@ -52,7 +52,7 @@ contract NoirWebAuthnRecover is BasePluginWithEventMetadata {
     }
 
     function swapOwnerToRecoverSafe(
-        bytes calldata _swapTxCalldata,
+        bytes calldata _swapOwnerData,
         uint _nonce,
         address _manager,
         bytes memory _proof,
@@ -67,24 +67,23 @@ contract NoirWebAuthnRecover is BasePluginWithEventMetadata {
         if (!verifier.verify(_proof, publicInputs))
             revert PROOF_VERIFICATION_FAILED();
 
-        // SafeProtocolAction memory action = SafeProtocolAction(
-        //     payable(safe),
-        //     0,
-        //     _swapTxCalldata
-        // );
+        SafeProtocolAction[] memory actions = new SafeProtocolAction[](1);
+        actions[0].to = payable(safe);
+        actions[0].value = 0;
+        actions[0].data = _swapOwnerData;
 
-        SafeRootAccess memory safeRoot = SafeRootAccess({
-            action: SafeProtocolAction(payable(safe), 0, _swapTxCalldata),
+        SafeTransaction memory safeTx = SafeTransaction({
+            actions: actions,
             nonce: _nonce,
             metadataHash: metadataHash
         });
 
         try
-            ISafeProtocolManager(_manager).executeRootAccess(
+            ISafeProtocolManager(_manager).executeTransaction(
                 ISafe(safe),
-                safeRoot
+                safeTx
             )
-        returns (bytes memory) {} catch (bytes memory reason) {
+        returns (bytes[] memory) {} catch (bytes memory reason) {
             revert RECOVER_FAILED(reason);
         }
 

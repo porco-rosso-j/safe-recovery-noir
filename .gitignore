@@ -11,8 +11,10 @@ docs/
 # Dotenv file
 .env
 
-# Cargo
-target/
+# Circuits
+circuits/proofs/main.nr
+circuits/target/
 
 # Misc
+trash
 .idea
