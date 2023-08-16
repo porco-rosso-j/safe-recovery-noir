@@ -5,6 +5,7 @@ pragma solidity ^0.8.18;
 // import {IBonsaiRelay} from "bonsai-lib-sol/IBonsaiRelay.sol";
 import {NoirWebAuthnRecover} from "./webauthn/NoirWebAuthnRecover.sol";
 
+// will be proxy factory in the future.
 contract RecoveryModuleFactory {
     // address public bonsaiRelay;
     // bytes32 public imageId;
