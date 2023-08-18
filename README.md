@@ -12,7 +12,12 @@ Available recovery methods with zero-knowledge proofs of...
 
 This recovery app is built on top of [safe-core-protocol](https://github.com/5afe/safe-core-protocol) so that Safe apps and other wallet apps can easily integrate to increase the security of user funds. The recovery plugin can call `swapOwner` and `changeThreshold` functions in the Safe contract to flexibly transfer the ownership and multi-signature set-up.  
 
+## Test
 
+```shell
+forge build
+forge test --match-contract RecoveryPluginNoirTest -vvv 
+```
 
 ## References
 
