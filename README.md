@@ -1,5 +1,8 @@
 # safe-recovery-noir
 
+
+<img width="150" alt="Screenshot 2023-06-11 at 9 53 19" src="https://github.com/porco-rosso-j/safe-recovery-noir/assets/88586592/b8e4854e-2e02-4801-aa18-0118d494553c">
+
 ## Introduction
 A safe plugin that allows Safe owners to recover the ownership of the account in the case where they lose access to their Safe. All the recovery methods leverage Noir, a DSL for writing zero knowledge proof circuits to help owners recover their account ownership in a secure and private manner.  
 
