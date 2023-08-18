@@ -1,18 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-contract SecretRecover {
+import "./RecoverBase.sol";
+
+contract SecretRecover is RecoverBase {
     address public secretVerifeir;
     bool public isSecretRecoverEnabled;
     bytes32[] public hashed_secret;
 
-    function addSecretRecover(bytes32 _hashed_secret) public {
+    // should call basic recovery setup func that determines pending period, etc...
+    function addSecretRecover(
+        uint _recoveryTimeLock,
+        bytes32 _hashed_secret
+    ) public onlySafe {
         require(_hashed_secret != bytes32(0), "INVALID_HASH");
         hashed_secret = _convertBytes32ToBytes32Array(_hashed_secret);
+        _addDelay(_recoveryTimeLock);
         isSecretRecoverEnabled = true;
     }
 
-    function removeSecretRecover() public {
+    function removeSecretRecover() public onlySafe {
         require(isSecretRecoverEnabled, "NOT_ENABLED");
         isSecretRecoverEnabled = false;
     }

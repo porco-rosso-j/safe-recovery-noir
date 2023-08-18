@@ -177,7 +177,7 @@ contract Inputs {
 
     function convertUint8ToBytes32(
         uint8[] memory _array
-    ) public view returns (bytes32[] memory array) {
+    ) public pure returns (bytes32[] memory array) {
         for (uint i; i < _array.length; i++) {
             array[i] = bytes32(uint256(_array[i]));
         }
@@ -186,7 +186,7 @@ contract Inputs {
     function concatBytes32Array(
         uint8[] memory _array1,
         uint8[] memory _array2
-    ) public view returns (bytes32[] memory) {
+    ) public pure returns (bytes32[] memory) {
         bytes32[] memory array = new bytes32[](64);
 
         for (uint i; i < 32; i++) {
