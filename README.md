@@ -11,7 +11,7 @@ Available recovery methods with zero-knowledge proofs of...
 - Social Recovery: correct verification of the k256 ECDSA signatures from private guardians.
 - (methods To be added: 2FA, email, and other biometrics)
 
-This recovery app is built on top of [safe-core-protocol](https://github.com/5afe/safe-core-protocol) so that Safe apps and other wallet apps can easily integrate to increase the security of user funds. The recovery plugin carries out a batched call that executes `swapOwner` and `changeThreshold` functions simultaneously in the Safe contract to flexibly transfer the ownerships and multi-signature set-up.  
+This recovery app is built on top of [safe-core-protocol](https://github.com/5afe/safe-core-protocol), a modular smart account protocol so that Safe and other wallet apps can easily integrate to enhance the security of user funds. The recovery plugin performs a batched call that executes `swapOwner` and `changeThreshold` simultaneously to flexibly transfer the account authorities and change the multi-signature set-up.  
 
 ## Test
 
