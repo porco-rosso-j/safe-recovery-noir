@@ -5,7 +5,6 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 
-// import {ISafe} from "@safe-global/safe-core-protocol/contracts/interfaces/Accounts.sol";
 import {ISafe, ISafeProtocolManager} from "@safe-global/safe-core-protocol/contracts/interfaces/Manager.sol";
 import {SafeTransaction, SafeProtocolAction} from "@safe-global/safe-core-protocol/contracts/DataTypes.sol";
 import {BasePluginWithEventMetadata, PluginMetadata} from "./common/Base.sol";
@@ -49,7 +48,7 @@ contract RecoveryPluginNoir is
                 version: "1.0.0",
                 requiresRootAccess: true,
                 iconUrl: "",
-                appUrl: "https://github.com/porco-rosso-j"
+                appUrl: "https://github.com/porco-rosso-j/safe-recovery-noir"
             })
         );
         safe = _safe;
@@ -258,12 +257,6 @@ contract RecoveryPluginNoir is
         }
 
         return prevOwner;
-    }
-
-    function supportsInterface(
-        bytes4 interfaceId
-    ) external view returns (bool) {
-        return true;
     }
 
     function _authorizeUpgrade(

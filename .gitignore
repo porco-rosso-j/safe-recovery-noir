@@ -14,6 +14,9 @@ docs/
 # Circuits
 circuits/proofs/main.nr
 circuits/target/
+circuits/ecrecover-k256/contract/.DS_Store
+circuits/secret/contract/.DS_Store
+circuits/p256/contract.DS_Store
 
 # Misc
 trash

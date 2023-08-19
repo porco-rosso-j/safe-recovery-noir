@@ -119,6 +119,14 @@ abstract contract BasePluginWithStoredMetadata is
         providerType = uint256(MetadataProviderType.Contract);
         location = abi.encode(address(this));
     }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) external view returns (bool) {
+        return
+            interfaceId == type(ISafeProtocolPlugin).interfaceId ||
+            interfaceId == 0x01ffc9a7;
+    }
 }
 
 abstract contract BasePluginWithEventMetadata is BasePlugin {
@@ -145,5 +153,13 @@ abstract contract BasePluginWithEventMetadata is BasePlugin {
     {
         providerType = uint256(MetadataProviderType.Event);
         location = abi.encode(address(this));
+    }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) external view returns (bool) {
+        return
+            interfaceId == type(ISafeProtocolPlugin).interfaceId ||
+            interfaceId == 0x01ffc9a7;
     }
 }
