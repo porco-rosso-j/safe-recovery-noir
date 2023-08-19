@@ -20,5 +20,6 @@ remappings = [
 
 [rpc_endpoints]
 localhost="http://localhost:8545"
+goerli="https://rpc.ankr.com/eth_goerli"
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

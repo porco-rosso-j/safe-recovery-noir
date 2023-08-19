@@ -37,16 +37,4 @@ contract EcrecoverRecover is RecoverBase {
 
         return _publicInputs;
     }
-
-    // function _convertBytes32ToBytes32Array(
-    //     bytes32 value
-    // ) public pure returns (bytes32[32] memory) {
-    //     bytes32[32] memory paddedArray;
-
-    //     for (uint256 i = 0; i < 32; i++) {
-    //         paddedArray[i] = bytes32(uint(uint8(value[i])));
-    //     }
-
-    //     return paddedArray;
-    // }
 }

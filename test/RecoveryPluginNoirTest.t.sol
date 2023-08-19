@@ -508,6 +508,5 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
     }
 
     // differnet circuits & proof generation
-    // - ecrecover-k256
     // - social
 }

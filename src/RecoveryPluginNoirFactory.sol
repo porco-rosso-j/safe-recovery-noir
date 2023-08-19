@@ -89,4 +89,8 @@ contract RecoveryPluginNoirFactory {
                 )
             );
     }
+
+    function getPluginAddr(address _safe) public view returns (address) {
+        return safeToPlugins[_safe];
+    }
 }
