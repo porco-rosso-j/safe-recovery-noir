@@ -36,7 +36,7 @@ forge test --match-contract RecoveryPluginNoirTest -vvv
 
 ## References
 
-#### My Past Projects
+#### Past Projects
 
 - [AnonAA](https://github.com/porco-rosso-j/zk-ecdsAA)
 - [noir-browser-p255](https://github.com/porco-rosso-j/noir-browser-p256)
