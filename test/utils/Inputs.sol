@@ -177,13 +177,16 @@ contract Inputs {
 
     function convertUint8ToBytes32(
         uint8[] memory _array
-    ) public pure returns (bytes32[] memory array) {
-        for (uint i; i < _array.length; i++) {
+    ) public pure returns (bytes32[] memory) {
+        bytes32[] memory array = new bytes32[](32);
+
+        for (uint i; i < 32; i++) {
             array[i] = bytes32(uint256(_array[i]));
         }
+        return array;
     }
 
-    function concatBytes32Array(
+    function convertUint8ToBytes32(
         uint8[] memory _array1,
         uint8[] memory _array2
     ) public pure returns (bytes32[] memory) {
@@ -196,4 +199,142 @@ contract Inputs {
 
         return array;
     }
+
+    // for ecrecover-k256
+    uint8[] public pubkey = [
+        131,
+        24,
+        83,
+        91,
+        84,
+        16,
+        93,
+        74,
+        122,
+        174,
+        96,
+        192,
+        143,
+        196,
+        95,
+        150,
+        135,
+        24,
+        27,
+        79,
+        223,
+        198,
+        37,
+        189,
+        26,
+        117,
+        63,
+        167,
+        57,
+        127,
+        237,
+        117,
+        53,
+        71,
+        241,
+        28,
+        168,
+        105,
+        102,
+        70,
+        242,
+        243,
+        172,
+        176,
+        142,
+        49,
+        1,
+        106,
+        250,
+        194,
+        62,
+        99,
+        12,
+        93,
+        17,
+        245,
+        159,
+        97,
+        254,
+        245,
+        123,
+        13,
+        42,
+        165
+    ];
+
+    uint8[] public hashedAddr = [
+        233,
+        112,
+        125,
+        14,
+        97,
+        113,
+        247,
+        40,
+        247,
+        71,
+        60,
+        36,
+        204,
+        4,
+        50,
+        169,
+        176,
+        126,
+        170,
+        241,
+        239,
+        237,
+        106,
+        19,
+        122,
+        74,
+        140,
+        18,
+        199,
+        149,
+        82,
+        217
+    ];
+
+    uint8[] public k256_message = [
+        82,
+        154,
+        122,
+        115,
+        3,
+        254,
+        180,
+        9,
+        84,
+        23,
+        70,
+        63,
+        179,
+        211,
+        86,
+        72,
+        32,
+        88,
+        133,
+        119,
+        7,
+        93,
+        100,
+        22,
+        177,
+        234,
+        251,
+        240,
+        46,
+        87,
+        132,
+        171
+    ];
 }

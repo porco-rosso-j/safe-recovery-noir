@@ -18,14 +18,16 @@ contract RecoveryPluginNoirFactory {
         address _safe,
         address _safeProtocolManager,
         address _webAuthnVerifier,
-        address _secretVerifeir,
+        address _secretVerifier,
+        address _ecrecoverVerifier,
         uint256 _salt
     ) public returns (RecoveryPluginNoir proxy) {
         address addr = getAddress(
             _safe,
             _safeProtocolManager,
             _webAuthnVerifier,
-            _secretVerifeir,
+            _secretVerifier,
+            _ecrecoverVerifier,
             _salt
         );
         uint codeSize = addr.code.length;
@@ -42,7 +44,8 @@ contract RecoveryPluginNoirFactory {
                             _safe,
                             _safeProtocolManager,
                             _webAuthnVerifier,
-                            _secretVerifeir
+                            _secretVerifier,
+                            _ecrecoverVerifier
                         )
                     )
                 )
@@ -59,7 +62,8 @@ contract RecoveryPluginNoirFactory {
         address _safe,
         address _safeProtocolManager,
         address _webAuthnVerifier,
-        address _secretVerifeir,
+        address _secretVerifier,
+        address _ecrecoverVerifier,
         uint256 _salt
     ) public view returns (address) {
         return
@@ -76,7 +80,8 @@ contract RecoveryPluginNoirFactory {
                                     _safe,
                                     _safeProtocolManager,
                                     _webAuthnVerifier,
-                                    _secretVerifeir
+                                    _secretVerifier,
+                                    _ecrecoverVerifier
                                 )
                             )
                         )
