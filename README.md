@@ -34,6 +34,21 @@ forge build
 forge test --match-contract RecoveryPluginNoirTest -vvv
 ```
 
+## Development
+
+run forked goerli chain
+```shell
+anvil --fork-url goerli
+forge script script/Deploy.s.sol:Deploy --rpc-url localhost --broadcast
+```
+
+start frontend
+```shell
+cd front
+yarn
+yarn start
+```
+
 ## References
 
 #### Past Projects
