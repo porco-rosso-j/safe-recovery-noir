@@ -8,6 +8,7 @@ import {RecoveryPluginNoirFactory} from "../src/RecoveryPluginNoirFactory.sol";
 
 import {UltraVerifier as SecretVerifier} from "../circuits/secret/contract/secret/plonk_vk.sol";
 import {UltraVerifier as WebAuthnVerifier} from "../circuits/p256/contract/p256/plonk_vk.sol";
+import {UltraVerifier as EcrecoverVerifier} from "../circuits/ecrecover-k256/contract/k256/plonk_vk.sol";
 import {NoirHelper} from "./utils/NoirHelper.sol";
 import "forge-std/console.sol";
 
@@ -51,6 +52,7 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
 
         address secretVerifier = address(new SecretVerifier());
         address webauthnVerifier = address(new WebAuthnVerifier());
+        address ecrecoverVerifier = address(new EcrecoverVerifier());
 
         registry = new SafeProtocolRegistry(pluginOwner);
         manager = new SafeProtocolManager(pluginOwner, address(registry));
@@ -63,6 +65,7 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
                 address(manager),
                 webauthnVerifier,
                 secretVerifier,
+                ecrecoverVerifier,
                 0 // salt
             )
         );
@@ -92,8 +95,13 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
 
         recoveryPlugin.addWebAuthnRecover(
             45 days,
-            concatBytes32Array(pubkey_x, pubkey_y),
+            convertUint8ToBytes32(pubkey_x, pubkey_y),
             "test"
+        );
+
+        recoveryPlugin.addEcrecoverRecover(
+            45 days,
+            convertUint8ToBytes32(hashedAddr)
         );
 
         vm.stopBroadcast();
@@ -448,6 +456,45 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
             1, // 2 -> 1
             proof,
             webAuthnInputs
+        );
+
+        vm.warp(block.timestamp + 60 days);
+        recoveryPlugin.execRecovery(1);
+
+        address[] memory owners = safe.getOwners();
+        assertEq(owners[0], newOwners[0]);
+
+        uint newThreshold = safe.getThreshold();
+        assertEq(newThreshold, 1);
+    }
+
+    // ecrecover-k256
+    function test_recovery_k256() public {
+        vm.startBroadcast(newOwners[0]);
+
+        address[] memory ownersReplaced = new address[](1);
+        ownersReplaced[0] = owners[0];
+
+        address[] memory newPendingOwners = new address[](1);
+        newPendingOwners[0] = newOwners[0];
+
+        vm.expectRevert(0x0711fcec); // PROOF_FAILURE in verifier
+        recoveryPlugin.proposeEcrecoverRecover(
+            ownersReplaced,
+            newPendingOwners,
+            1, // 2 -> 1
+            proof,
+            convertUint8ToBytes32(k256_message)
+        );
+
+        bytes memory proof = readProof("ecrecover-k256", "k256");
+
+        recoveryPlugin.proposeEcrecoverRecover(
+            ownersReplaced,
+            newPendingOwners,
+            1, // 2 -> 1
+            proof,
+            convertUint8ToBytes32(k256_message)
         );
 
         vm.warp(block.timestamp + 60 days);

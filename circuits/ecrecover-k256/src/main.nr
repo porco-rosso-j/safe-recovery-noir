@@ -2,7 +2,7 @@ use dep::std;
 mod ecrecover;
 
 fn main(
-    hashedAddr: pub Field,
+    hashedAddr: pub [u8;32],
     pub_key: [u8; 64], 
     signature: [u8; 64], 
     message_hash: pub [u8; 32],
@@ -11,34 +11,30 @@ fn main(
     let pubkey_x = to_first_32(pub_key);
     let pubkey_y = to_second_32(pub_key);
 
-    let recovered_addr = ecrecover::ecrecover(
+    let recovered_addr: [u8;20] = ecrecover::ecrecover(
         pubkey_x,
         pubkey_y,
         signature,
         message_hash
     );
 
-    std::println(recovered_addr);
+    // std::println(recovered_addr);
 
-    let mut addr: [Field; 1] = [0; 1];
-    addr[0] = recovered_addr;
-
-    let computed_root = std::hash::pedersen(addr);
+    let computed_root = std::hash::keccak256(recovered_addr, 20);
     std::println(computed_root);
     std::println(hashedAddr);
 
-    assert(computed_root[0] == hashedAddr);
+    assert(computed_root == hashedAddr);
 }
 
 #[test]
 fn test_main() {
 
   let message_hash = [
-    25, 207, 171, 174, 102, 123, 180,
-    203, 237, 218, 232, 136, 111, 180,
-    142,  11,  68, 251,   9,   3, 144,
-    103,  41, 137, 231, 122,   0, 249,
-    220, 242, 224, 153
+      82, 154, 122, 115,   3, 254, 180,   9,
+      84,  23,  70,  63, 179, 211,  86,  72,
+      32,  88, 133, 119,   7,  93, 100,  22,
+      177, 234, 251, 240,  46,  87, 132, 171
   ];
 
   let pub_key = [
@@ -50,15 +46,19 @@ fn test_main() {
     245, 159,  97, 254, 245, 123, 13,  42, 165
   ];
 
-  let hashedAddr = 0x2840920c6b28172affa5533dbcec73f20e1a7d54cdb0c5d79b1297895c3c6d03;
+  let hashedAddr = [
+    233, 112, 125, 14, 97, 113, 247, 40, 247, 71, 60, 36, 204, 
+    4, 50, 169, 176, 126, 170, 241, 239, 237, 106, 19, 122, 74, 
+    140, 18, 199, 149, 82, 217
+  ];
     
   let signature = [
-    210,   1, 118,  62,  14, 109, 127, 105,  12, 114, 199,
-    141,  95, 204, 184,  88, 127,  81,  34, 240, 134,  36,
-    251,  19, 217, 164,  34,  38, 215, 195, 248, 181,  56,
-    80,  60, 135, 183,  77, 233, 227, 170,  10,  94,  17,
-    48,  11,  13, 171,  88,  69,  93,  69, 114,  18, 223,
-    172, 226,  73, 196, 117, 252, 172,   3,  74
+    117, 243, 201, 212, 4, 53, 177, 246, 42, 131, 162, 141, 
+    164, 28, 57, 67,154, 138, 178, 165, 211, 94, 234, 229, 
+    106, 52, 35, 69, 146, 186, 88, 250, 37, 34, 68, 250, 73, 
+    228, 197, 71, 164, 152, 188, 193, 36, 59, 103, 102, 64, 
+    164, 145, 77, 73, 58, 143, 198, 53, 20, 11, 19, 23, 136, 
+    166, 185
   ];
 
   main(hashedAddr, pub_key, signature, message_hash);

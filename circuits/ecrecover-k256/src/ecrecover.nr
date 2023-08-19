@@ -8,7 +8,7 @@ use dep::std;
       pub_key_y: [u8; 32],
       signature: [u8; 64], // clip v value
       hashed_message: [u8; 32]
-    ) -> Field {
+    ) -> [u8;20] {
       assert(verify_sig(pub_key_x, pub_key_y, signature, hashed_message) == true);
       let addr = to_eth_address(pub_key_x, pub_key_y);
       addr 
@@ -16,14 +16,15 @@ use dep::std;
 
     fn verify_sig(pub_key_x: [u8; 32], pub_key_y: [u8; 32], signature: [u8; 64], hashed_message: [u8; 32]) -> bool {
         let isValid = std::ecdsa_secp256k1::verify_signature(pub_key_x, pub_key_y, signature, hashed_message);
-        isValid == true
+        assert(isValid == true);
+        isValid
+
     }
 
-    fn to_eth_address(pub_key_x: [u8; 32], pub_key_y: [u8; 32]) -> Field {
+    fn to_eth_address(pub_key_x: [u8; 32], pub_key_y: [u8; 32]) -> [u8;20] {
         let pub_key = unify_pub_x_pub_y(pub_key_x, pub_key_y);
-        let hashed_pub_key = std::hash::keccak256(pub_key, 32);
-
-        u8_32_to_u160(hashed_pub_key)
+        let hashed_pub_key = std::hash::keccak256(pub_key, 64);
+        to_address_array(hashed_pub_key)
     }
 
     fn unify_pub_x_pub_y(array_x: [u8; 32], array_y: [u8; 32]) -> [u8; 64] {
@@ -46,5 +47,16 @@ use dep::std;
         addr = (addr * 256) + (array[i + 12] as Field);
       }
 
+      addr
+    }
+
+
+   // only take the last 20 bytes of the hash
+    fn to_address_array(array: [u8; 32]) -> [u8;20] {
+      let mut addr: [u8;20] = [0;20];
+
+      for i in 0..20 {
+        addr[i] = array[i + 12];
+      }
       addr
     }

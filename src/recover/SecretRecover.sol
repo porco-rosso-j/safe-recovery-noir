@@ -4,7 +4,7 @@ pragma solidity ^0.8.17;
 import "./RecoverBase.sol";
 
 contract SecretRecover is RecoverBase {
-    address public secretVerifeir;
+    address public secretVerifier;
     bool public isSecretRecoverEnabled;
     bytes32[] public hashed_secret;
 

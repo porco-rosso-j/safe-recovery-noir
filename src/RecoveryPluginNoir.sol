@@ -17,6 +17,7 @@ import {IUltraVerifier} from "./interfaces/IUltraVerifier.sol";
 // recovery contracts
 import {WebAuthnRecover} from "./recover/WebAuthnRecover.sol";
 import {SecretRecover} from "./recover/SecretRecover.sol";
+import {EcrecoverRecover} from "./recover/EcrecoverRecover.sol";
 
 import "forge-std/console.sol";
 
@@ -25,7 +26,8 @@ contract RecoveryPluginNoir is
     Initializable,
     BasePluginWithEventMetadata,
     WebAuthnRecover,
-    SecretRecover
+    SecretRecover,
+    EcrecoverRecover
 {
     error PROOF_VERIFICATION_FAILED();
     error RECOVER_FAILED(bytes reason);
@@ -38,7 +40,8 @@ contract RecoveryPluginNoir is
         address _safe,
         address _safeProtocolManager,
         address _webAuthnVerifier, // stored and passed by factory
-        address _secretVerifeir
+        address _secretVerifier,
+        address _ecrecoverVerifier
     ) public initializer {
         _initializeBasePluginWithEventMetadata(
             PluginMetadata({
@@ -52,7 +55,8 @@ contract RecoveryPluginNoir is
         safe = _safe;
         safeProtocolManager = ISafeProtocolManager(_safeProtocolManager);
         webAuthnVerifier = _webAuthnVerifier;
-        secretVerifeir = _secretVerifeir;
+        secretVerifier = _secretVerifier;
+        ecrecoverVerifier = _ecrecoverVerifier;
     }
 
     function proposeWebAuthnRecover(
@@ -100,7 +104,33 @@ contract RecoveryPluginNoir is
         bytes32[] memory publicInputs = new bytes32[](32);
         publicInputs = hashed_secret;
 
-        if (!IUltraVerifier(secretVerifeir).verify(_proof, publicInputs))
+        if (!IUltraVerifier(secretVerifier).verify(_proof, publicInputs))
+            revert PROOF_VERIFICATION_FAILED();
+
+        return _proposeRecovery(_oldAddresses, _newAddresses, newThreshold);
+    }
+
+    function proposeEcrecoverRecover(
+        address[] memory _oldAddresses,
+        address[] memory _newAddresses,
+        uint _newThreshold,
+        bytes memory _proof,
+        bytes32[] memory _message
+    ) public returns (uint, uint) {
+        require(msg.sender != safe, "INVALID_SENDER");
+        require(isEcrecoverRecoverEnabled, "NOT_ENABLED");
+
+        uint newThreshold = _validateAddressesAndThreshold(
+            _oldAddresses,
+            _newAddresses,
+            _newThreshold
+        );
+
+        bytes32[] memory publicInputs = new bytes32[](64);
+
+        publicInputs = _getPublicInputEcrecover(publicInputs, _message);
+
+        if (!IUltraVerifier(ecrecoverVerifier).verify(_proof, publicInputs))
             revert PROOF_VERIFICATION_FAILED();
 
         return _proposeRecovery(_oldAddresses, _newAddresses, newThreshold);
