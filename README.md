@@ -20,6 +20,7 @@ This recovery app is built on top of [safe-core-protocol](https://github.com/5af
 
 ## Test
 
+Noir circuits  
 ```shell
 cd circuits/{CIRCUIT_NAMME}
 nargo test --show-output
@@ -27,6 +28,7 @@ nargo prove
 nargo verify
 ```
 
+Smart contracts  
 ```shell
 forge build
 forge test --match-contract RecoveryPluginNoirTest -vvv
