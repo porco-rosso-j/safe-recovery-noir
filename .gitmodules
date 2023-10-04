@@ -4,9 +4,6 @@
 [submodule "lib/safe-tools"]
 	path = lib/safe-tools
 	url = https://github.com/colinnielsen/safe-tools
-[submodule "lib/safe-core-protocol"]
-	path = lib/safe-core-protocol
-	url = https://github.com/5afe/safe-core-protocol
 [submodule "lib/openzeppelin-contracts"]
 	path = lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts

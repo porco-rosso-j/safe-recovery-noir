@@ -91,6 +91,27 @@ export async function _proposeRecoveryWebAuthn(
     }
 }
 
+export async function _executeRecover(
+    pluginAddr: string,
+    recoveryId: number,
+    ) {
+    const recoveryPlugin = new ethers.Contract(pluginAddr, RecoveryPlugin.abi, provider);
+
+    try {
+        const tx = await(
+            await recoveryPlugin.proposeWebAuthnRecovery(
+                recoveryId,
+            {
+                gasLimit: 1000000
+            }
+        )).wait()
+        console.log("txhash: ", tx.transactionHash)
+    } catch(e) {
+        console.log("e: ", e)
+    
+    }
+}
+
 export async function getSafePluginAddress(safeAddr: any):Promise<string> {
     const pluginFac = new ethers.Contract(addresses.recoveryPluginFac, RecoveryPluginFac.abi, provider);
     return await pluginFac.getPluginAddr(safeAddr);
