@@ -1,0 +1,6 @@
+
+[build.environment]
+  YARN_VERSION = "1.22.19"
+  YARN_FLAGS = "--production=false"
+  NODE_VERSION = "v16.19.1"
+  NODE_ENV = "development"

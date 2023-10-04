@@ -20,7 +20,8 @@ This recovery app is built on top of [safe-core-protocol](https://github.com/5af
 
 ## Test
 
-Noir circuits  
+Noir circuits
+
 ```shell
 cd circuits/{CIRCUIT_NAMME}
 nargo test --show-output
@@ -28,7 +29,8 @@ nargo prove
 nargo verify
 ```
 
-Smart contracts  
+Smart contracts
+
 ```shell
 forge build
 forge test --match-contract RecoveryPluginNoirTest -vvv
@@ -37,12 +39,14 @@ forge test --match-contract RecoveryPluginNoirTest -vvv
 ## Development
 
 run forked goerli chain
+
 ```shell
 anvil --fork-url goerli
 forge script script/Deploy.s.sol:Deploy --rpc-url localhost --broadcast
 ```
 
 start frontend
+
 ```shell
 cd front
 yarn
@@ -54,7 +58,7 @@ yarn start
 #### Past Projects
 
 - [AnonAA](https://github.com/porco-rosso-j/zk-ecdsAA)
-- [noir-browser-p255](https://github.com/porco-rosso-j/noir-browser-p256)
+- [noir-browser-p256](https://github.com/porco-rosso-j/noir-browser-p256)
 - [zksync-account-webauthn](https://github.com/porco-rosso-j/zksync-account-webauthn)
 
 #### Others
@@ -62,3 +66,24 @@ yarn start
 - [Noir](https://noir-lang.org/)
 - [Safe {Core} Protocol](https://docs.safe.global/safe-core-protocol/safe-core-protocol)
 - [safe-core-protocol](https://github.com/5afe/safe-core-protocol)
+
+## TODO
+
+#### Milestone1: contract development
+
+- update deps, `safe-core-protocol` and `nargo` to the latest
+- implement social recovery w/ 256k1 verification circuit
+- centralized privacy-relayer implementation
+- implement guard for restrcting function signatures
+- add capability to add multiple Safes
+- tests
+
+#### Milestone2: frontend development
+
+- has all the basic methods
+- activation of multiple recovery methods
+
+#### Milestone3: testnet launch (Jan, 2024)
+
+- invite users to the demo app
+- add improvements based on the feedback
