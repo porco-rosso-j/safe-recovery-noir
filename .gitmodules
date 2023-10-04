@@ -8,3 +8,6 @@
 	path = lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
 	branch = v4.8.3
+[submodule "lib/safe-core-protocol"]
+	path = lib/safe-core-protocol
+	url = https://github.com/5afe/safe-core-protocol
