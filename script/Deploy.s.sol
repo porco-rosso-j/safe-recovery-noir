@@ -1,4 +1,6 @@
-import {SafeProtocolRegistry, Enum as RegistryEnum} from "@safe-global/safe-core-protocol/contracts/SafeProtocolRegistry.sol";
+pragma solidity ^0.8.17;
+
+import {SafeProtocolRegistry} from "@safe-global/safe-core-protocol/contracts/SafeProtocolRegistry.sol";
 import {SafeProtocolManager} from "@safe-global/safe-core-protocol/contracts/SafeProtocolManager.sol";
 import {SafeTestTools, DeployedSafe, SafeInstance, SafeTestLib} from "safe-tools/SafeTestTools.sol";
 import {RecoveryPluginNoir} from "../src/RecoveryPluginNoir.sol";
@@ -44,10 +46,7 @@ contract Deploy is Script {
             )
         );
 
-        registry.addIntegration(
-            address(recoveryPlugin),
-            RegistryEnum.IntegrationType.Plugin
-        );
+        registry.addModule(address(recoveryPlugin), 1);
 
         console.logString("recoveryPlugin");
         console.logAddress(address(recoveryPlugin));

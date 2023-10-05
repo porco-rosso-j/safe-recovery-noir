@@ -5,8 +5,9 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 
-import {ISafe, ISafeProtocolManager} from "@safe-global/safe-core-protocol/contracts/interfaces/Manager.sol";
+import {ISafeProtocolManager} from "@safe-global/safe-core-protocol/contracts/interfaces/Manager.sol";
 import {SafeTransaction, SafeProtocolAction} from "@safe-global/safe-core-protocol/contracts/DataTypes.sol";
+import {PLUGIN_PERMISSION_CALL_TO_SELF} from "@safe-global/safe-core-protocol/contracts/common/Constants.sol";
 import {BasePluginWithEventMetadata, PluginMetadata} from "./common/Base.sol";
 
 // interfaces
@@ -182,13 +183,13 @@ contract RecoveryPluginNoir is
 
         SafeTransaction memory safeTx = SafeTransaction({
             actions: actions,
-            nonce: IGnosisSafe(safe).nonce(),
+            nonce: IGnosisSafe(safe).nonce(), // should be fiexed: this isn't abt account nonce
             metadataHash: metadataHash
         });
 
-        try
-            safeProtocolManager.executeTransaction(ISafe(safe), safeTx)
-        returns (bytes[] memory) {} catch (bytes memory reason) {
+        try safeProtocolManager.executeTransaction(safe, safeTx) returns (
+            bytes[] memory
+        ) {} catch (bytes memory reason) {
             revert RECOVER_FAILED(reason);
         }
 
@@ -264,5 +265,10 @@ contract RecoveryPluginNoir is
     ) internal view override {
         (newImplementation);
         //_onlySelf();
+    }
+
+    function requiresPermissions() external view returns (uint8 permissions) {
+        return PLUGIN_PERMISSION_CALL_TO_SELF;
+        //return 1;
     }
 }
