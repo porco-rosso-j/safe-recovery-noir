@@ -1,7 +1,13 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.18;
 
-import {ISafeProtocolPlugin} from "@safe-global/safe-core-protocol/contracts/interfaces/Integrations.sol";
+// import {ISafeProtocolPlugin} from "@safe-global/safe-core-protocol/contracts/interfaces/Integrations.sol";
+import {ISafeProtocolPlugin} from "@safe-global/safe-core-protocol/contracts/interfaces/Modules.sol";
+// import {IAccount} from "../interfaces/Accounts.sol";
+// import {ISafeProtocolPlugin} from "../interfaces/Modules.sol";
+// import {ISafeProtocolManager} from "../interfaces/Manager.sol";
+// import {SafeTransaction, SafeRootAccess} from "../DataTypes.sol";
+// import {PLUGIN_PERMISSION_NONE, PLUGIN_PERMISSION_EXECUTE_CALL, PLUGIN_PERMISSION_EXECUTE_DELEGATECALL} from "../common/Constants.sol";
 
 enum MetadataProviderType {
     IPFS,

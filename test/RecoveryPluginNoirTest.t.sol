@@ -1,6 +1,6 @@
 pragma solidity ^0.8.17;
 
-import {SafeProtocolRegistry, Enum as RegistryEnum} from "@safe-global/safe-core-protocol/contracts/SafeProtocolRegistry.sol";
+import {SafeProtocolRegistry} from "@safe-global/safe-core-protocol/contracts/SafeProtocolRegistry.sol";
 import {SafeProtocolManager} from "@safe-global/safe-core-protocol/contracts/SafeProtocolManager.sol";
 import {SafeTestTools, DeployedSafe, SafeInstance, SafeTestLib} from "safe-tools/SafeTestTools.sol";
 import {RecoveryPluginNoir} from "../src/RecoveryPluginNoir.sol";
@@ -47,7 +47,7 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
     bytes public proof;
 
     function setUp() public {
-        SafeInstance memory safeInstance = _setupSafe(privateKeys, 2);
+        SafeInstance memory safeInstance = _setupSafe(privateKeys, 1);
         safe = DeployedSafe(payable(address(safeInstance.safe)));
 
         address secretVerifier = address(new SecretVerifier());
@@ -73,19 +73,23 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
         vm.prank(pluginOwner);
 
         // register plugin
-        registry.addIntegration(
-            address(recoveryPlugin),
-            RegistryEnum.IntegrationType.Plugin
-        );
+        registry.addModule(address(recoveryPlugin), uint8(1));
+
+        // caller = safe
+        vm.startPrank(address(safe));
 
         // enable Module
         safeInstance.enableModule(address(manager));
 
-        // caller = safe
-        vm.startBroadcast(address(safe));
+        bytes memory data = abi.encodeWithSelector(
+            SafeProtocolManager.enablePlugin.selector,
+            address(recoveryPlugin),
+            2,
+            address(safe) // as its safe tx, u need address at the tale of tx.
+        );
 
-        // 3.2: enable module on manager
-        manager.enablePlugin(address(recoveryPlugin), true);
+        console.logBytes(data);
+        safeInstance.execTransaction(address(manager), 0, data);
 
         // 3.4: set
         recoveryPlugin.addSecretRecover(
@@ -104,7 +108,7 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
             convertUint8ToBytes32(hashedAddr)
         );
 
-        vm.stopBroadcast();
+        vm.stopPrank();
 
         bool isStaticProof = true;
 
