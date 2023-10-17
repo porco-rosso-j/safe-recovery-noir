@@ -9,19 +9,14 @@ import { useEthers } from '@usedapp/core';
 
 const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545")
 
-export async function _enableModule(safeAddr: any, safeSDK: any, coordinates: any, credentialId:any):Promise<any> {
+export async function _enableModule(safeAddr: string, safeSDK: any, coordinates: any, credentialId:any):Promise<any> {
+
     // console.log("safeAddr: ", safeAddr)
     // console.log("coordinates: ", coordinates)
     // console.log("credentialId: ", credentialId)
     // const pluginAddr = await computeSafeModuleAddress(safeAddr, coordinates, credentialId);
 
     const enableModuletx = await safeSDK.createEnableModuleTx(addresses.safeProotcolManager)
-
-    const managerIface = new ethers.utils.Interface(SafeProtocolManager.abi)
-    const enablePluginTx = managerIface.encodeFunctionData("enablePlugin", [
-        addresses.recoveryPlugin,
-        true
-    ])
 
     const pluginIface = new ethers.utils.Interface(RecoveryPlugin.abi)
     const addWebAuthnRecovTx = pluginIface.encodeFunctionData("addWebAuthnRecover", [
@@ -31,18 +26,11 @@ export async function _enableModule(safeAddr: any, safeSDK: any, coordinates: an
     ])
 
     const safeTransactionData: MetaTransactionData[] = [
-        // 
         // enableModule(manager)
         {
             to: enableModuletx.data.to,
             data: enableModuletx.data.data,
             value: enableModuletx.data.value,
-        },
-        // enablePlugin(plugin)
-        {
-            to: addresses.safeProotcolManager,
-            data: enablePluginTx,
-            value: "0",
         },
         // addWebAuthnRecover
         {
@@ -51,14 +39,47 @@ export async function _enableModule(safeAddr: any, safeSDK: any, coordinates: an
             value: "0"
         }
     ]
-    
+
     const safeTransaction = await safeSDK.createTransaction({ safeTransactionData })
     console.log("safeTransaction: ", safeTransaction)
-    const txResponse = await safeSDK.executeTransaction(safeTransaction)
+    const txResponse = await safeSDK.executeTransaction(safeTransaction, {gasLimit:300000})
     console.log("txResponse: ", txResponse)
     const res = await txResponse.transactionResponse?.wait()
     console.log("res:", res)
-    return res;
+    //return res;
+
+    const managerIface = new ethers.utils.Interface(SafeProtocolManager.abi)
+    const enablePluginTx = managerIface.encodeFunctionData("enablePlugin", [
+        addresses.recoveryPlugin,
+        2
+    ])
+
+    console.log("enablePluginTx: ", enablePluginTx)
+    const _data = ethers.utils.solidityPack(["bytes", "address"], [enablePluginTx, safeAddr])
+    console.log("data: ", _data)
+
+    const paddedAddress = ethers.utils.hexZeroPad(`0x${(safeAddr.slice(2, 32)).toString()}`, 32)
+    console.log("paddedAddress: ", paddedAddress)
+    const data = _data.concat(paddedAddress)
+    
+    //const data = "0x1ea246160000000000000000000000007CeAF780866DF731dFaF11A4406882Fe0a94a9ed0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000786458FBFa964E34e417F305EDa3dbC02cA7a13D"
+
+           // enablePlugin(plugin)
+    const enablePluginTxData: MetaTransactionData = {
+            // to: addresses.safeProotcolManager,
+            to: "0x876cadAF5BEebf0BD4a48bdb5016Af7fE4a2dE28",
+            // data: enablePluginTx,
+            data: data,
+            value: "0",
+        }
+    
+    const safeTransaction1 = await safeSDK.createTransaction(enablePluginTxData)
+    console.log("safeTransaction: ", safeTransaction1)
+    const txResponse1 = await safeSDK.executeTransaction(safeTransaction1, {gasLimit:300000})
+    console.log("txResponse: ", txResponse1)
+    const res1 = await txResponse1.transactionResponse?.wait()
+    console.log("res:", res1)
+    return res1;
 }
 
 export async function _proposeRecoveryWebAuthn(

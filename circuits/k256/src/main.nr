@@ -1,26 +1,29 @@
 use dep::std;
-mod ecrecover;
+use dep::ecrecover;
 
 fn main(
-    hashedAddr: pub [u8;32],
+    // hashedAddr: pub [u8;32],
+    hashedAddr: pub Field,
     pub_key: [u8; 64], 
     signature: [u8; 64], 
     message_hash: pub [u8; 32],
 ) {
 
-    let pubkey_x = to_first_32(pub_key);
-    let pubkey_y = to_second_32(pub_key);
+    // let pubkey_x = to_first_32(pub_key);
+    // let pubkey_y = to_second_32(pub_key);
+    let key = ecrecover::secp256k1::PubKey::from_unified(pub_key);
 
-    let recovered_addr: [u8;20] = ecrecover::ecrecover(
-        pubkey_x,
-        pubkey_y,
+    let recovered_addr = ecrecover::ecrecover(
+        key.pub_x, 
+        key.pub_y,
         signature,
         message_hash
     );
 
     // std::println(recovered_addr);
 
-    let computed_root = std::hash::keccak256(recovered_addr, 20);
+    // let computed_root = std::hash::keccak256(recovered_addr, 20);
+    let computed_root = std::hash::pedersen([recovered_addr])[0];
     std::println(computed_root);
     std::println(hashedAddr);
 
@@ -46,11 +49,12 @@ fn test_main() {
     245, 159,  97, 254, 245, 123, 13,  42, 165
   ];
 
-  let hashedAddr = [
-    233, 112, 125, 14, 97, 113, 247, 40, 247, 71, 60, 36, 204, 
-    4, 50, 169, 176, 126, 170, 241, 239, 237, 106, 19, 122, 74, 
-    140, 18, 199, 149, 82, 217
-  ];
+  // let hashedAddr = [
+  //   233, 112, 125, 14, 97, 113, 247, 40, 247, 71, 60, 36, 204, 
+  //   4, 50, 169, 176, 126, 170, 241, 239, 237, 106, 19, 122, 74, 
+  //   140, 18, 199, 149, 82, 217
+  // ];
+  let hashedAddr = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
     
   let signature = [
     117, 243, 201, 212, 4, 53, 177, 246, 42, 131, 162, 141, 

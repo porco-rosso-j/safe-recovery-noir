@@ -1,7 +1,7 @@
 [package]
 name = "social"
 type = "bin"
-authors = [""]
-compiler_version = "0.9.0"
+compiler_version = "0.10.5"
 
 [dependencies]
+ecrecover = { tag="aztec-packages-v0.8.10", path="../ecrecover" }
