@@ -3468,6 +3468,32 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@noir-lang/acvm_js@0.28.0-4646a93.nightly":
+  version "0.28.0-4646a93.nightly"
+  resolved "https://registry.yarnpkg.com/@noir-lang/acvm_js/-/acvm_js-0.28.0-4646a93.nightly.tgz#e36b218628181f38be218a1f5120b3cd6d3f6b66"
+  integrity sha512-/axZnVKZPp4k1E6C3NZrC3bpdmL//eyVTxvEM76JzIIZNw01NPLwnevxTs1aQe0D5n9ogsYIjZSRbgsuiW6xWg==
+
+"@noir-lang/noir_js@0.16.0-4646a93.nightly":
+  version "0.16.0-4646a93.nightly"
+  resolved "https://registry.yarnpkg.com/@noir-lang/noir_js/-/noir_js-0.16.0-4646a93.nightly.tgz#8b9a91a583f929001ab7534a7c226676685acd39"
+  integrity sha512-nrnvH1mqHcwFdz9d3uiVxHXVpECENvUFkyUHW7e7y3J+0mKY8jAIsQQWdMWqJlqnBZmScyVXPzIahNkKAN4IcA==
+  dependencies:
+    "@noir-lang/acvm_js" "0.28.0-4646a93.nightly"
+    "@noir-lang/noirc_abi" "0.16.0-4646a93.nightly"
+    "@noir-lang/types" "0.16.0-4646a93.nightly"
+
+"@noir-lang/noirc_abi@0.16.0-4646a93.nightly":
+  version "0.16.0-4646a93.nightly"
+  resolved "https://registry.yarnpkg.com/@noir-lang/noirc_abi/-/noirc_abi-0.16.0-4646a93.nightly.tgz#fb2550878d85aec4f77813da586ae2ee3f5ca769"
+  integrity sha512-BMOpwbxLQicVx0gymGPgstQ23pwBFlRjmgfKlI5a/oHR/cY8mC+Az2EOu7aZqbCc83Azx7DjlsJ1LHVFXUnixA==
+
+"@noir-lang/types@0.16.0-4646a93.nightly":
+  version "0.16.0-4646a93.nightly"
+  resolved "https://registry.yarnpkg.com/@noir-lang/types/-/types-0.16.0-4646a93.nightly.tgz#8b4d49fa8bfba51278ffd7448df8395c983183dc"
+  integrity sha512-g/zeyvWsgc+pd6MduZkD0Ch3467Aj8PgJkKSHTV/DCKtwmBiHAwTd0hiihkqKXzlejw2dXC5E7VEb7naAawoDg==
+  dependencies:
+    "@noir-lang/noirc_abi" "0.16.0-4646a93.nightly"
+
 "@npmcli/fs@^1.0.0":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@npmcli/fs/-/fs-1.1.1.tgz#72f719fe935e687c56a4faecf3c03d06ba593257"

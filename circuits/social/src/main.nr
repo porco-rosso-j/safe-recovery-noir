@@ -9,7 +9,7 @@ fn main(
   pub_key: [u8; 64],
   signature: [u8; 64],
   index : Field,
-  hash_path : [Field; 3]
+  hash_path : [Field; 2]
 ) -> pub Field {
 
   let key = ecrecover::secp256k1::PubKey::from_unified(pub_key);
@@ -22,13 +22,12 @@ fn main(
    std::println(leaf);
 
   let computed_root = std::merkle::compute_merkle_root(leaf, index, hash_path);
-  // assert(computed_root == root);
   std::println(computed_root);
+  assert(computed_root == root);
     
   // Compute input note nullifier
   let nullifier = std::hash::pedersen([leaf, address, proposal_id])[0];
-  // or doesn't need this assert?
-  //assert(nullifierHash == nullifier);
+  assert(nullifierHash == nullifier);
   std::println(nullifier);
 
   nullifier
@@ -36,11 +35,11 @@ fn main(
 
 #[test]
 fn test_main() {
-  let root = 0x1216f48e56154621f2524f521e5a95abab5eaccef08b216ebd0ab85bf390f3d1;
+  let root = 0x14ed8e8ef5a31fb0d35bac70e981222631e7724280bdd684561b255822760e85;
 
   let proposal_id = 0;
   
-  let nullifierHash = 0x1d02fdde5154d957d52e2f70bec3f1c31d8cceb896d2d0af910c66f785ac19e5;
+  let nullifierHash = 0x148380388d4098955c15435907dfe0e9135c374660fc3cbaef8b702b87d412a4;
 
   let hashed_message = [
       82, 154, 122, 115,   3, 254, 180,   9,
@@ -69,10 +68,9 @@ fn test_main() {
 
   let index = 0;
 
-  let hash_path: [Field; 3] = [
-    0x2840920c6b28172affa5533dbcec73f20e1a7d54cdb0c5d79b1297895c3c6d03,
-    0x22cb87c36e50385680750b00997fdd2f866360fc2da6c73882aa48fc1696423f,
-    0x17dba07b1f54e623fce562e728c07be7e02e1fe66e9fd5df2e9e231eaa03c9c3
+  let hash_path: [Field; 2] = [
+    0x042ea8c3cebf729da5465ae371db8e8421f7af7d13a4013d2d30cc4d12aefdcc,
+    0x074f605dc8b98de80c5c9df19f0e4243e746603631de29e4e86a81d71c9b6581
     ];
 
 
@@ -88,13 +86,6 @@ fn test_main() {
     );
 
 }
-
-// what's needed off-chain?
-// computation of a new merkle root
-// hash computation of note_commitment
-
-// each leaf is hash of private key, which is note_commitment.
-// secret is basically salt?
 
 // is double-claim really possible?
 // https://x.com/0xPARC/status/1493704577002049537?s=20

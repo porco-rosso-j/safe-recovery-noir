@@ -1,0 +1,47 @@
+{
+    "hash": 846717459508324560,
+    "backend": "acvm-backend-barretenberg",
+    "abi": {
+        "parameters": [
+            {
+                "name": "x",
+                "type": {
+                    "kind": "field"
+                },
+                "visibility": "public"
+            },
+            {
+                "name": "y",
+                "type": {
+                    "kind": "field"
+                },
+                "visibility": "public"
+            },
+            {
+                "name": "z",
+                "type": {
+                    "kind": "field"
+                },
+                "visibility": "public"
+            }
+        ],
+        "param_witnesses": {
+            "x": [
+                1
+            ],
+            "y": [
+                2
+            ],
+            "z": [
+                3
+            ]
+        },
+        "return_type": {
+            "kind": "field"
+        },
+        "return_witnesses": [
+            4
+        ]
+    },
+    "bytecode": "H4sIAAAAAAAA/02LAQoAIAgDp2b/f3GktHAHxzHQBGB4dHcZsk/pbLDNKhOD/ji3ye3nAvrQL6lwAAAA"
+}

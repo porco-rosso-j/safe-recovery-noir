@@ -1,4 +1,6 @@
 import { Barretenberg, Fr, } from '@aztec/bb.js';
+import { pedersen } from '../pedersen.ts';
+
     
 export interface IMerkleTree {
   root: () => Fr;
@@ -44,30 +46,37 @@ export class MerkleTree implements IMerkleTree {
     }
   }
 
- pedersenHash(left: Fr, right: Fr):Promise<Fr> {
-    // let hashRes = await this.bb.pedersenPlookupCommit([left, right]);
+  async pedersenHash(left: Fr, right: Fr):Promise<Fr> {
+    const leftStr = left.toString()
+    const rightStr = right.toString()
+    const hash = await pedersen(leftStr, rightStr)
+    return Fr.fromString(hash)
+  }
 
-    //let hashRes = await this.bb.pedersenCommit([left, right]);
+//  pedersenHash(left: Fr, right: Fr):Promise<Fr> {
+//     // let hashRes = await this.bb.pedersenPlookupCommit([left, right]);
 
-    let hashRes = this.bb.pedersenHashPair(left, right);
-    // 0x18b1ffb34a0ba5f89f8da47cc506ed77d38e69f0ab8bf9c87c5ba6ad893ee958
+//     //let hashRes = await this.bb.pedersenCommit([left, right]);
 
-    //let hashRes = await this.bb.pedersenCompressFields(left, right);
-    // 0x2a83c09ac27cb4a0a94d62d15259092d22ca6824e2a4dab9ace5e9855b17b35e
+//     let hashRes = this.bb.pedersenHashPair(left, right);
+//     // 0x18b1ffb34a0ba5f89f8da47cc506ed77d38e69f0ab8bf9c87c5ba6ad893ee958
 
-    //let hashRes = await this.bb.pedersenPlookupCompressFields(left, right);
-    // 0x04dddc7e9aa030bba792370572ef6c22c4b3a5889f84cdb861ab46affedf0579
+//     //let hashRes = await this.bb.pedersenCompressFields(left, right);
+//     // 0x2a83c09ac27cb4a0a94d62d15259092d22ca6824e2a4dab9ace5e9855b17b35e
 
-    //let hashRes = await this.bb.pedersenCompress([left, right]);
-    // 0x1ae3d0fcfe4bcd56ebcb34a76955771d05d935fe1f7b588f9f47b630ae68eaa6
+//     //let hashRes = await this.bb.pedersenPlookupCompressFields(left, right);
+//     // 0x04dddc7e9aa030bba792370572ef6c22c4b3a5889f84cdb861ab46affedf0579
+
+//     //let hashRes = await this.bb.pedersenCompress([left, right]);
+//     // 0x1ae3d0fcfe4bcd56ebcb34a76955771d05d935fe1f7b588f9f47b630ae68eaa6
     
-    return hashRes;
-  }
+//     return hashRes;
+//   }
 
-  async pedersenHashMultiple(inputs: Fr[]):Promise<Fr> {
-    let hashRes = await this.bb.pedersenHashMultiple(inputs);
-    return hashRes;
-  }
+//   async pedersenHashMultiple(inputs: Fr[]):Promise<Fr> {
+//     let hashRes = await this.bb.pedersenHashMultiple(inputs);
+//     return hashRes;
+//   }
 
   static indexToKey(level: number, index: number): string {
     return `${level}-${index}`;
