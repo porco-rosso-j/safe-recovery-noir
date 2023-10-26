@@ -1,0 +1,7 @@
+[package]
+name = "p256"
+type = "bin"
+authors = ["porco_rosso"]
+compiler_version = "0.16.0"
+
+[dependencies]

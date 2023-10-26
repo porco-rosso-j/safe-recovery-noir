@@ -1,5 +1,5 @@
 import { Barretenberg, Fr, } from '@aztec/bb.js';
-import { pedersen } from '../pedersen.ts';
+import { pedersen } from './pedersen.ts';
 
     
 export interface IMerkleTree {

@@ -1,10 +1,9 @@
-
-//@ts-ignore
-//import {MerkleTree} from "./utils/MerkleTree";
 import { Fr } from '@aztec/bb.js';
 import { MerkleTree } from "./utils/MerkleTree.ts";
 import merkle from './merkle.json' assert { type:'json'};
-import { pedersen, pedersen3 } from './pedersen.ts';
+import { pedersen, pedersen3 } from './utils/pedersen.ts';
+
+// nargo 0.16.0 (git version hash: 4646a93f5e95604b5710353764b2c4295efaef6b, is dirty: true)
 
 async function main() {
     let merkleTree = new MerkleTree(2);
@@ -28,18 +27,8 @@ async function main() {
     console.log("leaf: ", proof.leaf.toString())
     console.log("path 0: ", proof.pathElements[0].toString())
     console.log("path 1: ", proof.pathElements[1].toString())
-    console.log("path 2: ", proof.pathElements[2]!.toString())
 
-  // let i = 0;
-  // for (i; i < merkle.length;) {
-  //  const leaf = await Fr.fromString(merkle[i]);
-  //  await merkleTree.insert(leaf);
-  //  i = i + 1;
-  // }
-
-  // const proof = merkleTree.proof(0)
-  // console.log("proof: ", proof.leaf.toString())
-    const nullifierHash = await pedersen3(proof.leaf.toString(), "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", "0")
+    const nullifierHash = await pedersen3(proof.leaf.toString(), merkle[0], "0")
     console.log("nullifierHash: ", nullifierHash.toString())
 }
 

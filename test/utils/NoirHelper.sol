@@ -61,7 +61,13 @@ contract NoirHelper is Inputs, Test {
         string memory fileName
     ) public view returns (bytes memory) {
         string memory file = vm.readFile(
-            string.concat("circuits/", path, "/proofs/", fileName, ".proof")
+            string.concat(
+                "circuits/recoveries/",
+                path,
+                "/proofs/",
+                fileName,
+                ".proof"
+            )
         );
         return vm.parseBytes(file);
     }

@@ -1,0 +1,8 @@
+[package]
+name = "social"
+type = "bin"
+compiler_version = "0.16.0"
+
+
+[dependencies]
+ecrecover = { tag = "v0.10.1", git = "https://github.com/colinnielsen/ecrecover-noir" }

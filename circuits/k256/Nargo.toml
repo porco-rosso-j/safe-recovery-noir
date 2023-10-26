@@ -1,8 +1,0 @@
-[package]
-name = "k256"
-type = "bin"
-authors = ["porco_rosso"]
-compiler_version = "0.9.0"
-
-[dependencies]
-ecrecover = { tag="aztec-packages-v0.8.10", path="../ecrecover" }

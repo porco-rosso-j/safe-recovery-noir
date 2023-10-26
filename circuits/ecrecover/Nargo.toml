@@ -1,8 +1,0 @@
-[package]
-name = "ecrecover"
-type = "lib"
-authors = [""]
-compiler_version = "0.10.5"
-
-[dependencies]
-array_helpers = { tag = "v0.10.0", git = "https://github.com/colinnielsen/noir-array-helpers" }

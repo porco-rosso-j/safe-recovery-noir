@@ -1,13 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+// recivert types
+
 contract RecoverBase {
     struct Recovery {
+        uint8 recoveryType;
         address[] pendingNewOwners;
         address[] ownersReplaced;
         uint newThreshold;
         uint deadline;
         bool rejected;
+        uint approvalCount;
+        mapping(bytes32 => bool) nullifierHash;
     }
 
     address public safe;
@@ -29,6 +34,7 @@ contract RecoverBase {
     }
 
     function _proposeRecovery(
+        uint8 _recoveryType,
         address[] memory _oldAddresses,
         address[] memory _newAddresses,
         uint _newThreshold
@@ -36,6 +42,7 @@ contract RecoverBase {
         uint newRecoveryCount = recoveryCount + 1;
         Recovery storage recovery = recoveries[newRecoveryCount];
 
+        recovery.recoveryType = _recoveryType;
         recovery.ownersReplaced = _oldAddresses;
         recovery.pendingNewOwners = _newAddresses;
         recovery.newThreshold = _newThreshold;

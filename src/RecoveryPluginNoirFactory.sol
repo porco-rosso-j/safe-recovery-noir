@@ -1,35 +1,65 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Create2.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {RecoveryPluginNoir} from "./RecoveryPluginNoir.sol";
 
-contract RecoveryPluginNoirFactory {
+contract RecoveryPluginNoirFactory is Ownable {
     RecoveryPluginNoir public immutable recoveryPluginNoirImp;
+
+    address public safeProtocolManager;
+    address public webAuthnVerifier;
+    address public secretVerifier;
+    address public ecrecoverVerifier;
+    address public socialRecoverVerifier;
 
     mapping(address => address) public safeToPlugins; // safe address => plugin address
 
-    constructor() {
+    constructor(
+        address _safeProtocolManager,
+        address _ecrecoverVerifier,
+        address _webAuthnVerifier, // stored and passed by factory
+        address _secretVerifier,
+        address _socialRecoverVerifier
+    ) {
         recoveryPluginNoirImp = new RecoveryPluginNoir();
+        safeProtocolManager = _safeProtocolManager;
+        ecrecoverVerifier = _ecrecoverVerifier;
+        webAuthnVerifier = _webAuthnVerifier;
+        secretVerifier = _secretVerifier;
+        socialRecoverVerifier = _socialRecoverVerifier;
+    }
+
+    function setSafeProtocolManagerAddr(address _manager) public onlyOwner {
+        require(_manager != address(0), "ZERO_ADDRESS");
+        safeProtocolManager = _manager;
+    }
+
+    function setVerifier(
+        uint _recoveryType,
+        address _verifier
+    ) public onlyOwner {
+        require(_verifier != address(0), "ZERO_ADDRESS");
+        if (_recoveryType == 0) {
+            ecrecoverVerifier = _verifier;
+        } else if (_recoveryType == 1) {
+            webAuthnVerifier = _verifier;
+        } else if (_recoveryType == 2) {
+            secretVerifier = _verifier;
+        } else if (_recoveryType == 3) {
+            socialRecoverVerifier = _verifier;
+        } else {
+            revert("INVALID_TYPE");
+        }
     }
 
     function createRecoveryPluginNoir(
         address _safe,
-        address _safeProtocolManager,
-        address _webAuthnVerifier,
-        address _secretVerifier,
-        address _ecrecoverVerifier,
         uint256 _salt
     ) public returns (RecoveryPluginNoir proxy) {
-        address addr = getAddress(
-            _safe,
-            _safeProtocolManager,
-            _webAuthnVerifier,
-            _secretVerifier,
-            _ecrecoverVerifier,
-            _salt
-        );
+        address addr = getAddress(_safe, _salt);
         uint codeSize = addr.code.length;
         if (codeSize > 0) {
             return RecoveryPluginNoir(payable(addr));
@@ -42,10 +72,11 @@ contract RecoveryPluginNoirFactory {
                         RecoveryPluginNoir.initialize,
                         (
                             _safe,
-                            _safeProtocolManager,
-                            _webAuthnVerifier,
-                            _secretVerifier,
-                            _ecrecoverVerifier
+                            safeProtocolManager,
+                            ecrecoverVerifier,
+                            webAuthnVerifier,
+                            secretVerifier,
+                            socialRecoverVerifier
                         )
                     )
                 )
@@ -60,10 +91,6 @@ contract RecoveryPluginNoirFactory {
      */
     function getAddress(
         address _safe,
-        address _safeProtocolManager,
-        address _webAuthnVerifier,
-        address _secretVerifier,
-        address _ecrecoverVerifier,
         uint256 _salt
     ) public view returns (address) {
         return
@@ -78,10 +105,11 @@ contract RecoveryPluginNoirFactory {
                                 RecoveryPluginNoir.initialize,
                                 (
                                     _safe,
-                                    _safeProtocolManager,
-                                    _webAuthnVerifier,
-                                    _secretVerifier,
-                                    _ecrecoverVerifier
+                                    safeProtocolManager,
+                                    ecrecoverVerifier,
+                                    webAuthnVerifier,
+                                    secretVerifier,
+                                    socialRecoverVerifier
                                 )
                             )
                         )

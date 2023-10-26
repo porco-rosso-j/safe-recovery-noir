@@ -200,6 +200,9 @@ contract Inputs {
         return array;
     }
 
+    bytes32 public hashedAddr =
+        0x1179882e12c584be6cd0e556ee1d215da5e621a32df46e712766d602a0736346;
+
     // for ecrecover-k256
     uint8[] public pubkey = [
         131,
@@ -268,41 +271,6 @@ contract Inputs {
         165
     ];
 
-    uint8[] public hashedAddr = [
-        233,
-        112,
-        125,
-        14,
-        97,
-        113,
-        247,
-        40,
-        247,
-        71,
-        60,
-        36,
-        204,
-        4,
-        50,
-        169,
-        176,
-        126,
-        170,
-        241,
-        239,
-        237,
-        106,
-        19,
-        122,
-        74,
-        140,
-        18,
-        199,
-        149,
-        82,
-        217
-    ];
-
     uint8[] public k256_message = [
         82,
         154,
@@ -337,4 +305,10 @@ contract Inputs {
         132,
         171
     ];
+
+    bytes32 public guardiansRoot =
+        0x14ed8e8ef5a31fb0d35bac70e981222631e7724280bdd684561b255822760e85;
+
+    bytes32 public nullifierHash =
+        0x148380388d4098955c15435907dfe0e9135c374660fc3cbaef8b702b87d412a4;
 }

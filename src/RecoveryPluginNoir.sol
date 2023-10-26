@@ -18,6 +18,8 @@ import {IUltraVerifier} from "./interfaces/IUltraVerifier.sol";
 import {WebAuthnRecover} from "./recover/WebAuthnRecover.sol";
 import {SecretRecover} from "./recover/SecretRecover.sol";
 import {EcrecoverRecover} from "./recover/EcrecoverRecover.sol";
+import {SocialRecover} from "./recover/SocialRecover.sol";
+import {RECOVERY_TYPE_K256, RECOVERY_TYPE_P256, RECOVERY_TYPE_SECRET, RECOVERY_TYPE_SOCIAL} from "./common/Constants.sol";
 
 import "forge-std/console.sol";
 
@@ -27,21 +29,21 @@ contract RecoveryPluginNoir is
     BasePluginWithEventMetadata,
     WebAuthnRecover,
     SecretRecover,
-    EcrecoverRecover
+    EcrecoverRecover,
+    SocialRecover
 {
     error PROOF_VERIFICATION_FAILED();
     error RECOVER_FAILED(bytes reason);
 
     ISafeProtocolManager public safeProtocolManager;
 
-    constructor() {}
-
     function initialize(
         address _safe,
         address _safeProtocolManager,
+        address _ecrecoverVerifier,
         address _webAuthnVerifier, // stored and passed by factory
         address _secretVerifier,
-        address _ecrecoverVerifier
+        address _socialRecoverVerifier
     ) public initializer {
         _initializeBasePluginWithEventMetadata(
             PluginMetadata({
@@ -54,9 +56,42 @@ contract RecoveryPluginNoir is
         );
         safe = _safe;
         safeProtocolManager = ISafeProtocolManager(_safeProtocolManager);
+        ecrecoverVerifier = _ecrecoverVerifier;
         webAuthnVerifier = _webAuthnVerifier;
         secretVerifier = _secretVerifier;
-        ecrecoverVerifier = _ecrecoverVerifier;
+        socialRecoverVerifier = _socialRecoverVerifier;
+    }
+
+    function proposeEcrecoverRecover(
+        address[] memory _oldAddresses,
+        address[] memory _newAddresses,
+        uint _newThreshold,
+        bytes memory _proof,
+        bytes32[] memory _message
+    ) public returns (uint, uint) {
+        require(msg.sender != safe, "INVALID_SENDER");
+        require(isEcrecoverRecoverEnabled, "NOT_ENABLED");
+
+        uint newThreshold = _validateAddressesAndThreshold(
+            _oldAddresses,
+            _newAddresses,
+            _newThreshold
+        );
+
+        bytes32[] memory publicInputs = new bytes32[](33);
+
+        publicInputs = _getPublicInputEcrecover(publicInputs, _message);
+
+        if (!IUltraVerifier(ecrecoverVerifier).verify(_proof, publicInputs))
+            revert PROOF_VERIFICATION_FAILED();
+
+        return
+            _proposeRecovery(
+                RECOVERY_TYPE_K256,
+                _oldAddresses,
+                _newAddresses,
+                newThreshold
+            );
     }
 
     function proposeWebAuthnRecover(
@@ -83,7 +118,13 @@ contract RecoveryPluginNoir is
         if (!IUltraVerifier(webAuthnVerifier).verify(_proof, publicInputs))
             revert PROOF_VERIFICATION_FAILED();
 
-        return _proposeRecovery(_oldAddresses, _newAddresses, newThreshold);
+        return
+            _proposeRecovery(
+                RECOVERY_TYPE_P256,
+                _oldAddresses,
+                _newAddresses,
+                newThreshold
+            );
     }
 
     function proposeSecretRecover(
@@ -107,18 +148,25 @@ contract RecoveryPluginNoir is
         if (!IUltraVerifier(secretVerifier).verify(_proof, publicInputs))
             revert PROOF_VERIFICATION_FAILED();
 
-        return _proposeRecovery(_oldAddresses, _newAddresses, newThreshold);
+        return
+            _proposeRecovery(
+                RECOVERY_TYPE_SECRET,
+                _oldAddresses,
+                _newAddresses,
+                newThreshold
+            );
     }
 
-    function proposeEcrecoverRecover(
+    function proposeSocialRecover(
         address[] memory _oldAddresses,
         address[] memory _newAddresses,
         uint _newThreshold,
         bytes memory _proof,
+        bytes32 _nullifierHash,
         bytes32[] memory _message
     ) public returns (uint, uint) {
         require(msg.sender != safe, "INVALID_SENDER");
-        require(isEcrecoverRecoverEnabled, "NOT_ENABLED");
+        require(isSocialRecoverEnabled, "NOT_ENABLED");
 
         uint newThreshold = _validateAddressesAndThreshold(
             _oldAddresses,
@@ -126,14 +174,56 @@ contract RecoveryPluginNoir is
             _newThreshold
         );
 
-        bytes32[] memory publicInputs = new bytes32[](64);
+        bytes32[] memory publicInputs = new bytes32[](35);
 
-        publicInputs = _getPublicInputEcrecover(publicInputs, _message);
+        publicInputs = _getPublicInputSocial(
+            publicInputs,
+            _message,
+            _nullifierHash
+        );
 
-        if (!IUltraVerifier(ecrecoverVerifier).verify(_proof, publicInputs))
+        if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
             revert PROOF_VERIFICATION_FAILED();
 
-        return _proposeRecovery(_oldAddresses, _newAddresses, newThreshold);
+        (uint recoveryId, uint deadline) = _proposeRecovery(
+            RECOVERY_TYPE_SOCIAL,
+            _oldAddresses,
+            _newAddresses,
+            newThreshold
+        );
+
+        _incrementApprovalCount(recoveryId, _nullifierHash);
+
+        return (recoveryId, deadline);
+    }
+
+    function approveSocialRecovery(
+        uint _recoveryId,
+        bytes memory _proof,
+        bytes32 nullifierHash,
+        bytes32[] memory _message
+    ) public returns (uint) {
+        bytes32[] memory publicInputs = new bytes32[](35);
+
+        publicInputs = _getPublicInputSocial(
+            publicInputs,
+            _message,
+            nullifierHash
+        );
+
+        if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
+            revert PROOF_VERIFICATION_FAILED();
+
+        uint approvalCount = _incrementApprovalCount(
+            _recoveryId,
+            nullifierHash
+        );
+
+        // if (approvalCount >= threshold) {
+        //     execRecovery(_recoveryId);
+        // }
+
+        return approvalCount;
     }
 
     function rejectRecovery(uint _recoveryId) public onlySafe {
@@ -145,9 +235,14 @@ contract RecoveryPluginNoir is
     function execRecovery(uint _recoveryId) public returns (bool) {
         require(_recoveryId != 0, "INVALID_RECOVERY_ID");
 
-        Recovery memory recovery = recoveries[_recoveryId];
+        Recovery storage recovery = recoveries[_recoveryId];
         require(!recovery.rejected, "PROPOSAL_REJECTED");
         require(block.timestamp >= recovery.deadline, "DELAY_NOT_EXPIRED");
+
+        if (
+            recovery.recoveryType == RECOVERY_TYPE_SOCIAL &&
+            recovery.approvalCount < threshold
+        ) revert("INSUFFICIENT_APPROVAL");
 
         bool isNewThreshold = IGnosisSafe(safe).getThreshold() !=
             recovery.newThreshold;
