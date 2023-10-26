@@ -4,26 +4,38 @@
 
 ## Introduction
 
-A safe plugin that allows Safe owners to recover the ownership of the account in the case where they lose access to their Safe. All the recovery methods leverage Noir, a DSL for writing zero-knowledge proof circuits to help owners recover their account ownership in a secure and private manner.
+A safe plugin that allows Safe owners to recover account ownership in the case where they lose access to their Safe. All the recovery methods leverage Noir, a DSL for writing zero-knowledge proof circuits, to help owners recover their account in a secure and private manner.
 
 #### Recovery Mechanism
 
-Available recovery methods with zero-knowledge proofs of...
+Available recovery methods:
 
-- TouchID: correct verification of the p256 ECDSA signature with a fingerprint (via WebAuthn).
-- Shielded Backup Address: correct verification of the k256 ECDSA signature. Public keys are hidden(hashed).
-- Social Recovery: correct verification of the k256 ECDSA signatures from private guardians.
-- Secret Word: knowledge of a particular secret word to regain account ownership.
-- (methods To be added: 2FA, email, and other biometrics)
+- Private Backup Address Recovery:
+  This method allows backup signer, whose eth address is hashed and stored in smart contract, to recover account by proving that the the hashed hidden address matches the the hash of an eth address that is ec-recovered with provided public keys, signature, and message in `k256` circuit.
 
-This recovery app is built on top of [safe-core-protocol](https://github.com/5afe/safe-core-protocol), a modular smart account protocol so that Safe and other wallet apps can easily integrate to enhance the security of user funds. The recovery plugin performs a batched call that executes `swapOwner` and `changeThreshold` simultaneously to flexibly transfer the account authorities and change the multi-signature set-up.
+- TouchID Recovery:
+  This method allows for account recovery via the correct verification of ECDSA with p256 curve for a provided fingerprint signature generated through WebAuthn on user device.
+
+- Secret Word Recovery:
+  This method lets a user recover account by privately proving the knowledge of a particular secret word.
+
+- Social Recovery:
+  This method allows private guardians, whose eth addresses are included in the merkle root stored on smart contract, to recover account ownership by proving their membership in the merkle root. Recovery can successfully be executed if the suffcient number of guardians approve a proposed recovery.
+
+- Other zk-powered methods to be explored:
+
+1. 2FA,
+2. email
+3. other biometrics
+
+This recovery app is built on top of [safe-core-protocol](https://github.com/5afe/safe-core-protocol), a modular smart account protocol so that Safe and other wallet apps can easily integrate to enhance the security of user funds. The recovery plugin performs a batched call that executes `swapOwner` and `changeThreshold` simultaneously to flexibly rearrange the account authority: replace `owners` and `threshold`.
 
 ## Test
 
 Noir circuits
 
 ```shell
-cd circuits/{CIRCUIT_NAMME}
+cd circuits/recoveries/{CIRCUIT_NAME}
 nargo test --show-output
 nargo prove
 nargo verify
@@ -71,12 +83,9 @@ yarn start
 
 #### Milestone1: contract development
 
-- update deps, `safe-core-protocol` and `nargo` to the latest
-- implement social recovery w/ 256k1 verification circuit
-- centralized privacy-relayer implementation
-- implement guard for restrcting function signatures
-- add capability to add multiple Safes
-- tests
+- done: update deps, `safe-core-protocol` and `nargo` to the latest
+- done: implement social recovery
+- done: tests
 
 #### Milestone2: frontend development
 
