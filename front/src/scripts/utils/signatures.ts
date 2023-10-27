@@ -1,4 +1,4 @@
-import { privatekeys } from "./addresses.ts";
+import { privatekeys } from "../constants/addresses";
 import { Wallet, utils } from "ethers";
 
 async function getArrarifiedInputs(index: number) {

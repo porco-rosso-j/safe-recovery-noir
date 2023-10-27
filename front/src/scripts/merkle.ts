@@ -1,5 +1,5 @@
-import { addresses } from "./addresses.ts";
-import { pedersen, pedersen3, getMerkleRoot } from "./utils/pedersen.ts";
+import { addresses } from "./constants/addresses";
+import { pedersen, pedersen3, getMerkleRoot } from "./utils/pedersen";
 
 // nargo 0.16.0 (git version hash: 4646a93f5e95604b5710353764b2c4295efaef6b, is dirty: true)
 
