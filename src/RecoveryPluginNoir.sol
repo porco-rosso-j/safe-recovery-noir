@@ -177,6 +177,7 @@ contract RecoveryPluginNoir is
         bytes32[] memory publicInputs = new bytes32[](35);
 
         publicInputs = _getPublicInputSocial(
+            recoveryCount + 1,
             publicInputs,
             _message,
             _nullifierHash
@@ -206,6 +207,7 @@ contract RecoveryPluginNoir is
         bytes32[] memory publicInputs = new bytes32[](35);
 
         publicInputs = _getPublicInputSocial(
+            _recoveryId,
             publicInputs,
             _message,
             nullifierHash

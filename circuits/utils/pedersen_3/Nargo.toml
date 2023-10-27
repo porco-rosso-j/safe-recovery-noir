@@ -2,6 +2,6 @@
 name = "pedersen"
 type = "bin"
 authors = [""]
-compiler_version = "0.16.0"
+compiler_version = "0.18.0"
 
 [dependencies]

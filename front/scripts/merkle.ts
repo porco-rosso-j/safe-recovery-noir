@@ -1,35 +1,38 @@
-import { Fr } from '@aztec/bb.js';
-import { MerkleTree } from "./utils/MerkleTree.ts";
-import merkle from './merkle.json' assert { type:'json'};
-import { pedersen, pedersen3 } from './utils/pedersen.ts';
+import { addresses } from "./addresses.ts";
+import { pedersen, pedersen3, getMerkleRoot } from "./utils/pedersen.ts";
 
 // nargo 0.16.0 (git version hash: 4646a93f5e95604b5710353764b2c4295efaef6b, is dirty: true)
 
-async function main() {
-    let merkleTree = new MerkleTree(2);
-    await merkleTree.initialize([]);
+async function main(index: number) {
+	let i = 0;
+	let hashed_node = [];
+	for (i; i < addresses.length; ) {
+		hashed_node.push(await pedersen(addresses[i], "0"));
+		i = i + 1;
+	}
 
-   let i = 0;
-   let hashed_node = []
-   for (i; i < merkle.length;) {
-    const leaf = await Fr.fromString(merkle[i]);
-    hashed_node.push(await pedersen(leaf.toString(), "0"))
-    await merkleTree.insert(await Fr.fromString(hashed_node[i]));
-    i = i + 1;
-   }
+	console.log("hashed_node: ", hashed_node);
+	const tree = await getMerkleRoot(hashed_node);
+	console.log("root: ", tree.root);
 
-  console.log("hashed_node: ", hashed_node)
+	let hash_path = [];
+	let siblingIndex;
+	if (index % 2 == 0) {
+		siblingIndex = index + 1;
+	} else {
+		siblingIndex = index - 1;
+	}
 
-  const index = merkleTree.getIndex(Fr.fromString(hashed_node[0]))
+	hash_path[0] = tree.hashed_nodes0[siblingIndex];
+	hash_path[1] = index >= 2 ? tree.hashed_nodes1[0] : tree.hashed_nodes1[1];
+	console.log("hash_path: ", hash_path);
 
-    const proof = merkleTree.proof(index)
-    console.log("root: ", proof.root.toString())
-    console.log("leaf: ", proof.leaf.toString())
-    console.log("path 0: ", proof.pathElements[0].toString())
-    console.log("path 1: ", proof.pathElements[1].toString())
-
-    const nullifierHash = await pedersen3(proof.leaf.toString(), merkle[0], "0")
-    console.log("nullifierHash: ", nullifierHash.toString())
+	const nullifierHash = await pedersen3(
+		hashed_node[index],
+		addresses[index],
+		"0"
+	);
+	console.log("nullifierHash: ", nullifierHash.toString());
 }
 
-main()
+main(1);

@@ -456,7 +456,7 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
             webAuthnInputs
         );
 
-        bytes memory proof = proof = readProof("p256", "p256");
+        bytes memory proof = readProof("p256", "p256");
 
         recoveryPlugin.proposeWebAuthnRecover(
             ownersReplaced,
@@ -492,7 +492,7 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
             newPendingOwners,
             1, // 2 -> 1
             proof,
-            convertUint8ToBytes32(k256_message)
+            convertUint8ToBytes32(hashed_message1)
         );
 
         bytes memory proof = readProof("k256", "k256");
@@ -502,7 +502,7 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
             newPendingOwners,
             1, // 2 -> 1
             proof,
-            convertUint8ToBytes32(k256_message)
+            convertUint8ToBytes32(hashed_message1)
         );
 
         vm.warp(block.timestamp + 60 days);
@@ -520,7 +520,9 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
     // - social
 
     // k256
-    function test_recovery_social_single_guardian() public {
+    function test_recovery_social_guardian_threshold_1() public {
+        bytes32 nullifierHash = 0x0d173fa4f77255d90652f059d28541bddfd1bd030a7eb484f94509046e426b20;
+
         vm.startBroadcast(newOwners[0]);
 
         address[] memory ownersReplaced = new address[](1);
@@ -536,10 +538,10 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
             1, // 2 -> 1
             proof,
             nullifierHash,
-            convertUint8ToBytes32(k256_message)
+            convertUint8ToBytes32(hashed_message1)
         );
 
-        bytes memory proof = readProof("social", "social");
+        bytes memory proof = readProof("social", "social1");
 
         (uint recoveryId, uint deadline) = recoveryPlugin.proposeSocialRecover(
             ownersReplaced,
@@ -547,7 +549,62 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
             1, // 2 -> 1
             proof,
             nullifierHash,
-            convertUint8ToBytes32(k256_message)
+            convertUint8ToBytes32(hashed_message1)
+        );
+
+        vm.warp(block.timestamp + 60 days);
+        recoveryPlugin.execRecovery(recoveryId);
+
+        address[] memory owners = safe.getOwners();
+        assertEq(owners[0], newOwners[0]);
+
+        uint newThreshold = safe.getThreshold();
+        assertEq(newThreshold, 1);
+    }
+
+    function test_recovery_social_guardian_threshold_2() public {
+        bytes32 nullifierHash = 0x0d173fa4f77255d90652f059d28541bddfd1bd030a7eb484f94509046e426b20;
+
+        vm.prank(address(safe));
+        recoveryPlugin.addSocialRecover(45 days, 2, guardiansRoot);
+
+        vm.startBroadcast(newOwners[0]);
+
+        address[] memory ownersReplaced = new address[](1);
+        ownersReplaced[0] = owners[0];
+
+        address[] memory newPendingOwners = new address[](1);
+        newPendingOwners[0] = newOwners[0];
+
+        vm.expectRevert(0x0711fcec); // PROOF_FAILURE in verifier
+        recoveryPlugin.proposeSocialRecover(
+            ownersReplaced,
+            newPendingOwners,
+            1, // 2 -> 1
+            proof,
+            nullifierHash,
+            convertUint8ToBytes32(hashed_message1)
+        );
+
+        bytes memory proof = readProof("social", "social1");
+
+        (uint recoveryId, uint deadline) = recoveryPlugin.proposeSocialRecover(
+            ownersReplaced,
+            newPendingOwners,
+            1, // 2 -> 1
+            proof,
+            nullifierHash,
+            convertUint8ToBytes32(hashed_message1)
+        );
+
+        bytes memory proof2 = readProof("social", "social2");
+        bytes32 nullifierHash2 = 0x0f52f73dc45bf590504c109e54fdb9c8f6bb761d33cf45ee58c6ad175a696bf3;
+
+        uint approvalCount = recoveryPlugin.approveSocialRecovery(
+            recoveryId,
+            proof2,
+            nullifierHash2,
+            convertUint8ToBytes32(hashed_message2)
         );
 
         vm.warp(block.timestamp + 60 days);

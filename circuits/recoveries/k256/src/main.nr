@@ -44,7 +44,7 @@ fn test_main() {
     245, 159,  97, 254, 245, 123, 13,  42, 165
   ];
 
-  let hashedAddr = 0x1179882e12c584be6cd0e556ee1d215da5e621a32df46e712766d602a0736346;
+  let hashedAddr = 0x11afe536a3d158d626aabefad9dc7a70ef5f23280d262cd7db5da5bd8d5f87e6;
     
   let signature = [
     117, 243, 201, 212, 4, 53, 177, 246, 42, 131, 162, 141, 
@@ -54,6 +54,7 @@ fn test_main() {
     164, 145, 77, 73, 58, 143, 198, 53, 20, 11, 19, 23, 136, 
     166, 185
   ];
+    
 
   main(hashedAddr, pub_key, signature, hashed_message);
 }

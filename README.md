@@ -6,7 +6,7 @@
 
 A safe plugin that allows Safe owners to recover account ownership in the case where they lose access to their Safe. All the recovery methods leverage Noir, a DSL for writing zero-knowledge proof circuits, to help owners recover their account in a secure and private manner.
 
-#### Recovery Mechanism
+#### Recovery Mechanisms
 
 Available recovery methods:
 
@@ -20,7 +20,7 @@ Available recovery methods:
   This method lets a user recover account by privately proving the knowledge of a particular secret word.
 
 - Social Recovery:
-  This method allows private guardians, whose eth addresses are included in the merkle root stored on smart contract, to recover account ownership by proving their membership in the merkle root. Recovery can successfully be executed if the suffcient number of guardians approve a proposed recovery.
+  This method allows private guardians, whose eth addresses are included in a merkle root stored on smart contract, to recover account ownership by proving their membership in the merkle root. Recovery can successfully be executed if the suffcient number of guardians approve a proposed recovery.
 
 - Other zk-powered methods to be explored:
 
@@ -28,7 +28,7 @@ Available recovery methods:
 2. email
 3. other biometrics
 
-This recovery app is built on top of [safe-core-protocol](https://github.com/5afe/safe-core-protocol), a modular smart account protocol so that Safe and other wallet apps can easily integrate to enhance the security of user funds. The recovery plugin performs a batched call that executes `swapOwner` and `changeThreshold` simultaneously to flexibly rearrange the account authority: replace `owners` and `threshold`.
+This recovery app is built on top of [safe-core-protocol](https://github.com/5afe/safe-core-protocol), a modular smart account protocol so that Safe and other wallet apps can easily integrate to enhance the security of user funds. The recovery plugin performs a batched call that executes `swapOwner` and `changeThreshold` simultaneously to flexibly rearrange the account authority: replace `owners` and change `threshold`.
 
 ## Test
 

@@ -42,13 +42,15 @@ contract SocialRecover is RecoverBase {
     }
 
     function _getPublicInputSocial(
+        uint _recoveryId,
         bytes32[] memory _publicInputs,
         bytes32[] memory _message,
-        bytes32 nullifierHash
+        bytes32 _nullifierHash
     ) internal view returns (bytes32[] memory) {
         _publicInputs[0] = guardiansRoot;
-        _publicInputs[1] = bytes32(recoveryCount);
-        _publicInputs[2] = nullifierHash;
+        //_publicInputs[1] = bytes32(_recoveryId);
+        _publicInputs[1] = bytes32(0);
+        _publicInputs[2] = _nullifierHash;
 
         for (uint i = 0; i < 32; i++) {
             _publicInputs[i + 3] = _message[i];
