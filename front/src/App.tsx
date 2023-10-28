@@ -25,7 +25,7 @@ function App() {
   } = useUserCredential();
 
   const getShowLoginPage = () => {
-    if (!safeSDK && !signer && !safeAddress) {
+    if (safeSDK === null || signer === null || safeAddress === '') {
       return true
     }
 
@@ -44,16 +44,16 @@ function App() {
     }}>
       <Header />
        <Container>
-        <Box mt="20" display="flex" justifyContent="center" alignItems="center">
+        <Box mt="10" display="flex" justifyContent="center" alignItems="center">
          <Box display="flex" flexDirection="column" alignItems="center">
-          <Text variant="h2" fontSize={30} textAlign="center" color={useColorModeValue('white', '')}>
-            Safe Recovery Plugin powered by Noir 🔑
+          <Text mb="5" variant="h2" fontSize={30} textAlign="center" color={useColorModeValue('white', '')}>
+            Safe Recovery Plugin powered by Noir ZKP
           </Text>
-          <Box maxW='768px' mx="auto">
+          <Box maxW='1024px' width="550px" mx="auto" >
           {
-            getShowLoginPage() ? <WalletLogin /> : <Box p="16px">
-              <Onboard />
-            </Box>
+            getShowLoginPage() 
+            ? <WalletLogin /> 
+            : <Onboard />
           }
           </Box>
          </Box>

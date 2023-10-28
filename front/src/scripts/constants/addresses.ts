@@ -11,3 +11,9 @@ export const privatekeys = [
 	"0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a",
 	"0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6",
 ];
+
+export const contracts = {
+	recoveryPlugin: "0x4af635a26e8ed6d685C1A78feDf650c58765312B",
+	recoveryPluginFac: "0xa5a69B04Dc8953CD14DF208C05fbA8B58B5AAce6",
+	safeProotcolManager: "0xe288a03e7fcdd83F1c8B2baC45D2507274E7A11C",
+};

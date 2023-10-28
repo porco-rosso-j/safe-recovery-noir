@@ -1,9 +1,10 @@
-import { Box, Input, Button, Text, Textarea, Link } from "@chakra-ui/react";
+import { Box, Input, Button, Text } from "@chakra-ui/react";
 import React, { useState, useContext } from "react";
 import UserCredentialContext from 'src/contexts/userCredential';
+// import * as ethers from "ethers"
 import {ethers, providers, Signer} from "ethers"
 import Safe, {EthersAdapter} from '@safe-global/protocol-kit'
-// import {EthAdapter} from "@safe-global/safe-core-sdk-types"
+// import {EthAdapter} from '@safe-global/safe-core-sdk-types'
 
 
 declare global {
@@ -14,26 +15,35 @@ declare global {
 
 const WalletLogin: React.FC = () => {
 
-  const { safeAddress, saveSafeAddress, saveSafeSDK, saveSigner } = useContext(UserCredentialContext);
+  const { saveSafeAddress, saveSafeSDK, saveSigner } = useContext(UserCredentialContext);
   const [safeAddressInput, setSafeAddressInput] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string>('')
 
   const onClickLogin = async () => {
-    const provider = new providers.Web3Provider(window.ethereum, "any");
+    const provider = new providers.Web3Provider(window.ethereum);
     await provider.send("eth_requestAccounts", []);
-    const signer = provider.getSigner();
-    console.log("Account:", await signer.getAddress());
-    console.log("saveSigner:", saveSigner);
+    const signer:Signer = provider.getSigner(0);
+    console.log("addr: ", await signer.getAddress())
 
     if (safeAddressInput !== '') {
-      saveSigner(signer)
-      saveSafeAddress(safeAddressInput);
+      const ethAdapter = new EthersAdapter({
+        ethers,
+        signerOrProvider: signer
+      })
 
+      let safeSDK;
       try {
-        saveSafeSDK( await Safe.create(safeAddress));
+        console.log("safeAddressInput: ", safeAddressInput)
+        safeSDK = await Safe.create({ethAdapter:ethAdapter, safeAddress:safeAddressInput, isL1SafeMasterCopy:true }) // L1SafeMasterCopy:true
+        console.log("safeSDK: ", await safeSDK.getBalance())
+        
       } catch {
-        console.log("Failed to set SafeSDK");
+      console.log("Failed to set SafeSDK", safeSDK);
       }
+
+      saveSafeAddress(safeAddressInput);
+      saveSigner(signer)
+      saveSafeSDK(safeSDK);
     } else {
       setErrorMessage("plsease set your safe address")
       console.log("empty safe address");
@@ -56,6 +66,7 @@ const WalletLogin: React.FC = () => {
       </Text>
       <Box mb={4}>
         <Text mb={2}>safe address:</Text>
+        0x786458FBFa964E34e417F305EDa3dbC02cA7a13D
         <Input placeholder="0xAbCd..." type="address" onChange={(e) => setSafeAddressInput(e.target.value)} />
       </Box>
       <Text color="red.500" mb={4}>{errorMessage}</Text>
