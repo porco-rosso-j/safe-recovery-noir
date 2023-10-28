@@ -25,9 +25,8 @@ const WalletLogin: React.FC = () => {
     console.log("Account:", await signer.getAddress());
     console.log("saveSigner:", saveSigner);
 
-    saveSigner(signer)
-
-    if (safeAddressInput !== "") {
+    if (safeAddressInput !== '') {
+      saveSigner(signer)
       saveSafeAddress(safeAddressInput);
 
       try {
@@ -38,6 +37,7 @@ const WalletLogin: React.FC = () => {
     } else {
       setErrorMessage("plsease set your safe address")
       console.log("empty safe address");
+      return;
     }
 
   }
@@ -49,16 +49,17 @@ const WalletLogin: React.FC = () => {
       mt={20}
       borderRadius="lg"
       boxShadow="lg"
+      backgroundColor={"gray.800"}
     >
       <Text fontSize="xl" fontWeight="bold" mb={6}>
         Login to your wallet with Safe Address
       </Text>
       <Box mb={4}>
-        <Text mb={2}>Safe Address</Text>
-        <Input type="address" onChange={(e) => setSafeAddressInput(e.target.value)} />
+        <Text mb={2}>safe address:</Text>
+        <Input placeholder="0xAbCd..." type="address" onChange={(e) => setSafeAddressInput(e.target.value)} />
       </Box>
       <Text color="red.500" mb={4}>{errorMessage}</Text>
-      <Button colorScheme="teal" w="100%" onClick={onClickLogin}>Connect Wallet & Login</Button>
+      <Button colorScheme="teal" w="100%" onClick={onClickLogin}>Login</Button>
        </Box>
   );
 };
