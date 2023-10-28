@@ -2,7 +2,7 @@
 // TransferTabs.tsx
 import {
     Tag, Select, Spinner, Card, CardBody, Box, Tabs, TabList, Tab, TabPanels, TabPanel,
-    Input, Flex, Button, StatNumber, Stat, StatLabel, Text, VStack
+    Input, Flex, Button, StatNumber, Stat, StatLabel, Text, VStack, Divider
   } from "@chakra-ui/react";
 
 import { useContext, useState, useEffect } from 'react'
@@ -146,17 +146,38 @@ const Onboard = () => {
                </Box>
               </Box>
             ) :  (
-              <Box> 
+              <Box sx={{ pt: "10px" }} > 
                 { method === 1 ? (
-                   <BackupAddress/> 
+                  <Box>
+                    <Box  flex={15} mb={5} textAlign="center" color="white" fontSize={20}>
+                     Hidden Backup Address Recovery 🔑
+                    </Box>
+                    <BackupAddress/> 
+                  </Box>
                 ) : method === 2 ? (
-                   <FingerPrint/>                 
+                  <Box>
+                    <Box flex={15} mb={5} textAlign="center" color="white" fontSize={20}>
+                      Fingerprint Recovery 🔑
+                    </Box>
+                    <FingerPrint/>   
+                  </Box>              
                 ) : method === 3 ? (
+                  <Box>
+                    <Box flex={15} mb={5} textAlign="center" color="white" fontSize={20}>
+                       Secret Password Recovery 🔑
+                    </Box>
                     <SecretWord/> 
+                  </Box>
                 ) : method === 4 ? (
+                  <Box>
+                    <Box flex={15} mb={5} textAlign="center" color="white" fontSize={20}>
+                       Social Recovery by Private Guardians 🔑
+                    </Box>                 
                     <SocialRecovery/> 
+                  </Box>   
                 ) : null }
-                <Button onClick={async () => {
+                <Divider mt="50px" borderColor={"black"} ></Divider>
+                <Button mt="15px" h="30px" onClick={async () => {
                     setMethod(0)
                  }}>back</Button>
               </Box>

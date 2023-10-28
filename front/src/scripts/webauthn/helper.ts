@@ -1,130 +1,160 @@
-// // import { utils } from "@passwordless-id/webauthn";
-// import * as ethers from "ethers";
+// import { utils } from "@passwordless-id/webauthn";
+import {
+	AuthenticateOptions,
+	AuthenticationEncoded,
+	AuthType,
+	NamedAlgo,
+	NumAlgo,
+	RegisterOptions,
+	RegistrationEncoded,
+} from "./types";
+import * as ethers from "ethers";
 
-// export function randomChallenge() {
-// 	return crypto.randomUUID();
-// }
+export function randomChallenge() {
+	return crypto.randomUUID();
+}
 
-// export function isBase64url(txt) {
-// 	return txt.match(/^[a-zA-Z0-9\-_]+=*$/) !== null;
-// }
+export function toBuffer(txt: string): ArrayBuffer {
+	return Uint8Array.from(txt, (c) => c.charCodeAt(0)).buffer;
+}
 
-// export function toBase64url(buffer) {
-// 	const txt = btoa(parseBuffer(buffer)); // base64
-// 	return txt.replaceAll("+", "-").replaceAll("/", "_");
-// }
+export function parseBuffer(buffer: ArrayBuffer): string {
+	return String.fromCharCode(...new Uint8Array(buffer));
+}
 
-// export function parseBase64url(txt) {
-// 	txt = txt.replaceAll("-", "+").replaceAll("_", "/"); // base64url -> base64
-// 	return toBuffer(atob(txt));
-// }
+export function isBase64url(txt: string): boolean {
+	return txt.match(/^[a-zA-Z0-9\-_]+=*$/) !== null;
+}
 
-// export function parseBuffer(buffer) {
-// 	return String.fromCharCode(...new Uint8Array(buffer));
-// }
+export function toBase64url(buffer: ArrayBuffer): string {
+	const txt = btoa(parseBuffer(buffer)); // base64
+	return txt.replaceAll("+", "-").replaceAll("/", "_");
+}
 
-// export function toBuffer(txt) {
-// 	return Uint8Array.from(txt, (c) => c.charCodeAt(0)).buffer;
-// }
+export function parseBase64url(txt: string): ArrayBuffer {
+	txt = txt.replaceAll("-", "+").replaceAll("_", "/"); // base64url -> base64
+	return toBuffer(atob(txt));
+}
 
-// export async function sha256(buffer) {
-// 	return await crypto.subtle.digest("SHA-256", buffer);
-// }
+export async function sha256(buffer: ArrayBuffer): Promise<ArrayBuffer> {
+	return await crypto.subtle.digest("SHA-256", buffer);
+}
 
-// export const data = {
-// 	challenge: randomChallenge(),
-// 	registerOptions: {
-// 		authenticatorType: "auto",
-// 		userVerification: "required",
-// 		timeout: 0,
-// 		attestation: false,
-// 	},
-// 	authOptions: {
-// 		authenticatorType: "auto",
-// 		userVerification: "required",
-// 		timeout: 0,
-// 	},
-// 	algorithm: "ES256",
-// };
+export function concatenateBuffers(buffer1: ArrayBuffer, buffer2: ArrayBuffer) {
+	var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+	tmp.set(new Uint8Array(buffer1), 0);
+	tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+	return tmp;
+}
 
-// export async function derToRS(der) {
-// 	var offset = 3;
-// 	var dataOffset;
+export const data = {
+	challenge: randomChallenge(),
+	registerOptions: {
+		authenticatorType: "auto",
+		userVerification: "required",
+		timeout: 0,
+		attestation: false,
+	} as RegisterOptions,
+	authOptions: {
+		authenticatorType: "auto",
+		userVerification: "required",
+		timeout: 0,
+	} as AuthenticateOptions,
+	algorithm: "ES256",
+};
 
-// 	if (der[offset] == 0x21) {
-// 		dataOffset = offset + 2;
-// 	} else {
-// 		dataOffset = offset + 1;
-// 	}
-// 	const r = der.slice(dataOffset, dataOffset + 32);
-// 	offset = offset + der[offset] + 1 + 1;
-// 	if (der[offset] == 0x21) {
-// 		dataOffset = offset + 2;
-// 	} else {
-// 		dataOffset = offset + 1;
-// 	}
-// 	const s = der.slice(dataOffset, dataOffset + 32);
-// 	return [r, s];
-// }
+function derToRS(der: Buffer): Buffer[] {
+	var offset: number = 3;
+	var dataOffset;
 
-// export function bufferFromBase64(value) {
-// 	return Buffer.from(value, "base64");
-// }
+	if (der[offset] == 0x21) {
+		dataOffset = offset + 2;
+	} else {
+		dataOffset = offset + 1;
+	}
+	const r = der.slice(dataOffset, dataOffset + 32);
+	offset = offset + der[offset] + 1 + 1;
+	if (der[offset] == 0x21) {
+		dataOffset = offset + 2;
+	} else {
+		dataOffset = offset + 1;
+	}
+	const s = der.slice(dataOffset, dataOffset + 32);
+	return [r, s];
+}
 
-// export function bufferToHex(buffer) {
-// 	return "0x".concat(
-// 		[...new Uint8Array(buffer)]
-// 			.map((b) => b.toString(16).padStart(2, "0"))
-// 			.join("")
-// 	);
-// }
+export function bufferFromBase64(value: string): Buffer {
+	return Buffer.from(value, "base64");
+}
 
-// export async function getKey(pubkey) {
-// 	const algoParams = {
-// 		name: "ECDSA",
-// 		namedCurve: "P-256",
-// 		hash: "SHA-256",
-// 	};
-// 	return await crypto.subtle.importKey("spki", pubkey, algoParams, true, [
-// 		"verify",
-// 	]);
-// }
+export function bufferToHex(buffer: ArrayBufferLike): string {
+	return "0x".concat(
+		[...new Uint8Array(buffer)]
+			.map((b) => b.toString(16).padStart(2, "0"))
+			.join("")
+	);
+}
 
-// export async function getCordinates(pubkey) {
-// 	const pubKeyBuffer = bufferFromBase64(pubkey);
-// 	const rawPubkey = await crypto.subtle.exportKey(
-// 		"jwk",
-// 		await getKey(pubKeyBuffer)
-// 	);
-// 	const { x, y } = rawPubkey;
+async function getKey(pubkey: ArrayBufferLike) {
+	const algoParams = {
+		name: "ECDSA",
+		namedCurve: "P-256",
+		hash: "SHA-256",
+	};
+	return await crypto.subtle.importKey("spki", pubkey, algoParams, true, [
+		"verify",
+	]);
+}
 
-// 	//return new Uint8Array(Buffer.concat([bufferFromBase64(x), bufferFromBase64(y)]))
+export async function getCordinates(pubkey: string): Promise<string[]> {
+	const pubKeyBuffer = bufferFromBase64(pubkey as string);
+	const rawPubkey = await crypto.subtle.exportKey(
+		"jwk",
+		await getKey(pubKeyBuffer)
+	);
+	const { x, y } = rawPubkey;
 
-// 	return [
-// 		ethers.BigNumber.from(bufferToHex(bufferFromBase64(x))),
-// 		ethers.BigNumber.from(bufferToHex(bufferFromBase64(y))),
-// 	];
-// }
+	const xBuffer = bufferFromBase64(x);
+	const yBuffer = bufferFromBase64(y);
+	// console.log("x: ", xBuffer);
+	// console.log("y: ", yBuffer);
 
-// export async function getSignature(_signature) {
-// 	const signatureParsed = await derToRS(bufferFromBase64(_signature));
+	// const uint8ArrayPubkey = new Uint8Array(concatenateBuffers(xBuffer, yBuffer));
+	const uint8ArrayPubkey = concatenateBuffers(xBuffer, yBuffer);
+	console.log("uint8ArrayPubkey: ", uint8ArrayPubkey);
 
-// 	console.log(
-// 		"bufferToHex(signatureParsed[0]): ",
-// 		bufferToHex(signatureParsed[0])
-// 	);
-// 	console.log(
-// 		"bufferToHex(signatureParsed[1]): ",
-// 		bufferToHex(signatureParsed[1])
-// 	);
-// 	console.log(
-// 		"bufferToHex(signatureParsed[1]): ",
-// 		bufferToHex(signatureParsed[1]).slice(2)
-// 	);
+	let pubkeyBytes32Array: string[] = [];
+	let i = 0;
+	for (i; i < uint8ArrayPubkey.length; i++) {
+		pubkeyBytes32Array[i] = ethers.utils.hexZeroPad(
+			`0x${uint8ArrayPubkey[i].toString(16)}`,
+			32
+		);
+	}
+	//console.log("pubkeyBytes32Array: ", pubkeyBytes32Array);
 
-// 	const signature = ethers.BigNumber.from(
-// 		bufferToHex(signatureParsed[0]) + bufferToHex(signatureParsed[1]).slice(2)
-// 	);
+	return pubkeyBytes32Array;
+}
 
-// 	return signature;
-// }
+export async function getSignature(_signature) {
+	const signatureParsed = await derToRS(bufferFromBase64(_signature));
+
+	console.log(
+		"bufferToHex(signatureParsed[0]): ",
+		bufferToHex(signatureParsed[0])
+	);
+	console.log(
+		"bufferToHex(signatureParsed[1]): ",
+		bufferToHex(signatureParsed[1])
+	);
+	console.log(
+		"bufferToHex(signatureParsed[1]): ",
+		bufferToHex(signatureParsed[1]).slice(2)
+	);
+
+	const signature = ethers.BigNumber.from(
+		bufferToHex(signatureParsed[0]) + bufferToHex(signatureParsed[1]).slice(2)
+	);
+
+	return signature;
+}

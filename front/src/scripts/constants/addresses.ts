@@ -13,7 +13,7 @@ export const privatekeys = [
 ];
 
 export const contracts = {
-	recoveryPlugin: "0x4af635a26e8ed6d685C1A78feDf650c58765312B",
-	recoveryPluginFac: "0xa5a69B04Dc8953CD14DF208C05fbA8B58B5AAce6",
-	safeProotcolManager: "0xe288a03e7fcdd83F1c8B2baC45D2507274E7A11C",
+	recoveryPlugin: "0x921ec8FA188ea8628384169D2c010187180797d8",
+	recoveryPluginFac: "0x5A19C0A1A9C06224686F6a8386147C7262360CF8",
+	safeProotcolManager: "0x84324BA0E38921C3b4548F85e3cb3556C8bDE712",
 };

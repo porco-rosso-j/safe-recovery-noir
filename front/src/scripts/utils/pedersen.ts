@@ -1,11 +1,8 @@
 import { Noir } from "@noir-lang/noir_js";
 import { CompiledCircuit } from "@noir-lang/types";
-// import pedersenCircuit from "../../../circuits/utils/pedersen/target/pedersen.json" assert { type: "json" };
-// import pedersen3Circuit from "../../../circuits/utils/pedersen_3/target/pedersen.json" assert { type: "json" };
-// import MerkleCircuit from "../../../circuits/utils/merkle/target/merkle.json" assert { type: "json" };
-import pedersenCircuit from "../../../../circuits/utils/pedersen/target/pedersen.json";
-import pedersen3Circuit from "../../../../circuits/utils/pedersen_3/target/pedersen.json";
-import MerkleCircuit from "../../../../circuits/utils/merkle/target/merkle.json";
+import pedersenCircuit from "../artifacts/circuits/pedersen.json";
+import pedersen3Circuit from "../artifacts/circuits/pedersen_3.json";
+import MerkleCircuit from "../artifacts/circuits/merkle.json";
 
 export async function pedersen(_x: string, _y: string): Promise<string> {
 	const program = pedersenCircuit as CompiledCircuit;

@@ -6,10 +6,10 @@ import Safe, {
 import { SafeTransactionDataPartial } from "@safe-global/safe-core-sdk-types";
 import { ethers } from "ethers";
 import { contracts } from "./constants/addresses";
-import RecoveryPlugin from "./artifacts/RecoveryPluginNoir.json";
-import RecoveryPluginFac from "./artifacts/RecoveryPluginNoirFactory.json";
-import SafeProtocolManager from "./artifacts/SafeProtocolManager.json";
-import SafeAbi from "./artifacts/Safe.json";
+import RecoveryPlugin from "./artifacts/contracts/RecoveryPluginNoir.json";
+import RecoveryPluginFac from "./artifacts/contracts/RecoveryPluginNoirFactory.json";
+import SafeProtocolManager from "./artifacts/contracts/SafeProtocolManager.json";
+import SafeAbi from "./artifacts/contracts/Safe.json";
 
 const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
 // const provider = new ethers.providers.JsonRpcProvider(
@@ -55,7 +55,7 @@ export async function enablePlugin(
 	await sendSafeTx(safeSDK, enablePluginTxData);
 }
 
-async function sendSafeTx(
+export async function sendSafeTx(
 	safeSDK: Safe,
 	safeTx: SafeTransactionDataPartial
 ): Promise<any> {
@@ -64,7 +64,7 @@ async function sendSafeTx(
 	});
 	console.log("safeTransaction: ", safeTransaction);
 	const txResponse = await safeSDK.executeTransaction(safeTransaction, {
-		gasLimit: 300000,
+		gasLimit: 3000000,
 	});
 	console.log("txResponse: ", txResponse);
 	const res = await txResponse.transactionResponse?.wait();

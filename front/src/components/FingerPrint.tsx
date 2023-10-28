@@ -4,64 +4,50 @@ import {
     Input, Flex, Button, StatNumber, Stat, StatLabel, Text, VStack
 } from "@chakra-ui/react";
 import { useContext, useState, useEffect } from 'react'
-
+import UserCredentialContext from 'src/contexts/userCredential';
+import { _isMethodEnabled, _addWebAuthnRecover } from '../scripts/plugin'
 
 const FingerPrint = () => {
+    const { safeAddress, safeSDK, signer } = useContext(UserCredentialContext);
     const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
+    const [newOwner, setNewOwner] = useState<string>("");
+    const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false)
 
     useEffect(() => {
         ;(async () => {
-            // const _isPluginEnabled = await isPluginEnabled(SafePluginAddress);
-            // console.log("isPluginEnabled: ", _isPluginEnabled)
-            // if (_isPluginEnabled) {
-            //   setIsEnabled(_isPluginEnabled)
-
+            const _isPluginEnabled = await _isMethodEnabled(2);
+            console.log("isPluginEnabled: ", _isPluginEnabled)
+            if (_isPluginEnabled) {
+                setIsMethodEnabled(_isPluginEnabled)
+            }
         })()
       })
       
     return (
-        <Box>FingerPrint
-            <Box 
-            sx={{ pt: "10px" }} 
-            display="flex" 
-            alignItems="center" 
-            justifyContent="center"
-            >
-                  <Box flex={15} textAlign="center" color="white" fontSize={20}>
-                    [ 🚑 Change an owner to recover your Safe 🚑 ]
-                  </Box>
-                  <Box>
-                    <Input
-                      sx={{
-                        marginRight: "20px",
-                        width: "44ch",
-                        color: "white",
-                        borderBottom: "2px solid #aaddb5",
-                        textAlign: "center"
-                      }}
-                      id="filled-basic"
-                      variant="filled"
-                      placeholder="0x1234..."
-                      size="sm"
-                      onChange={(e) => setPendingNewOwner(e.target.value)}
-                    />
-                  </Box>
-                  <Box sx={{ marginBottom: "6px" }} textAlign="center" alignItems="center">
-                    <Button sx={{ mt: "35px" }} variant="contained" onClick={async () => {
-                      if (pendingNewOwner !== "") {
-                       // const newOwnerAddress = await changeOwner(safeAddress, safeSDK, SafePluginAddress, currentOwner, pendingNewOwner);
-                       // setNewOwner(newOwnerAddress);
-                        console.log("yay!");
-                      } else {
-                        console.log("pending owner address not set");
-                      }
-                    }}>
-                      Change Owner
-                    </Button>
-                  </Box>
-                </Box>
-        </Box>
+        <Box pt="10px">
+        { !isMethodEnabled ? (<Box>
+            <Text mb={3} fontSize={15} mx="75px">
+               Create a keypair generated via webauthn. 
+               private key will be stored on your device securely while 
+               public key will be stored on smart contract.
+            </Text>
+              <Box sx={{ marginBottom: "6px" }} textAlign="center" alignItems="center">
+                <Button sx={{ mt: "35px" }}  colorScheme="teal" w="55%"  onClick={async () => {
+                    await _addWebAuthnRecover(safeSDK);
+                    setIsMethodEnabled(true)
+                }}>
+                  Enable this method
+            </Button>
+           </Box> 
+        </Box>) : (
+            <Box>
+              Enabled
+            </Box>
+        )}
+    </Box>
     )
 }
 
 export default FingerPrint;
+
+//isMethodEnabled
