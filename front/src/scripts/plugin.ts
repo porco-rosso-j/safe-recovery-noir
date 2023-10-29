@@ -4,6 +4,7 @@ import RecoveryPlugin from "./artifacts/contracts/RecoveryPluginNoir.json";
 import { pedersen } from "./utils/pedersen";
 import { sendSafeTx } from "./safe";
 import { getKeyPairAndID } from "./webauthn-utils";
+import { getMerkleRootFromAddresses } from "./merkle";
 import Safe from "@safe-global/protocol-kit";
 const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
 
@@ -19,6 +20,10 @@ export async function _isMethodEnabled(moduleId: number): Promise<boolean> {
 		ret = await plugin.isEcrecoverRecoverEnabled();
 	} else if (moduleId === 2) {
 		ret = await plugin.isWebAuthnRecoverEnabled();
+	} else if (moduleId === 3) {
+		ret = await plugin.isSecretRecoverEnabled();
+	} else if (moduleId === 4) {
+		ret = await plugin.isSocialRecoverEnabled();
 	} else {
 		return false;
 	}
@@ -31,6 +36,7 @@ export async function _addEcrecoverRecover(
 ): Promise<string> {
 	const delay = daysToMilliseconds(45);
 	//const delay = 10000; // 10 sec
+	// hash in circuit should also be pedersen
 	const hashedAddr = await pedersen(address, "0");
 
 	const pluginIface = new ethers.utils.Interface(RecoveryPlugin.abi);
@@ -77,4 +83,51 @@ export async function _addWebAuthnRecover(safeSDK: Safe) {
 
 function daysToMilliseconds(days) {
 	return days * 24 * 60 * 60 * 1000;
+}
+
+export async function _addSecretRecover(safeSDK: any, secret: string) {
+	const delay = daysToMilliseconds(45);
+	//const delay = 10000; // 10 sec
+	// hash in circuit should also be pedersen
+	const hashedSecret = await ethers.utils.keccak256(Buffer.from(secret));
+
+	const pluginIface = new ethers.utils.Interface(RecoveryPlugin.abi);
+	const addSecreRecoverTx = pluginIface.encodeFunctionData("addSecretRecover", [
+		delay,
+		hashedSecret,
+	]);
+
+	const safeTxData = {
+		to: contracts.recoveryPlugin,
+		data: addSecreRecoverTx,
+		value: "0",
+	};
+
+	await sendSafeTx(safeSDK, safeTxData);
+}
+
+export async function _addSocialRecover(
+	safeSDK: any,
+	threshold: number,
+	guardians: string[]
+) {
+	console.log("guardians: ", guardians);
+	const delay = daysToMilliseconds(45);
+	//const delay = 10000; // 10 sec
+	// hash in circuit should also be pedersen
+	const merkleRoot = await getMerkleRootFromAddresses(guardians);
+
+	const pluginIface = new ethers.utils.Interface(RecoveryPlugin.abi);
+	const addSocialRecoverTx = pluginIface.encodeFunctionData(
+		"addSocialRecover",
+		[delay, threshold, merkleRoot]
+	);
+
+	const safeTxData = {
+		to: contracts.recoveryPlugin,
+		data: addSocialRecoverTx,
+		value: "0",
+	};
+
+	await sendSafeTx(safeSDK, safeTxData);
 }

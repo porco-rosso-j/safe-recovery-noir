@@ -15,10 +15,10 @@ const FingerPrint = () => {
 
     useEffect(() => {
         ;(async () => {
-            const _isPluginEnabled = await _isMethodEnabled(2);
-            console.log("isPluginEnabled: ", _isPluginEnabled)
-            if (_isPluginEnabled) {
-                setIsMethodEnabled(_isPluginEnabled)
+            const isEnabled = await _isMethodEnabled(2);
+            console.log("isSecretRecoverEnabled: ", isEnabled)
+            if (isEnabled) {
+                setIsMethodEnabled(isEnabled)
             }
         })()
       })
@@ -34,7 +34,10 @@ const FingerPrint = () => {
               <Box sx={{ marginBottom: "6px" }} textAlign="center" alignItems="center">
                 <Button sx={{ mt: "35px" }}  colorScheme="teal" w="55%"  onClick={async () => {
                     await _addWebAuthnRecover(safeSDK);
-                    setIsMethodEnabled(true)
+                    const _isMthodEnabled = await _isMethodEnabled(2);
+                    if (_isMthodEnabled) {
+                       setIsMethodEnabled(_isMthodEnabled)
+                    }
                 }}>
                   Enable this method
             </Button>

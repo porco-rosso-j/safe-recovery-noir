@@ -36,3 +36,16 @@ async function main(index: number) {
 }
 
 main(1);
+
+export async function getMerkleRootFromAddresses(
+	addresses: string[]
+): Promise<string> {
+	let i = 0;
+	let hashed_node = [];
+	for (i; i < addresses.length; ) {
+		hashed_node.push(await pedersen(addresses[i], "0"));
+		i = i + 1;
+	}
+	const tree = await getMerkleRoot(hashed_node);
+	return tree.root;
+}
