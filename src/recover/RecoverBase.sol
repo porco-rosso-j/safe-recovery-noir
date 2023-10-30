@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-// recivert types
-
 contract RecoverBase {
     struct Recovery {
         uint8 recoveryType;
@@ -17,7 +15,9 @@ contract RecoverBase {
 
     address public safe;
     address internal constant SENTINEL_DELEGATES = address(0x1);
-    uint256 public constant MIN_TIMELOCK = 30 days;
+    // uint256 public constant MIN_TIMELOCK = 30 days;
+    // set to 10 secds for testing
+    uint256 public constant MIN_TIMELOCK = 10 seconds;
     uint256 public recoveryTimeLock;
 
     uint public recoveryCount;
@@ -28,7 +28,7 @@ contract RecoverBase {
         _;
     }
 
-    function _addDelay(uint _recoveryTimeLock) internal {
+    function _setTimeLock(uint _recoveryTimeLock) internal {
         require(_recoveryTimeLock >= MIN_TIMELOCK, "DELAY_TOO_SHORT");
         recoveryTimeLock = _recoveryTimeLock;
     }
@@ -39,8 +39,9 @@ contract RecoverBase {
         address[] memory _newAddresses,
         uint _newThreshold
     ) internal returns (uint, uint) {
-        uint newRecoveryCount = recoveryCount + 1;
-        Recovery storage recovery = recoveries[newRecoveryCount];
+        // uint newRecoveryCount = recoveryCount + 1;
+        recoveryCount += 1;
+        Recovery storage recovery = recoveries[recoveryCount];
 
         recovery.recoveryType = _recoveryType;
         recovery.ownersReplaced = _oldAddresses;
@@ -49,6 +50,28 @@ contract RecoverBase {
         recovery.deadline = block.timestamp + recoveryTimeLock;
 
         // should emit an event to notify owner
-        return (newRecoveryCount, recovery.deadline);
+        return (recoveryCount, recovery.deadline);
+    }
+
+    // getter
+
+    function getRecoveryByProposalId(
+        uint _proposalId
+    ) public view returns (uint8, address[] memory, uint) {
+        require(_proposalId != 0 && _proposalId <= recoveryCount, "INVALID_ID");
+        Recovery storage recovery = recoveries[_proposalId];
+        return (
+            recovery.recoveryType,
+            recovery.pendingNewOwners,
+            recovery.newThreshold
+        );
+    }
+
+    function getPendingNewOwners(
+        uint _proposalId
+    ) public view returns (address[] memory) {
+        require(_proposalId != 0 && _proposalId <= recoveryCount, "INVALID_ID");
+        Recovery storage recovery = recoveries[_proposalId];
+        return recovery.pendingNewOwners;
     }
 }

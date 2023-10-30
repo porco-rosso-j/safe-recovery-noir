@@ -23,7 +23,7 @@ contract WebAuthnRecover is RecoverBase {
         );
         pubkey = _pubkey;
         credentialId = _credentialId;
-        _addDelay(_recoveryTimeLock);
+        _setTimeLock(_recoveryTimeLock);
         isWebAuthnRecoverEnabled = true;
     }
 

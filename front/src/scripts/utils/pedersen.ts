@@ -1,8 +1,38 @@
 import { Noir } from "@noir-lang/noir_js";
 import { CompiledCircuit } from "@noir-lang/types";
+// import pedersenNewCircuit from "../artifacts/circuits/pedersen_new.json" assert { type: "json" };
+import pedersenNewCircuit from "../artifacts/circuits/pedersen_new.json";
 import pedersenCircuit from "../artifacts/circuits/pedersen.json";
 import pedersen3Circuit from "../artifacts/circuits/pedersen_3.json";
 import MerkleCircuit from "../artifacts/circuits/merkle.json";
+
+export async function pedersen_new(
+	_inputs: string[],
+	_length: number
+): Promise<string> {
+	const program = pedersenNewCircuit as CompiledCircuit;
+	const noir = new Noir(program);
+
+	let array =
+		_length === 1
+			? [_inputs[0], "0", "0"]
+			: _length === 2
+			? [_inputs[0], _inputs[1], "0"]
+			: _length === 3
+			? [_inputs[0], _inputs[1], _inputs[2]]
+			: ["0"];
+
+	const inputs = {
+		input: array,
+		length: _length.toString(),
+	};
+	console.log("inputs: ", inputs);
+
+	const { returnValue } = await noir.execute(inputs);
+
+	console.log("return: ", returnValue);
+	return returnValue.toString();
+}
 
 export async function pedersen(_x: string, _y: string): Promise<string> {
 	const program = pedersenCircuit as CompiledCircuit;
@@ -15,7 +45,7 @@ export async function pedersen(_x: string, _y: string): Promise<string> {
 
 	const { returnValue } = await noir.execute(inputs);
 
-	//console.log("return: ", returnValue);
+	console.log("return: ", returnValue);
 	return returnValue.toString();
 }
 
@@ -38,25 +68,25 @@ export async function pedersen3(
 	return returnValue.toString();
 }
 
-export async function merkleRoot(
-	_leaf: string,
-	_index: string,
-	_hash_path: string[]
-): Promise<string> {
-	const program = MerkleCircuit as CompiledCircuit;
-	const noir = new Noir(program);
+// export async function merkleRoot(
+// 	_leaf: string,
+// 	_index: string,
+// 	_hash_path: string[]
+// ): Promise<string> {
+// 	const program = MerkleCircuit as CompiledCircuit;
+// 	const noir = new Noir(program);
 
-	const inputs = {
-		leaf: _leaf,
-		index: _index,
-		hash_path: _hash_path,
-	};
+// 	const inputs = {
+// 		leaf: _leaf,
+// 		index: _index,
+// 		hash_path: _hash_path,
+// 	};
 
-	const { returnValue } = await noir.execute(inputs);
+// 	const { returnValue } = await noir.execute(inputs);
 
-	console.log("return: ", returnValue);
-	return returnValue.toString();
-}
+// 	console.log("return: ", returnValue);
+// 	return returnValue.toString();
+// }
 
 type Merkle = {
 	root: string;
@@ -105,10 +135,10 @@ export async function getMerkleRoot(nodes: string[]): Promise<Merkle> {
 // 	"0x3012a7c05f2d1ecd4e0a857de7fbbae428af4ad5c67ed23657caaa89ec7c090b"
 // );
 
-pedersen(
-	"0x3012a7c05f2d1ecd4e0a857de7fbbae428af4ad5c67ed23657caaa89ec7c090b",
-	"0x199a33fb7e9e85bded01f24eabac4af5cd53681ffa1df713741a2c93a2e636ab"
-);
+// pedersen(
+// 	"0x3012a7c05f2d1ecd4e0a857de7fbbae428af4ad5c67ed23657caaa89ec7c090b",
+// 	"0x199a33fb7e9e85bded01f24eabac4af5cd53681ffa1df713741a2c93a2e636ab"
+// );
 // 0x2d35f5d629548b5d64dafb3121e721d957d0f3ad0f0cbbfe538828e5acac203e
 
 // pedersen3(

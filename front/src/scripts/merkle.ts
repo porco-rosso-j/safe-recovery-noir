@@ -35,7 +35,7 @@ async function main(index: number) {
 	console.log("nullifierHash: ", nullifierHash.toString());
 }
 
-main(1);
+//main(1);
 
 export async function getMerkleRootFromAddresses(
 	addresses: string[]

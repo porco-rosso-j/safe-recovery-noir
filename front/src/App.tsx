@@ -1,4 +1,4 @@
-import Header from 'src/components/Header'
+import Header from 'src/components/Layouts/Header'
 import WalletLogin from 'src/components/WalletLogin'
 import {
   ChakraProvider,   
@@ -13,19 +13,27 @@ import UserCredentialContext from 'src/contexts/userCredential';
 import Onboard from 'src/components/Onboard';
 import { useEffect } from 'react';
 import chakraDefaultTheme from 'src/theme'
+
 function App() {
   const {
+    safeAddress,
     safeSDK,
     signer,
-    safeAddress,
+    pluginAddress,
+    isPluinEnabled,
+    currentOwner,
     saveSafeAddress,
     saveSafeSDK,
     saveSigner,
+    savePluginAdddress,
+    saveIsPluginEnabled,
+    saveCurrentOwner,
     logout
   } = useUserCredential();
 
   const getShowLoginPage = () => {
-    if (safeSDK === null || signer === null || safeAddress === '') {
+    //if (safeSDK === null || signer === null || safeAddress === '') {
+    if (signer === null || safeAddress === '') {
       return true
     }
 
@@ -34,29 +42,28 @@ function App() {
 
   return <ChakraProvider theme={chakraDefaultTheme}>
     <UserCredentialContext.Provider value={{
-      safeSDK,
-      signer,
-      safeAddress,
-      saveSafeAddress,
-      saveSafeSDK,
-      saveSigner,
-      logout
+    safeAddress,
+    safeSDK,
+    signer,
+    pluginAddress,
+    isPluinEnabled,
+    currentOwner,
+    saveSafeAddress,
+    saveSafeSDK,
+    saveSigner,
+    savePluginAdddress,
+    saveIsPluginEnabled,
+    saveCurrentOwner,
+    logout
     }}>
       <Header />
        <Container>
-        <Box mt="10" display="flex" justifyContent="center" alignItems="center">
-         <Box display="flex" flexDirection="column" alignItems="center">
-          <Text mb="5" variant="h2" fontSize={30} textAlign="center" color={useColorModeValue('white', '')}>
-            Safe Recovery Plugin powered by Noir ZKP
-          </Text>
-          <Box maxW='1024px' width="550px" mx="auto" >
+        <Box mt="10" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
           {
             getShowLoginPage() 
             ? <WalletLogin /> 
             : <Onboard />
           }
-          </Box>
-         </Box>
         </Box>
       </Container>
     </UserCredentialContext.Provider>

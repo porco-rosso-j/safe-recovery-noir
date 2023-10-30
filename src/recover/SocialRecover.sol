@@ -18,7 +18,7 @@ contract SocialRecover is RecoverBase {
         require(_guardiansRoot != bytes32(0), "INVALID_HASH");
         guardiansRoot = _guardiansRoot;
         threshold = _threshold;
-        _addDelay(_recoveryTimeLock);
+        _setTimeLock(_recoveryTimeLock);
         isSocialRecoverEnabled = true;
     }
 

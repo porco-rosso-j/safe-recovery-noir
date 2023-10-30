@@ -1,7 +1,7 @@
 // import { Flex, Box, Button } from '@chakra-ui/react'
 import { useContext } from 'react'
 import UserCredentialContext from 'src/contexts/userCredential';
-import logo from "../assets/logo.png";
+import logo from "../../assets/logo.png";
 
 import { Box, Button, Flex, Text, HStack, useColorModeValue } from '@chakra-ui/react';
 export default function Header() {

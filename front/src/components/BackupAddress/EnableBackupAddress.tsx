@@ -4,9 +4,9 @@ import {
 } from "@chakra-ui/react";
 import { useContext, useState, useEffect } from 'react'
 import UserCredentialContext from 'src/contexts/userCredential';
-import { _isMethodEnabled, _addEcrecoverRecover } from '../scripts/plugin'
+import { _isMethodEnabled, _addEcrecoverRecover } from '../../scripts/plugin'
 
-const BackupAddress = () => {
+const EnableBackupAddress = () => {
     const { safeAddress, safeSDK, signer } = useContext(UserCredentialContext);
     const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
     // const [newOwner, setNewOwner] = useState<string>("");
@@ -23,7 +23,7 @@ const BackupAddress = () => {
       })
       
     return (
-         <Box pt="10px">
+         <Box pt="3px">
             { !isMethodEnabled ? (<Box>
                 <Text mb={3} fontSize={15} mx="75px">
                    Set recoverer address. It won't be publicly revealed 
@@ -62,4 +62,4 @@ const BackupAddress = () => {
     )
 }
 
-export default BackupAddress;
+export default EnableBackupAddress;

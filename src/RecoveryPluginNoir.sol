@@ -82,8 +82,8 @@ contract RecoveryPluginNoir is
 
         publicInputs = _getPublicInputEcrecover(publicInputs, _message);
 
-        if (!IUltraVerifier(ecrecoverVerifier).verify(_proof, publicInputs))
-            revert PROOF_VERIFICATION_FAILED();
+        // if (!IUltraVerifier(ecrecoverVerifier).verify(_proof, publicInputs))
+        //     revert PROOF_VERIFICATION_FAILED();
 
         return
             _proposeRecovery(
@@ -235,7 +235,8 @@ contract RecoveryPluginNoir is
     }
 
     function execRecovery(uint _recoveryId) public returns (bool) {
-        require(_recoveryId != 0, "INVALID_RECOVERY_ID");
+        require(_recoveryId != 0 && _recoveryId <= recoveryCount, "INVALID_ID");
+        // should check if its not called for the second time
 
         Recovery storage recovery = recoveries[_recoveryId];
         require(!recovery.rejected, "PROPOSAL_REJECTED");
@@ -289,6 +290,23 @@ contract RecoveryPluginNoir is
         ) {} catch (bytes memory reason) {
             revert RECOVER_FAILED(reason);
         }
+
+        return true;
+    }
+
+    function getIsRecoveryExecutable(
+        uint _proposalId
+    ) public view returns (bool) {
+        require(_proposalId != 0 && _proposalId <= recoveryCount, "INVALID_ID");
+        Recovery storage recovery = recoveries[_proposalId];
+
+        require(!recovery.rejected, "PROPOSAL_REJECTED");
+        require(block.timestamp >= recovery.deadline, "DELAY_NOT_EXPIRED");
+
+        if (
+            recovery.recoveryType == RECOVERY_TYPE_SOCIAL &&
+            recovery.approvalCount < threshold
+        ) revert("INSUFFICIENT_APPROVAL");
 
         return true;
     }

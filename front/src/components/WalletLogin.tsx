@@ -1,11 +1,10 @@
-import { Box, Input, Button, Text } from "@chakra-ui/react";
+import { Box, Input, Button, Text, useColorModeValue } from "@chakra-ui/react";
 import React, { useState, useContext } from "react";
 import UserCredentialContext from 'src/contexts/userCredential';
 // import * as ethers from "ethers"
 import {ethers, providers, Signer} from "ethers"
 import Safe, {EthersAdapter} from '@safe-global/protocol-kit'
 // import {EthAdapter} from '@safe-global/safe-core-sdk-types'
-
 
 declare global {
   interface Window {
@@ -34,16 +33,21 @@ const WalletLogin: React.FC = () => {
       let safeSDK;
       try {
         console.log("safeAddressInput: ", safeAddressInput)
-        safeSDK = await Safe.create({ethAdapter:ethAdapter, safeAddress:safeAddressInput, isL1SafeMasterCopy:true }) // L1SafeMasterCopy:true
-        console.log("safeSDK: ", await safeSDK.getBalance())
-        
+        safeSDK = await Safe.create({ethAdapter:ethAdapter, safeAddress:safeAddressInput, isL1SafeMasterCopy:true }) // L1SafeMasterCopy:tru        
+        console.log("safeSDK: ", safeSDK)
       } catch {
       console.log("Failed to set SafeSDK", safeSDK);
       }
 
       saveSafeAddress(safeAddressInput);
       saveSigner(signer)
-      saveSafeSDK(safeSDK);
+
+      if ((await safeSDK.getOwners())[0] === await signer.getAddress()) {
+        saveSafeSDK(safeSDK)
+      } else {
+        console.log("not owner");
+      }
+      
     } else {
       setErrorMessage("plsease set your safe address")
       console.log("empty safe address");
@@ -53,6 +57,10 @@ const WalletLogin: React.FC = () => {
   }
 
   return (
+    <Box>
+      <Text mt={7} variant="h2" fontSize={30} textAlign="center" color={useColorModeValue('white', '')}>
+           Safe Recovery Plugin powered by Noir ZKP
+     </Text>
      <Box
       p={8}
       mx="auto"
@@ -71,7 +79,8 @@ const WalletLogin: React.FC = () => {
       </Box>
       <Text color="red.500" mb={4}>{errorMessage}</Text>
       <Button colorScheme="teal" w="100%" onClick={onClickLogin}>Login</Button>
-       </Box>
+      </Box>
+  </Box>
   );
 };
 

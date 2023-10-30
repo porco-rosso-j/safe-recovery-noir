@@ -1,3 +1,4 @@
+import addressJson from "./addresses.json";
 export const addresses = [
 	"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
 	"0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
@@ -13,7 +14,7 @@ export const privatekeys = [
 ];
 
 export const contracts = {
-	recoveryPlugin: "0x921ec8FA188ea8628384169D2c010187180797d8",
-	recoveryPluginFac: "0x5A19C0A1A9C06224686F6a8386147C7262360CF8",
-	safeProotcolManager: "0x84324BA0E38921C3b4548F85e3cb3556C8bDE712",
+	recoveryPlugin: addressJson.contracts[0],
+	recoveryPluginFac: addressJson.contracts[1],
+	safeProotcolManager: addressJson.contracts[2],
 };

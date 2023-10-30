@@ -17,10 +17,11 @@ contract EcrecoverRecover is RecoverBase {
     ) public onlySafe {
         require(_hashed_address != bytes32(0), "INVALID_HASH");
         hashed_address = _hashed_address;
-        _addDelay(_recoveryTimeLock);
+        _setTimeLock(_recoveryTimeLock);
         isEcrecoverRecoverEnabled = true;
     }
 
+    // should all the proposals invalidated if this is disabled?
     function removeEcrecoverRecover() public onlySafe {
         require(isEcrecoverRecoverEnabled, "NOT_ENABLED");
         isEcrecoverRecoverEnabled = false;

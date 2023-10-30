@@ -4,8 +4,11 @@ import Safe from '@safe-global/protocol-kit'
 
 const useUserCredential = () => {
   const [safeAddress, setSafeAddress] = useState<string | null>('');
-  const [safeSDK, setSafeSDK] = useState<any | null>(null);
+  const [safeSDK, setSafeSDK] = useState<Safe | null>(null);
   const [signer, setSigner] = useState<Signer | null>(null);
+  const [pluginAddress, setPluginAddress] = useState<string | null>('');
+  const [isPluinEnabled, setIsPluginEnabled] = useState<boolean>(false)
+  const [currentOwner, setCurrentOwner] = useState<string>("")
 
   const saveSafeAddress = (_safeAddress: string) => {
     setSafeAddress(_safeAddress);
@@ -19,6 +22,19 @@ const useUserCredential = () => {
     setSigner(_signer);
   };
 
+  const savePluginAdddress = (_plugin: string) => {
+    setPluginAddress(_plugin);
+  };
+
+  const saveIsPluginEnabled = (_isEnabled: boolean) => {
+    setIsPluginEnabled(_isEnabled);
+  };
+
+  const saveCurrentOwner = (_currentOwner: string) => {
+    setCurrentOwner(_currentOwner);
+  };
+
+
   const logout = () => {
     saveSafeAddress(null);
     saveSafeSDK(null);
@@ -30,9 +46,15 @@ const useUserCredential = () => {
     safeAddress,
     safeSDK,
     signer,
+    pluginAddress,
+    isPluinEnabled,
+    currentOwner,
     saveSafeAddress,
     saveSafeSDK,
     saveSigner,
+    savePluginAdddress,
+    saveIsPluginEnabled,
+    saveCurrentOwner,
     logout
   };
 };
