@@ -38,7 +38,7 @@ const EnableBackupAddress = () => {
                      onChange={(e) => setPendingNewOwner(e.target.value)}
                     />
                   <Box sx={{ marginBottom: "6px" }} textAlign="center" alignItems="center">
-                    <Button sx={{ mt: "35px" }}  colorScheme="teal" w="55%"  onClick={async () => {
+                    <Button sx={{ mt: "35px" }} colorScheme="teal" w="55%"  onClick={async () => {
                       if (pendingNewOwner !== "") {
                          await _addEcrecoverRecover(safeSDK, pendingNewOwner);
                          const _isMthodEnabled = await _isMethodEnabled(1);
@@ -55,7 +55,7 @@ const EnableBackupAddress = () => {
                </Box> 
             </Box>) : (
                 <Box>
-                  Enabled
+                  This method has already been enabled
                 </Box>
             )}
         </Box>

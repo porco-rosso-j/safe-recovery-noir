@@ -12,6 +12,7 @@ const ExecuteBackupAddress = () => {
     const [expectedNewOwner, setExpectedNewOwner] = useState<string>("");
     const [proposalId, setProposalId] = useState<number>(0);
     const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false)
+    const [isRecoveryExecutable, setIsRecoveryExecutable] = useState<boolean>(false)
 
     useEffect(() => {
         ;(async () => {
@@ -37,8 +38,9 @@ const ExecuteBackupAddress = () => {
         ;(async () => {
             if (proposalId !== 0) {
              const IsRecoveryExecutable = await _getIsRecoveryExecutable(proposalId);
-            //const IsRecoveryExecutable = await _getIsRecoveryExecutable(signer, proposalId);
-            console.log("IsRecoveryExecutable: ", IsRecoveryExecutable)
+             // const IsRecoveryExecutable = await _getIsRecoveryExecutable(signer, proposalId);
+             console.log("IsRecoveryExecutable: ", IsRecoveryExecutable)
+             setIsRecoveryExecutable(IsRecoveryExecutable)
             }
         })()
       })
@@ -61,8 +63,8 @@ const ExecuteBackupAddress = () => {
                 : null}
             </Text>
               <Box sx={{ marginBottom: "6px" }} textAlign="center" alignItems="center">
-                <Button sx={{ mt: "35px" }}  colorScheme="teal" w="55%"  onClick={async () => {
-                  if (proposalId !== 0) {
+                <Button sx={{ mt: "35px" }} colorScheme="teal" w="55%"  onClick={async () => {
+                  if (proposalId !== 0 && isRecoveryExecutable) {
                      const res = await _executeRecover(signer, proposalId);
                      if (res) {
                         saveCurrentOwner(expectedNewOwner)

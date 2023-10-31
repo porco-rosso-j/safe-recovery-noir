@@ -6,7 +6,8 @@ import logo from "../../assets/logo.png";
 import { Box, Button, Flex, Text, HStack, useColorModeValue } from '@chakra-ui/react';
 export default function Header() {
   const { signer, logout } = useContext(UserCredentialContext);
-  return <Box bg={useColorModeValue('#01796F', 'gray.700')}>
+  return  <Box>
+   {/* <Box bg={useColorModeValue('#01796F', 'gray.700')}> */}
   <Flex justify="space-between" p={4}>
     {/* <Text fontSize="1.5rem" fontWeight="bold">
       SafeRecover

@@ -1,4 +1,5 @@
 import Header from 'src/components/Layouts/Header'
+import Footer from 'src/components/Layouts/Footer'
 import WalletLogin from 'src/components/WalletLogin'
 import {
   ChakraProvider,   
@@ -57,8 +58,14 @@ function App() {
     logout
     }}>
       <Header />
-       <Container>
-        <Box mt="10" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+       <Container height={1000}>
+        <Box 
+        mt="10"
+        display="flex" 
+        flexDirection="column" 
+        justifyContent="center" 
+        alignItems="center"
+        >
           {
             getShowLoginPage() 
             ? <WalletLogin /> 
@@ -66,6 +73,7 @@ function App() {
           }
         </Box>
       </Container>
+     <Footer/>
     </UserCredentialContext.Provider>
   </ChakraProvider>
 

@@ -27,7 +27,8 @@ const Onboard = () => {
     return (
     <Box 
     p={5}
-    backgroundColor={"gray.600"}
+    // backgroundColor={"gray.600"}
+    backgroundColor={"#2e2e2e"}
     borderRadius="lg"
     boxShadow="lg"
     mt="5"
@@ -50,7 +51,7 @@ const Onboard = () => {
         <Box>
           <Box textAlign="center" alignItems="center" >
         
-            <Button sx={{ mt: "10px", mb: "10px" }} colorScheme="teal" w="50%"  onClick={async () => {
+            <Button sx={{ mt: "10px", mb: "10px" }}  colorScheme="teal" w="50%"  onClick={async () => {
               await enablePlugin(safeAddress, safeSDK)
               const _isPluginEnabled = await isPluginEnabled(safeAddress, pluginAddress);
               console.log("isPluginEnabled: ", _isPluginEnabled)

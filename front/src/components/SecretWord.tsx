@@ -37,7 +37,7 @@ const SecretWord = () => {
                      onChange={(e) => setSecretWord(e.target.value)}
                     />
                   <Box sx={{ marginBottom: "6px" }} textAlign="center" alignItems="center">
-                    <Button sx={{ mt: "35px" }}  colorScheme="teal" w="55%"  onClick={async () => {
+                    <Button sx={{ mt: "35px" }} colorScheme="teal" w="55%"  onClick={async () => {
                       if (secretWord !== "") {
                         await _addSecretRecover(safeSDK, secretWord);
                         const _isMthodEnabled = await _isMethodEnabled(3);

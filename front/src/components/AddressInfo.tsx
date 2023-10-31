@@ -65,14 +65,15 @@ const AddressInfo = () => {
         mb="5"
         borderRadius="lg"
         boxShadow="lg"
-        backgroundColor={"gray.800"}
+        // backgroundColor={"gray.800"}
+        backgroundColor={"#080808"}
         pb="30px" 
         justifyContent="space-between" // Align the button to the right
         alignItems="center" // Vertically center the button
         flexDirection="column"
         >
       <VStack spacing={1}>
-    <Text as='b' fontSize={15} color="white" justifyContent="center">
+    <Text as='b' fontSize={15} justifyContent="center">
       Address Info
     </Text>
     <ChevronDownIcon
@@ -109,7 +110,7 @@ const AddressInfo = () => {
     alignItems="center"
     flexDirection="column" 
   >
-    <Text as='b' fontSize={15} color="white" justifyContent="center">
+    <Text as='b' fontSize={15} justifyContent="center">
       Address Info
     </Text>
     <ChevronDownIcon

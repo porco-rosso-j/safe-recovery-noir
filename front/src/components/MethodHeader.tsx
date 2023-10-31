@@ -19,8 +19,8 @@ const MethodHeader = (props) => {
           : props.index === 1 ? <ProposeBackupAddress/> 
           : props.index === 2 ? <ExecuteBackupAddress/>
           : null}
-            <Divider mt="30px" borderColor={"black"} ></Divider>
-             <Button mt="15px" h="30px" onClick={async () => {
+            <Divider mt="30px" borderColor={"white.400"} ></Divider>
+             <Button mt="15px" h="30px" color="white" bgColor="gray.600" onClick={async () => {
                   props.updateMethod(0)
             }}>back</Button>
         </Box>   
@@ -31,8 +31,8 @@ const MethodHeader = (props) => {
             Fingerprint Recovery 🔑
           </Box>
           <FingerPrint/>   
-          <Divider mt="30px" borderColor={"black"} ></Divider>
-             <Button mt="15px" h="30px" onClick={async () => {
+          <Divider mt="30px" borderColor={"white.400"} ></Divider>
+             <Button mt="15px" h="30px" color="white" bgColor="gray.600" onClick={async () => {
                   props.updateMethod(0)
             }}>back</Button>
         </Box>              
@@ -42,8 +42,8 @@ const MethodHeader = (props) => {
              Secret Password Recovery 🔑
           </Box>
           <SecretWord/> 
-          <Divider mt="30px" borderColor={"black"} ></Divider>
-             <Button mt="15px" h="30px" onClick={async () => {
+          <Divider mt="30px" borderColor={"white.400"} ></Divider>
+             <Button mt="15px" h="30px" color="white" bgColor="gray.600" onClick={async () => {
                   props.updateMethod(0)
             }}>back</Button>
         </Box>
@@ -53,8 +53,8 @@ const MethodHeader = (props) => {
              Social Recovery by Private Guardians 🔑
           </Box>                 
           <SocialRecovery/> 
-          <Divider mt="30px" borderColor={"black"} ></Divider>
-             <Button mt="15px" h="30px" onClick={async () => {
+          <Divider mt="30px" borderColor={"white.400"} ></Divider>
+             <Button mt="15px" h="30px" color="white" bgColor="gray.600" onClick={async () => {
                   props.updateMethod(0)
             }}>back</Button>
         </Box>   

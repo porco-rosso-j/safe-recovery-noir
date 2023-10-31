@@ -67,7 +67,8 @@ const WalletLogin: React.FC = () => {
       mt={20}
       borderRadius="lg"
       boxShadow="lg"
-      backgroundColor={"gray.800"}
+      // backgroundColor={"gray.800"}
+      backgroundColor={"#2e2e2e"}
     >
       <Text fontSize="xl" fontWeight="bold" mb={6}>
         Login to your wallet with Safe Address
@@ -78,7 +79,8 @@ const WalletLogin: React.FC = () => {
         <Input placeholder="0xAbCd..." type="address" onChange={(e) => setSafeAddressInput(e.target.value)} />
       </Box>
       <Text color="red.500" mb={4}>{errorMessage}</Text>
-      <Button colorScheme="teal" w="100%" onClick={onClickLogin}>Login</Button>
+      <Button  w="100%" onClick={onClickLogin}>Login</Button>
+      {/* */}
       </Box>
   </Box>
   );

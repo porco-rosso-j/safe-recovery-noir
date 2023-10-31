@@ -39,7 +39,7 @@ const ProposeBackupAddress = () => {
             { closeSuccess ? (
             <Box>
                 <Text mb={3} fontSize={15} mx="75px">
-                   Propose recovery. New owner (1) will be replaced with old owner(2) as well as new threshold can be specified.
+                   Propose recovery. The old owner will be replaced with the new owner.
                    0xAB256C9d6aAE9ee6118A1531d43751996541799D
                 </Text>
             <Box mt="10px" textAlign="center" alignItems="center">
@@ -81,7 +81,7 @@ const ProposeBackupAddress = () => {
                 </Flex>
                </Box>
                     <Box sx={{ marginBottom: "6px" }} textAlign="center" alignItems="center">
-                    <Button sx={{ mt: "35px" }}  colorScheme="teal" w="55%"  onClick={async () => {
+                    <Button sx={{ mt: "35px" }} colorScheme="teal" w="55%"  onClick={async () => {
                       if (pendingNewOwner !== "") {
                          const _newOwner = await _proposeEcrecoverRecover(signer, threshold, ownerReplaced, pendingNewOwner);
                          setNewOwner(_newOwner)

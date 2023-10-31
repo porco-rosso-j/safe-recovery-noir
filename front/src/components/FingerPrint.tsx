@@ -32,7 +32,7 @@ const FingerPrint = () => {
                public key will be stored on smart contract.
             </Text>
               <Box sx={{ marginBottom: "6px" }} textAlign="center" alignItems="center">
-                <Button sx={{ mt: "35px" }}  colorScheme="teal" w="55%"  onClick={async () => {
+                <Button sx={{ mt: "35px" }} colorScheme="teal" w="55%"  onClick={async () => {
                     await _addWebAuthnRecover(safeSDK);
                     const _isMthodEnabled = await _isMethodEnabled(2);
                     if (_isMthodEnabled) {

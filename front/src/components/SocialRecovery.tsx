@@ -131,7 +131,7 @@ const SocialRecovery = () => {
                 </Flex>
                </Box>
                   <Box sx={{ marginBottom: "6px" }} textAlign="center" alignItems="center">
-                    <Button sx={{ mt: "35px" }}  colorScheme="teal" w="55%"  onClick={async () => {
+                    <Button sx={{ mt: "35px" }} colorScheme="teal" w="55%"  onClick={async () => {
                       if (guardians[0] !== '' && threshold !== 0) {
                          await _addSocialRecover(safeSDK, threshold, guardians);
                          const _isMthodEnabled = await _isMethodEnabled(4);
