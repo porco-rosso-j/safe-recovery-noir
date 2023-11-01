@@ -18,7 +18,7 @@ contract SocialRecover is RecoverBase {
         require(_guardiansRoot != bytes32(0), "INVALID_HASH");
         guardiansRoot = _guardiansRoot;
         threshold = _threshold;
-        _addDelay(_recoveryTimeLock);
+        _setTimeLock(_recoveryTimeLock);
         isSocialRecoverEnabled = true;
     }
 
@@ -48,8 +48,8 @@ contract SocialRecover is RecoverBase {
         bytes32 _nullifierHash
     ) internal view returns (bytes32[] memory) {
         _publicInputs[0] = guardiansRoot;
-        //_publicInputs[1] = bytes32(_recoveryId);
-        _publicInputs[1] = bytes32(0);
+        _publicInputs[1] = bytes32(_recoveryId);
+        //_publicInputs[1] = bytes32(0);
         _publicInputs[2] = _nullifierHash;
 
         for (uint i = 0; i < 32; i++) {

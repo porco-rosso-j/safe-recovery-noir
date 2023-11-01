@@ -15,7 +15,7 @@ contract SecretRecover is RecoverBase {
     ) public onlySafe {
         require(_hashed_secret != bytes32(0), "INVALID_HASH");
         hashed_secret = _convertBytes32ToBytes32Array(_hashed_secret);
-        _addDelay(_recoveryTimeLock);
+        _setTimeLock(_recoveryTimeLock);
         isSecretRecoverEnabled = true;
     }
 

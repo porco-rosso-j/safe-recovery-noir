@@ -1,0 +1,53 @@
+{
+    "noir_version": "0.18.0+1de0e6d0acb18f3164a3b1fbc1be6438ef16be39",
+    "hash": 6291067723507836526,
+    "backend": "acvm-backend-barretenberg",
+    "abi": {
+        "parameters": [
+            {
+                "name": "leaf",
+                "type": {
+                    "kind": "field"
+                },
+                "visibility": "private"
+            },
+            {
+                "name": "index",
+                "type": {
+                    "kind": "field"
+                },
+                "visibility": "private"
+            },
+            {
+                "name": "hash_path",
+                "type": {
+                    "kind": "array",
+                    "length": 2,
+                    "type": {
+                        "kind": "field"
+                    }
+                },
+                "visibility": "private"
+            }
+        ],
+        "param_witnesses": {
+            "hash_path": [
+                3,
+                4
+            ],
+            "index": [
+                2
+            ],
+            "leaf": [
+                1
+            ]
+        },
+        "return_type": {
+            "kind": "field"
+        },
+        "return_witnesses": [
+            25
+        ]
+    },
+    "bytecode": "H4sIAAAAAAAA/+1Y20rDQBCdpklaNbXeUusFLCgoPu3m0mze/BWDyf9/gZglG7sN+GLOFBY6sLSUMj1zzpnpTt6JaENdeO2Z0C769x/mVYwL6eFyCc/kCdoTGuwcmAPzG8O8qdhmWV0ktUzlp0jKSuUiy6utkkrmKv9KVJrWKlNFWZWFKGWW1rLJy7QxiQMgFxx1h4ZXdN0huO4+poxeRWr931x10wWSv97Xw16yA63/jEl/NM45YWeIZ/GsOdD5feszO0C/K/7iRowLOXMA4wkSo6tCzR3AeEo8A+FXMBRQ21Fjp8sZsGif9m9trpgTyQEXxogOZM6xhoqAuRZAAjlE0fkWhP/LfwCLja5bX3EjhroficfkUzDOcyCXQK0lmj+OfuHwzZMD/cIxJzbkRr8sgVwCtZZI/rS29uMfPSO+27M0rzou2nNJx3WLE+MVEuNx3eLDeE08wwv+AA7oqL2ix07VGyCBrq5uSA64MMbEZHT06hYDc62ABHKIog0fE/5K9gwWG123voKsGOp+IR6To6+it0AugVpLNH8c/cLhm1cH+oVjTryRG/2yBnIJ1Foi+RuubnpG6JVtTbvV7a4999Stbr3PPMO3b/E/sb7fxw8Efw+w2iAAAA=="
+}

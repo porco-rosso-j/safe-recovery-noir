@@ -17,20 +17,20 @@ fn main(
   let key = ecrecover::secp256k1::PubKey::from_unified(pub_key);
   let address = ecrecover::ecrecover(key.pub_x, key.pub_y, signature, hashed_message);
 
-  std::println(address);
+  //std::println(address);
     
   // Compute input note commitment a.k.a leaf
   let leaf = std::hash::pedersen([address, 0])[0];
-   std::println(leaf);
+  //std::println(leaf);
 
   let computed_root = std::merkle::compute_merkle_root(leaf, index, hash_path);
-  std::println(computed_root);
+  //std::println(computed_root);
   assert(computed_root == root);
     
   // Compute input note nullifier
   let nullifier = std::hash::pedersen([leaf, address, proposal_id])[0];
   assert(nullifierHash == nullifier);
-  std::println(nullifier);
+  //std::println(nullifier);
 
   nullifier
 }
