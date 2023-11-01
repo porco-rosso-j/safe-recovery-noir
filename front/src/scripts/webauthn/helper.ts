@@ -106,7 +106,7 @@ async function getKey(pubkey: ArrayBufferLike) {
 	]);
 }
 
-export async function getCordinates(pubkey: string): Promise<string[]> {
+export async function getCordinates(pubkey: string): Promise<any> {
 	const pubKeyBuffer = bufferFromBase64(pubkey as string);
 	const rawPubkey = await crypto.subtle.exportKey(
 		"jwk",
@@ -116,7 +116,12 @@ export async function getCordinates(pubkey: string): Promise<string[]> {
 
 	const xBuffer = bufferFromBase64(x);
 	const yBuffer = bufferFromBase64(y);
-	// console.log("x: ", xBuffer);
+
+	// const pubkeyHex = ethers.BigNumber.from(
+	// 	bufferToHex(Buffer.concat([xBuffer, yBuffer]))
+	// );
+	const pubkeyHex = [bufferToHex(xBuffer), bufferToHex(yBuffer)];
+	console.log("pubkeyHex: ", pubkeyHex);
 	// console.log("y: ", yBuffer);
 
 	// const uint8ArrayPubkey = new Uint8Array(concatenateBuffers(xBuffer, yBuffer));
@@ -133,7 +138,7 @@ export async function getCordinates(pubkey: string): Promise<string[]> {
 	}
 	//console.log("pubkeyBytes32Array: ", pubkeyBytes32Array);
 
-	return pubkeyBytes32Array;
+	return [pubkeyBytes32Array, pubkeyHex];
 }
 
 export async function getSignature(_signature) {

@@ -4,25 +4,27 @@ import {
 } from "@chakra-ui/react";
 import { useContext, useState, useEffect } from 'react'
 import UserCredentialContext from 'src/contexts/userCredential';
-import { _isMethodEnabled, _executeRecover, getNewOwnerForPoposal, _getIsRecoveryExecutable } from '../../scripts/plugin'
+import { _isMethodEnabled, _executeRecover, getNewOwnerForPoposal, _getIsRecoveryExecutable } from '../scripts/plugin'
 
-const ExecuteBackupAddress = () => {
+const ExecuteRecovery = (props) => {
     const { safeAddress, safeSDK, signer, currentOwner, saveCurrentOwner } = useContext(UserCredentialContext);
-    const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
     const [expectedNewOwner, setExpectedNewOwner] = useState<string>("");
     const [proposalId, setProposalId] = useState<number>(0);
     const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false)
     const [isRecoveryExecutable, setIsRecoveryExecutable] = useState<boolean>(false)
 
-    useEffect(() => {
-        ;(async () => {
-            const _isPluginEnabled = await _isMethodEnabled(1);
-            console.log("isPluginEnabled: ", _isPluginEnabled)
-            if (_isPluginEnabled) {
-                setIsMethodEnabled(_isPluginEnabled)
-            }
-        })()
-      })
+    // useEffect(() => {
+    //     ;(async () => {
+    //         if (proposalId!== 0) {
+    //           // can fetch method from Recovery struct of selected proposal id
+    //           const IsMethodEnabled = await _isMethodEnabled(props.method);
+    //           console.log("IsMethodEnabled: ", IsMethodEnabled)
+    //           if (IsMethodEnabled) {
+    //               setIsMethodEnabled(IsMethodEnabled)
+    //           }
+    //         }
+    //     })()
+    //   })
 
       useEffect(() => {
         ;(async () => {
@@ -47,8 +49,11 @@ const ExecuteBackupAddress = () => {
       
     return (
         <Box pt="3px">
-        { isMethodEnabled ? (
-        <Box>
+            <Text mb={5} fontSize={15} mx="75px">
+               Choose the proposal Id and execute ⚡️
+            </Text>
+        {/* { isMethodEnabled ? ( */}
+        {/* <Box> */}
             <label >proposal Id:</label>
                 <Input
                     ml={3}
@@ -58,10 +63,12 @@ const ExecuteBackupAddress = () => {
                     onChange={(e) => setProposalId(Number(e.target.value))}
                     />
             <Text mb={3} fontSize={15} mx="75px">
-               Execute Backup Address Recovery. 
-               { proposalId !== 0 ? "The current owner {currentOwner} will be swapped for the new owner address will be {expectedNewOwner} after execution."
+               { proposalId !== 0 ? "The current owner " + currentOwner + " will be swapped for the new owner address will be " + expectedNewOwner + " after execution."
                 : null}
             </Text>
+
+            {/* <List> Proposal Id List <List/> */}
+
               <Box sx={{ marginBottom: "6px" }} textAlign="center" alignItems="center">
                 <Button sx={{ mt: "35px" }} colorScheme="teal" w="55%"  onClick={async () => {
                   if (proposalId !== 0 && isRecoveryExecutable) {
@@ -73,16 +80,16 @@ const ExecuteBackupAddress = () => {
                     console.log("pending owner address not set");
                   }
                 }}>
-                  Enable this method
+                  Execute Recovery
             </Button>
            </Box> 
-        </Box>) : (
+        {/* </Box>) : (
             <Box>
               Enabled
             </Box>
-        )}
+        )} */}
     </Box>
     )
 }
 
-export default ExecuteBackupAddress;
+export default ExecuteRecovery;

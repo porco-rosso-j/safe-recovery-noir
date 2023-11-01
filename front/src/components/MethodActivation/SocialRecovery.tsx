@@ -4,7 +4,7 @@ import {
 } from "@chakra-ui/react";
 import { useContext, useState, useEffect } from 'react'
 import UserCredentialContext from 'src/contexts/userCredential';
-import { _isMethodEnabled, _addSocialRecover } from '../scripts/plugin'
+import { _isMethodEnabled, _addSocialRecover } from '../../scripts/plugin'
 
 const SocialRecovery = () => {
     const { safeAddress, safeSDK, signer } = useContext(UserCredentialContext);

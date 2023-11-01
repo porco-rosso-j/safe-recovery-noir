@@ -1,5 +1,6 @@
-import { _proposeRecoveryWebAuthn, getCredentialID } from "./safe";
-import { register, authenticate } from "./webauthn/client";
+// import { _proposeRecoveryWebAuthn } from "./safe";
+import { getCredentialID } from "./plugin";
+import { register, authenticate, getPublicKey } from "./webauthn/client";
 import * as utils from "./webauthn/helper";
 import * as ethers from "ethers";
 
@@ -20,10 +21,13 @@ export async function getKeyPairAndID(safeAddr: string): Promise<any> {
 	}
 	console.log(res);
 
-	const cordinates = await utils.getCordinates(res?.credential.publicKey);
+	const [cordinates, pubkeyHex] = await utils.getCordinates(
+		res?.credential.publicKey
+	);
 
 	return {
 		pubkey: cordinates,
+		pubkeyHex: pubkeyHex,
 		id: res.credential.id.toString(),
 	};
 }
@@ -67,6 +71,49 @@ export async function getKeyPairAndID(safeAddr: string): Promise<any> {
 // 	return safeSdk.getOwners()[0];
 // }
 
+export async function authenticateWebAuthn(credentialId: string) {
+	let result;
+	try {
+		result = await authenticate(
+			credentialId ? [credentialId] : [],
+			utils.data.challenge,
+			utils.data.authOptions
+		);
+	} catch (e) {
+		console.warn(e);
+	}
+
+	console.log("result: ", result);
+
+	const [signature, webauthnInputs] = await getWebAuthnInputs(
+		result?.signature,
+		result?.authenticatorData,
+		result?.clientData
+	);
+
+	return [signature, webauthnInputs];
+}
+
+export async function getPubkeyByCredentialId(id: string[]): Promise<any> {
+	const publicKey = await getPublicKey(
+		id,
+		utils.data.challenge,
+		utils.data.authOptions
+	);
+
+	navigator.credentials
+		.get({ publicKey })
+		.then((credentialInfo) => {
+			// Credential information is available in credentialInfo
+			console.log(credentialInfo);
+		})
+		.catch((error) => {
+			console.error(error);
+		});
+	const info = await navigator.credentials.get({ publicKey });
+	console.log("info: ", info);
+}
+
 async function getWebAuthnInputs(_signature, _authenticatorData, _clientData) {
 	const signature = await utils.getSignature(_signature);
 	const authenticatorData = utils.bufferFromBase64(_authenticatorData);
@@ -88,3 +135,25 @@ async function getWebAuthnInputs(_signature, _authenticatorData, _clientData) {
 
 	return [signature, ethers.utils.arrayify(webauthnInputs)];
 }
+
+// async function getPublicKey(creadentialId: string): Promise<any> {
+// 	const publicKey = {
+// 		challenge: utils.data.challenge,
+// 		allowCredentials: [
+// 			{
+// 				type: "public-key",
+// 				id: creadentialId,
+// 			},
+// 		],
+// 	};
+
+// 	navigator.credentials
+// 		.get({ publicKey })
+// 		.then((credentialInfo) => {
+// 			// Credential information is available in credentialInfo
+// 			console.log(credentialInfo);
+// 		})
+// 		.catch((error) => {
+// 			console.error(error);
+// 		});
+// }

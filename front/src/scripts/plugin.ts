@@ -5,10 +5,19 @@ import { pedersen, pedersen_new } from "./utils/pedersen";
 import { sendSafeTx } from "./safe";
 import { getKeyPairAndID } from "./webauthn-utils";
 import { getMerkleRootFromAddresses } from "./merkle";
+import { getHashFromSecret } from "./utils/secret";
 import Safe from "@safe-global/protocol-kit";
 import { privatekeys } from "./constants/addresses";
 import { arrayify } from "ethers/lib/utils";
-import { generateProofK256, parseUint8ArrayToBytes32 } from "./noir/proof";
+import {
+	generateProofK256,
+	generateProofP256,
+	generateProofSecret,
+} from "./noir/proof";
+import {
+	authenticateWebAuthn,
+	getPubkeyByCredentialId,
+} from "./webauthn-utils";
 import { Noir } from "@noir-lang/noir_js";
 
 const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
@@ -67,11 +76,14 @@ export async function _addWebAuthnRecover(safeSDK: Safe) {
 
 	console.log("res.id: ", res.id);
 	console.log("res.pubkey: ", res.pubkey);
+	console.log("res.pubkey: ", res.pubkeyHex);
 
 	const pluginIface = new ethers.utils.Interface(RecoveryPlugin.abi);
 	const addRecoveryData = pluginIface.encodeFunctionData("addWebAuthnRecover", [
 		delay,
 		res.pubkey,
+		res.pubkeyHex[0],
+		res.pubkeyHex[1],
 		res.id,
 	]);
 
@@ -90,7 +102,8 @@ function daysToMilliseconds(days) {
 
 export async function _addSecretRecover(safeSDK: any, secret: string) {
 	// hash in circuit should also be pedersen
-	const hashedSecret = await ethers.utils.keccak256(Buffer.from(secret));
+	const hashedSecret = await getHashFromSecret(secret);
+	console.log("hashedSecret: ", hashedSecret);
 
 	const pluginIface = new ethers.utils.Interface(RecoveryPlugin.abi);
 	const addSecreRecoverTx = pluginIface.encodeFunctionData("addSecretRecover", [
@@ -132,6 +145,43 @@ export async function _addSocialRecover(
 	await sendSafeTx(safeSDK, safeTxData);
 }
 
+export async function _proposeRecovery(
+	method: number,
+	signer: Signer,
+	newThreshold: number,
+	oldOwner: string,
+	newOwner: string,
+	secret: string,
+	safeAddr: string
+): Promise<string> {
+	if (method === 1) {
+		await _proposeEcrecoverRecover(signer, newThreshold, oldOwner, newOwner);
+	} else if (method === 2) {
+		await _proposeFingerPrintRecover(
+			signer,
+			newThreshold,
+			oldOwner,
+			newOwner,
+			safeAddr
+		);
+	} else if (method === 3) {
+		await _proposeSecretRecover(
+			signer,
+			newThreshold,
+			oldOwner,
+			newOwner,
+			secret
+		);
+	} else if (method === 4) {
+		await _proposeSocialRecover(signer, newThreshold, oldOwner, newOwner);
+	} else {
+		console.log("unrecognized method index");
+		return "";
+	}
+
+	return newOwner;
+}
+
 export async function _proposeEcrecoverRecover(
 	signer: Signer,
 	newThreshold: number,
@@ -155,13 +205,6 @@ export async function _proposeEcrecoverRecover(
 		arrayify(msgHash)
 	);
 
-	//console.log("proof: ", ret.proof);
-	//console.log("publicInputs: ", ret.publicInputs);
-	//console.log("*pubInputMsgHash: ", ret.publicInputs.slice(1, 33));
-
-	// create proof
-	// eth-call func
-
 	const plugin = new ethers.Contract(
 		contracts.recoveryPlugin,
 		RecoveryPlugin.abi,
@@ -179,30 +222,117 @@ export async function _proposeEcrecoverRecover(
 			//ret.proof,
 			ret,
 			pubInputMsgHash,
-			//ret.publicInputs.slice(1, 33),
 			{ gasLimit: 2000000 }
 		)
 	).wait();
 
 	console.log("txResponse: ", txResponse);
 
-	//const result = await Noir.
-
-	/*
-           recoveryPlugin.proposeEcrecoverRecover(
-            ownersReplaced,
-            newPendingOwners,
-            1, // 2 -> 1
-            proof,
-            convertUint8ToBytes32(hashed_message1) //  bytes32[] memory _message
-        );
-    */
-
 	// testing purpose to increase block.timestamp
 	await signer.sendTransaction({ to: await signer.getAddress() });
 
 	return newOwner;
 }
+
+export async function _proposeFingerPrintRecover(
+	signer: Signer,
+	newThreshold: number,
+	oldOwner: string,
+	newOwner: string,
+	safeAddr: string
+) {
+	const plugin = new ethers.Contract(
+		contracts.recoveryPlugin,
+		RecoveryPlugin.abi,
+		signer
+	);
+	const credentialId = await getCredentialID(safeAddr);
+	const [signature, webauthnInputs] = await authenticateWebAuthn(credentialId);
+	//const pubkey = await getPubkeyByCredentialId([credentialId]);
+	const pubkey = await getWebAuthnPubkey();
+
+	console.log("webauthnInputs: ", webauthnInputs);
+	console.log("signature: ", signature);
+
+	console.log("pubkey: ", pubkey);
+
+	const message = await computeMessage(webauthnInputs);
+	console.log("message: ", message);
+
+	const ret = await generateProofP256(
+		arrayify(signature),
+		arrayify(pubkey[0]),
+		arrayify(pubkey[1]),
+		arrayify(message)
+	);
+
+	// const pubInputMsgHash = await parseUint8ArrayToBytes32(arrayify(msgHash));
+	// console.log("pubInputMsgHash: ", pubInputMsgHash);
+
+	const txResponse = await (
+		await plugin.proposeWebAuthnRecover(
+			[oldOwner],
+			[newOwner],
+			newThreshold,
+			ret,
+			//ret.proof,
+			webauthnInputs,
+			{ gasLimit: 2000000 }
+		)
+	).wait();
+
+	console.log("txResponse: ", txResponse);
+
+	await sleep(10000); // Wait for 10 seconds
+	// testing purpose to increase block.timestamp
+	await signer.sendTransaction({ to: await signer.getAddress() });
+
+	//return newOwner;
+}
+export async function _proposeSecretRecover(
+	signer: Signer,
+	newThreshold: number,
+	oldOwner: string,
+	newOwner: string,
+	secret: string
+) {
+	console.log("oldOwner: ", oldOwner);
+	console.log("newOwner: ", newOwner);
+	console.log("newThreshold: ", newThreshold);
+
+	const plugin = new ethers.Contract(
+		contracts.recoveryPlugin,
+		RecoveryPlugin.abi,
+		signer
+	);
+
+	const ret = await generateProofSecret(secret);
+	console.log("ret: ", ret);
+
+	const txResponse = await (
+		await plugin.proposeSecretRecover(
+			[oldOwner],
+			[newOwner],
+			newThreshold,
+			ret,
+			//ret.proof,
+			{ gasLimit: 2000000 }
+		)
+	).wait();
+
+	console.log("txResponse: ", txResponse);
+
+	await sleep(10000); // Wait for 10 seconds
+	// testing purpose to increase block.timestamp
+	await signer.sendTransaction({ to: await signer.getAddress() });
+}
+
+export async function _proposeSocialRecover(
+	signer: Signer,
+	newThreshold: number,
+	oldOwner: string,
+	newOwner: string
+) {}
 
 export async function _executeRecover(
 	signer: Signer,
@@ -264,3 +394,36 @@ export async function getRecoveryCount(): Promise<number> {
 // 	);
 // 	return secp256k1.publicKeyConvert(senderPubKey, false).slice(1);
 // }
+
+export async function parseUint8ArrayToBytes32(
+	value: Uint8Array
+): Promise<string[]> {
+	let array: string[] = [];
+	let i = 0;
+	for (i; i < value.length; i++) {
+		array[i] = utils.hexZeroPad(`0x${value[i].toString(16)}`, 32);
+	}
+	return array;
+}
+
+export async function getCredentialID(pluginAddr: any): Promise<string> {
+	return plugin.credentialId();
+}
+
+export async function getWebAuthnPubkey(): Promise<any> {
+	const pubkey = await plugin.getPubkeyXY();
+	console.log("pubkey: ", pubkey);
+	// const x = await plugin.getPubkeyXY()[0];
+	// const y = await plugin.getPubkeyXY()[1];
+	return pubkey;
+}
+
+export async function computeMessage(webAuthnInputs: any): Promise<string> {
+	return await plugin._computeMessage(webAuthnInputs);
+}
+
+async function sleep(ms) {
+	return new Promise((resolve) => {
+		setTimeout(resolve, ms);
+	});
+}

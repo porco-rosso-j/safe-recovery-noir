@@ -49,7 +49,9 @@ const AddressInfo = () => {
   useEffect(() => {
     ;(async () => {
       if(safeAddress !== '') {
-          const owner = (await getSafeOwners(safeAddress))[0]
+          const owners = await getSafeOwners(safeAddress)
+          console.log("owners; ", owners)
+          const owner = owners[0]
           console.log("owner; ", owner)
           saveCurrentOwner(owner)
       }

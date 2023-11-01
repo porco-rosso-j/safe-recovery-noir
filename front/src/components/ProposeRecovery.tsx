@@ -4,14 +4,14 @@ import {
 } from "@chakra-ui/react";
 import { useContext, useState, useEffect } from 'react'
 import UserCredentialContext from 'src/contexts/userCredential';
-import { _isMethodEnabled, _proposeEcrecoverRecover, getRecoveryCount } from '../../scripts/plugin'
+import { _isMethodEnabled, _proposeEcrecoverRecover, getRecoveryCount, _proposeRecovery } from '../scripts/plugin'
 
-const ProposeBackupAddress = () => {
+const ProposeRecovery = (props) => {
     const { safeAddress, safeSDK, signer } = useContext(UserCredentialContext);
     const [ownerReplaced, setOwnerReplaced] = useState<string>("");
     const [threshold, setThreshold] = useState<number>(0);
     const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
-    const [newOwner, setNewOwner] = useState<string>("");
+    const [secret, setSecret] = useState<string>("");
     const [recoveryCount, setRecoveryCount] = useState<number>(0)
     const [closeSuccess, setCloseSuccess] = useState<boolean>(true)
     // const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false)
@@ -76,15 +76,29 @@ const ProposeBackupAddress = () => {
                     placeholder="1"
                     onChange={(e) => setThreshold(Number(e.target.value))}
                     />
-                    </Box>
-                    </VStack>
+                 </Box>
+                { props.method === 3 ? (
+                    <Box display='flex' alignItems='center' mt={4} >
+                    <label >secret: </label>
+                    <Input
+                        ml={3}
+                        sx={{ w: "300px" }}
+                        size="sm"
+                        placeholder="password"
+                        onChange={(e) => setSecret(e.target.value)}
+                        />
+                     </Box>
+                ) : null } 
+                </VStack>
                 </Flex>
                </Box>
                     <Box sx={{ marginBottom: "6px" }} textAlign="center" alignItems="center">
                     <Button sx={{ mt: "35px" }} colorScheme="teal" w="55%"  onClick={async () => {
-                      if (pendingNewOwner !== "") {
-                         const _newOwner = await _proposeEcrecoverRecover(signer, threshold, ownerReplaced, pendingNewOwner);
-                         setNewOwner(_newOwner)
+                      if (pendingNewOwner !== "" && secret !== "") {
+                         // const _newOwner = await _proposeEcrecoverRecover(signer, threshold, ownerReplaced, pendingNewOwner);
+                         console.log("method: ", props.method)
+                         console.log("secret: ", secret)
+                         await _proposeRecovery(props.method, signer, threshold, ownerReplaced, pendingNewOwner, secret, safeAddress);
                          const _recoveryCount = await getRecoveryCount()
                          setRecoveryCount(Number(_recoveryCount))
                          setCloseSuccess(false)
@@ -117,4 +131,4 @@ const ProposeBackupAddress = () => {
     )
 }
 
-export default ProposeBackupAddress;
+export default ProposeRecovery;

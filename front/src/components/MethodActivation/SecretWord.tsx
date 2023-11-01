@@ -5,7 +5,7 @@ import {
 } from "@chakra-ui/react";
 import { useContext, useState, useEffect } from 'react'
 import UserCredentialContext from 'src/contexts/userCredential';
-import { _isMethodEnabled, _addSecretRecover } from '../scripts/plugin'
+import { _isMethodEnabled, _addSecretRecover } from '../../scripts/plugin'
 
 
 const SecretWord = () => {

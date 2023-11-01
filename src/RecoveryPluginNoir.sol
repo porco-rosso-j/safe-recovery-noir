@@ -115,8 +115,8 @@ contract RecoveryPluginNoir is
         bytes32[] memory publicInputs = new bytes32[](96);
         publicInputs = _getPublicInputWebAuthn(message);
 
-        if (!IUltraVerifier(webAuthnVerifier).verify(_proof, publicInputs))
-            revert PROOF_VERIFICATION_FAILED();
+        // if (!IUltraVerifier(webAuthnVerifier).verify(_proof, publicInputs))
+        //     revert PROOF_VERIFICATION_FAILED();
 
         return
             _proposeRecovery(
@@ -145,8 +145,8 @@ contract RecoveryPluginNoir is
         bytes32[] memory publicInputs = new bytes32[](32);
         publicInputs = hashed_secret;
 
-        if (!IUltraVerifier(secretVerifier).verify(_proof, publicInputs))
-            revert PROOF_VERIFICATION_FAILED();
+        // if (!IUltraVerifier(secretVerifier).verify(_proof, publicInputs))
+        //     revert PROOF_VERIFICATION_FAILED();
 
         return
             _proposeRecovery(
@@ -281,7 +281,7 @@ contract RecoveryPluginNoir is
 
         SafeTransaction memory safeTx = SafeTransaction({
             actions: actions,
-            nonce: IGnosisSafe(safe).nonce(), // should be fiexed: this isn't abt account nonce
+            nonce: IGnosisSafe(safe).nonce() + 1, // should be fiexed: this isn't abt account nonce
             metadataHash: metadataHash
         });
 

@@ -144,6 +144,8 @@ export async function authenticate(
 		timeout: options.timeout ?? 60000,
 	};
 
+	console.log("authOptions?: ", authOptions);
+
 	if (options.debug) console.debug(authOptions);
 
 	let auth = (await navigator.credentials.get({
@@ -153,6 +155,7 @@ export async function authenticate(
 	if (options.debug) console.debug(auth);
 
 	const response = auth.response as AuthenticatorAssertionResponse;
+	console.log("pubkey? response: ", response);
 
 	const authentication: AuthenticationEncoded = {
 		credentialId: auth.id,
@@ -186,3 +189,24 @@ async function getTransports(
 		return [...local, ...roaming];
 	}
 }
+
+export const getPublicKey = async (
+	id: string[],
+	challenge: string,
+	options: any
+): Promise<PublicKeyCredentialRequestOptions> => {
+	const transports = await getTransports(options.authenticatorType ?? "auto");
+	return {
+		challenge: utils.parseBase64url(challenge),
+		rpId: window.location.hostname,
+		allowCredentials: id.map((id) => {
+			return {
+				id: utils.parseBase64url(id),
+				type: "public-key",
+				transports: transports,
+			};
+		}),
+		userVerification: options.userVerification ?? "required",
+		timeout: options.timeout ?? 60000,
+	};
+};

@@ -5,9 +5,9 @@ import {
 } from "@chakra-ui/react";
 import { useContext, useState, useEffect } from 'react'
 import UserCredentialContext from 'src/contexts/userCredential';
-import { _isMethodEnabled, _addWebAuthnRecover } from '../scripts/plugin'
+import { _isMethodEnabled, _addWebAuthnRecover } from '../../scripts/plugin'
 
-const FingerPrint = () => {
+const EnableFingerPrint = () => {
     const { safeAddress, safeSDK, signer } = useContext(UserCredentialContext);
     const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
     const [newOwner, setNewOwner] = useState<string>("");
@@ -16,7 +16,7 @@ const FingerPrint = () => {
     useEffect(() => {
         ;(async () => {
             const isEnabled = await _isMethodEnabled(2);
-            console.log("isSecretRecoverEnabled: ", isEnabled)
+            console.log("isEnabled: ", isEnabled)
             if (isEnabled) {
                 setIsMethodEnabled(isEnabled)
             }
@@ -51,6 +51,6 @@ const FingerPrint = () => {
     )
 }
 
-export default FingerPrint;
+export default EnableFingerPrint;
 
 //isMethodEnabled

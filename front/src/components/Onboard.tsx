@@ -1,17 +1,16 @@
 
 // TransferTabs.tsx
-import { Box, Flex, Button, VStack, Divider, Tabs, TabList, Tab, TabPanels, TabPanel, Text } from "@chakra-ui/react";
+import { Box, Flex, Button, VStack, Divider, Tabs, TabList, Tab, TabPanels, TabPanel, Text, Select } from "@chakra-ui/react";
 import { useContext, useState, useEffect } from 'react'
 import UserCredentialContext from 'src/contexts/userCredential';
 import {isPluginEnabled, enablePlugin} from '../scripts/safe'
 import AddressInfo from './AddressInfo'
 import { shortenAddress } from "src/scripts/utils/address";
-import MethodOptions from './MethodOptions'
 import MethodHeader from './MethodHeader'
 
 const Onboard = () => {
   const { safeAddress, safeSDK, pluginAddress, isPluinEnabled, saveIsPluginEnabled} = useContext(UserCredentialContext);
-  const [method, setMethod] = useState<number>(0)
+  const [method, setMethod] = useState<number>(1)
   const [tabIndex, setTabIndex] = useState(0)
 
   console.log("tabIndex: ", tabIndex)
@@ -27,7 +26,6 @@ const Onboard = () => {
     return (
     <Box 
     p={5}
-    // backgroundColor={"gray.600"}
     backgroundColor={"#2e2e2e"}
     borderRadius="lg"
     boxShadow="lg"
@@ -63,14 +61,8 @@ const Onboard = () => {
             </Button>
           </Box>
         </Box>
-      ) : safeSDK !== null && method === 0 ? (
-        <Box >Pick your preferable recovery method
-          <MethodOptions updateMethod={updateMethod}/>
-        </Box>
-      ) :  safeSDK !== null ? (
-         <Box>
-           <MethodHeader updateMethod={updateMethod} method={method} index={tabIndex}/>
-         </Box>
+      ) : safeSDK !== null ? (
+          <MethodHeader updateMethod={updateMethod} method={method} index={tabIndex}/>
         ) : (
           <Box mt="10px">
           <Text>
@@ -80,22 +72,10 @@ const Onboard = () => {
         )}
           </TabPanel>
           <TabPanel >
-            { method === 0 ? (
-              <Box >Pick recovery method you want to propose
-              <MethodOptions updateMethod={updateMethod}/>
-              </Box>   
-            ) : (
-              <MethodHeader updateMethod={updateMethod} method={method} index={tabIndex}/>
-            )}
+              <MethodHeader updateMethod={updateMethod} method={method} index={tabIndex}/>  
           </TabPanel>
           <TabPanel >
-            { method === 0 ? (
-              <Box >Pick recovery method you want to execute
-              <MethodOptions updateMethod={updateMethod}/>
-              </Box>   
-            ) : (
               <MethodHeader updateMethod={updateMethod} method={method} index={tabIndex}/>
-            )}
           </TabPanel>
         </TabPanels>
       </Tabs>

@@ -71,39 +71,6 @@ export async function sendSafeTx(
 	console.log("res:", res);
 }
 
-export async function _proposeRecoveryWebAuthn(
-	pluginAddr: string,
-	oldOwnerAddresses: string[],
-	newOwnerAddresses: string[],
-	newThreshold: number,
-	webauthnInputs: any
-) {
-	const recoveryPlugin = new ethers.Contract(
-		pluginAddr,
-		RecoveryPlugin.abi,
-		provider
-	);
-	let proof;
-
-	try {
-		const tx = await (
-			await recoveryPlugin.proposeWebAuthnRecovery(
-				oldOwnerAddresses,
-				newOwnerAddresses,
-				newThreshold,
-				proof,
-				webauthnInputs,
-				{
-					gasLimit: 1000000,
-				}
-			)
-		).wait();
-		console.log("txhash: ", tx.transactionHash);
-	} catch (e) {
-		console.log("e: ", e);
-	}
-}
-
 export async function _executeRecover(pluginAddr: string, recoveryId: number) {
 	const recoveryPlugin = new ethers.Contract(
 		pluginAddr,
@@ -155,9 +122,4 @@ export async function getSafeOwners(safe: string): Promise<string[]> {
 	const safeContract = new ethers.Contract(safe, SafeAbi, provider);
 	// console.log("wat: ", );
 	return await safeContract.getOwners();
-}
-
-export async function getCredentialID(pluginAddr: any): Promise<string> {
-	const plugin = new ethers.Contract(pluginAddr, RecoveryPlugin.abi, provider);
-	return await plugin.credentialId();
 }

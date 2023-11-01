@@ -39,9 +39,10 @@ contract RecoverBase {
         address[] memory _newAddresses,
         uint _newThreshold
     ) internal returns (uint, uint) {
-        // uint newRecoveryCount = recoveryCount + 1;
-        recoveryCount += 1;
-        Recovery storage recovery = recoveries[recoveryCount];
+        uint newRecoveryCount = recoveryCount + 1;
+        recoveryCount = newRecoveryCount;
+
+        Recovery storage recovery = recoveries[newRecoveryCount];
 
         recovery.recoveryType = _recoveryType;
         recovery.ownersReplaced = _oldAddresses;
@@ -50,7 +51,7 @@ contract RecoverBase {
         recovery.deadline = block.timestamp + recoveryTimeLock;
 
         // should emit an event to notify owner
-        return (recoveryCount, recovery.deadline);
+        return (newRecoveryCount, recovery.deadline);
     }
 
     // getter
