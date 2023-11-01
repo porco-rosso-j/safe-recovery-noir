@@ -1,0 +1,278 @@
+{
+    "noir_version": "0.18.0+1de0e6d0acb18f3164a3b1fbc1be6438ef16be39",
+    "hash": 3479275620480316148,
+    "backend": "acvm-backend-barretenberg",
+    "abi": {
+        "parameters": [
+            {
+                "name": "root",
+                "type": {
+                    "kind": "field"
+                },
+                "visibility": "public"
+            },
+            {
+                "name": "proposal_id",
+                "type": {
+                    "kind": "field"
+                },
+                "visibility": "public"
+            },
+            {
+                "name": "nullifierHash",
+                "type": {
+                    "kind": "field"
+                },
+                "visibility": "public"
+            },
+            {
+                "name": "hashed_message",
+                "type": {
+                    "kind": "array",
+                    "length": 32,
+                    "type": {
+                        "kind": "integer",
+                        "sign": "unsigned",
+                        "width": 8
+                    }
+                },
+                "visibility": "public"
+            },
+            {
+                "name": "pub_key",
+                "type": {
+                    "kind": "array",
+                    "length": 64,
+                    "type": {
+                        "kind": "integer",
+                        "sign": "unsigned",
+                        "width": 8
+                    }
+                },
+                "visibility": "private"
+            },
+            {
+                "name": "signature",
+                "type": {
+                    "kind": "array",
+                    "length": 64,
+                    "type": {
+                        "kind": "integer",
+                        "sign": "unsigned",
+                        "width": 8
+                    }
+                },
+                "visibility": "private"
+            },
+            {
+                "name": "index",
+                "type": {
+                    "kind": "field"
+                },
+                "visibility": "private"
+            },
+            {
+                "name": "hash_path",
+                "type": {
+                    "kind": "array",
+                    "length": 2,
+                    "type": {
+                        "kind": "field"
+                    }
+                },
+                "visibility": "private"
+            }
+        ],
+        "param_witnesses": {
+            "hash_path": [
+                165,
+                166
+            ],
+            "hashed_message": [
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35
+            ],
+            "index": [
+                164
+            ],
+            "nullifierHash": [
+                3
+            ],
+            "proposal_id": [
+                2
+            ],
+            "pub_key": [
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87,
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99
+            ],
+            "root": [
+                1
+            ],
+            "signature": [
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+                115,
+                116,
+                117,
+                118,
+                119,
+                120,
+                121,
+                122,
+                123,
+                124,
+                125,
+                126,
+                127,
+                128,
+                129,
+                130,
+                131,
+                132,
+                133,
+                134,
+                135,
+                136,
+                137,
+                138,
+                139,
+                140,
+                141,
+                142,
+                143,
+                144,
+                145,
+                146,
+                147,
+                148,
+                149,
+                150,
+                151,
+                152,
+                153,
+                154,
+                155,
+                156,
+                157,
+                158,
+                159,
+                160,
+                161,
+                162,
+                163
+            ]
+        },
+        "return_type": {
+            "kind": "field"
+        },
+        "return_witnesses": [
+            3
+        ]
+    },
+    "bytecode": "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"
+}

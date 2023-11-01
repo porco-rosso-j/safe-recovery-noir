@@ -94,7 +94,7 @@ const ProposeRecovery = (props) => {
                </Box>
                     <Box sx={{ marginBottom: "6px" }} textAlign="center" alignItems="center">
                     <Button sx={{ mt: "35px" }} colorScheme="teal" w="55%"  onClick={async () => {
-                      if (pendingNewOwner !== "" && secret !== "") {
+                      if (pendingNewOwner !== "") {
                          // const _newOwner = await _proposeEcrecoverRecover(signer, threshold, ownerReplaced, pendingNewOwner);
                          console.log("method: ", props.method)
                          console.log("secret: ", secret)

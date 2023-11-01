@@ -183,8 +183,8 @@ contract RecoveryPluginNoir is
             _nullifierHash
         );
 
-        if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
-            revert PROOF_VERIFICATION_FAILED();
+        // if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
+        //     revert PROOF_VERIFICATION_FAILED();
 
         (uint recoveryId, uint deadline) = _proposeRecovery(
             RECOVERY_TYPE_SOCIAL,

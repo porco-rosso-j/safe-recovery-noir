@@ -4,6 +4,7 @@ import { CompiledCircuit, ProofData } from "@noir-lang/types";
 import k256 from "../artifacts/circuits/k256.json";
 import p256 from "../artifacts/circuits/p256.json";
 import secret from "../artifacts/circuits/secret.json";
+import social from "../artifacts/circuits/social.json";
 import pedersen from "../artifacts/circuits/pedersen_new.json";
 import { getSecretBytesAndHashFromSecret } from "../utils/secret";
 import { utils } from "ethers";
@@ -101,6 +102,54 @@ export async function generateProofSecret(_secret: string): Promise<any> {
 	const input = {
 		preimage: secretBytes,
 		hash: hash,
+	};
+
+	console.log("input: ", input);
+
+	// const proof: ProofData = await noir.generateFinalProof(input);
+	// console.log("proof: ", proof);
+	const proof = Buffer.from("0x");
+	// // const { witness } = await noir.execute(input);
+	// // const proof = await backend.generateFinalProof(witness);
+
+	// const result = await noir.verifyFinalProof(proof);
+	// console.log("result: ", result);
+
+	return proof;
+}
+
+export async function generateProofSocial(
+	root: string,
+	nullHash: string,
+	proposalId: string,
+	pubkey: Uint8Array,
+	signature: Uint8Array,
+	msgHash: Uint8Array,
+	index: string,
+	hashPath: string[]
+): Promise<any> {
+	const program = social as CompiledCircuit;
+	const backend = new BarretenbergBackend(program);
+	const noir = new Noir(program, backend);
+
+	const pubkeyBytes32Array = await parseUint8ArrayToStrArray(pubkey);
+	console.log("pubkeyBytes32Array: ", pubkeyBytes32Array);
+
+	const signatureBytes32Array = await parseUint8ArrayToStrArray(signature);
+	console.log("signatureBytes32Array: ", signatureBytes32Array);
+
+	const msgHashBytes32Array = await parseUint8ArrayToStrArray(msgHash);
+	console.log("msgHashBytes32Array: ", msgHashBytes32Array);
+
+	const input = {
+		root: root,
+		proposal_id: proposalId,
+		nullifierHash: nullHash,
+		hashed_message: msgHashBytes32Array,
+		pub_key: pubkeyBytes32Array,
+		signature: signatureBytes32Array,
+		index: index,
+		hash_path: hashPath,
 	};
 
 	console.log("input: ", input);

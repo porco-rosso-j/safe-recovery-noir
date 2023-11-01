@@ -1,10 +1,13 @@
 import { ethers, Signer, utils } from "ethers";
 import { contracts } from "./constants/addresses";
 import RecoveryPlugin from "./artifacts/contracts/RecoveryPluginNoir.json";
-import { pedersen, pedersen_new } from "./utils/pedersen";
+import { pedersen_new } from "./utils/pedersen";
 import { sendSafeTx } from "./safe";
 import { getKeyPairAndID } from "./webauthn-utils";
-import { getMerkleRootFromAddresses } from "./merkle";
+import {
+	getMerkleRootFromAddresses,
+	getNullifierHashAndHashPath,
+} from "./merkle";
 import { getHashFromSecret } from "./utils/secret";
 import Safe from "@safe-global/protocol-kit";
 import { privatekeys } from "./constants/addresses";
@@ -13,12 +16,12 @@ import {
 	generateProofK256,
 	generateProofP256,
 	generateProofSecret,
+	generateProofSocial,
 } from "./noir/proof";
 import {
 	authenticateWebAuthn,
 	getPubkeyByCredentialId,
 } from "./webauthn-utils";
-import { Noir } from "@noir-lang/noir_js";
 
 const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
 const plugin = new ethers.Contract(
@@ -332,7 +335,63 @@ export async function _proposeSocialRecover(
 	newThreshold: number,
 	oldOwner: string,
 	newOwner: string
-) {}
+) {
+	const msg = "social_recovery";
+	const signature: string = await signer.signMessage(msg);
+	const msgHash: string = ethers.utils.hashMessage(msg);
+	const pubkey: string = utils.recoverPublicKey(
+		msgHash,
+		utils.arrayify(signature)
+	);
+
+	const proposalId = Number(await getRecoveryCount()) + 1;
+	const root = await getGuardiansRoot();
+
+	const { index, nullHash, hashPath } = await getNullifierHashAndHashPath(
+		root,
+		await signer.getAddress(),
+		proposalId.toString()
+	);
+
+	const ret = await generateProofSocial(
+		root,
+		nullHash,
+		proposalId.toString(),
+		arrayify(pubkey).slice(1, 65),
+		arrayify(signature).slice(0, -1),
+		arrayify(msgHash),
+		index.toString(),
+		hashPath
+	);
+
+	const plugin = new ethers.Contract(
+		contracts.recoveryPlugin,
+		RecoveryPlugin.abi,
+		signer
+	);
+
+	const pubInputMsgHash = await parseUint8ArrayToBytes32(arrayify(msgHash));
+	console.log("pubInputMsgHash: ", pubInputMsgHash);
+
+	const txResponse = await (
+		await plugin.proposeSocialRecover(
+			[oldOwner],
+			[newOwner],
+			newThreshold,
+			ret,
+			//ret.proof,
+			nullHash,
+			pubInputMsgHash,
+			{ gasLimit: 2000000 }
+		)
+	).wait();
+
+	console.log("txResponse: ", txResponse);
+
+	await sleep(10000); // Wait for 10 seconds
+	// testing purpose to increase block.timestamp
+	await signer.sendTransaction({ to: await signer.getAddress() });
+}
 
 export async function _executeRecover(
 	signer: Signer,
@@ -378,23 +437,6 @@ export async function getRecoveryCount(): Promise<number> {
 	return plugin.recoveryCount();
 }
 
-// async function test(msgHash: string, v, r, s) {
-// 	const signature = Buffer.concat(
-// 		[exports.setLength(r, 32), exports.setLength(s, 32)],
-// 		64
-// 	);
-// 	const recovery = v - 27;
-// 	if (recovery !== 0 && recovery !== 1) {
-// 		throw new Error("Invalid signature v value");
-// 	}
-// 	const senderPubKey = ethers.utils.computePublicKey()(
-// 		msgHash,
-// 		signature,
-// 		recovery
-// 	);
-// 	return secp256k1.publicKeyConvert(senderPubKey, false).slice(1);
-// }
-
 export async function parseUint8ArrayToBytes32(
 	value: Uint8Array
 ): Promise<string[]> {
@@ -420,6 +462,10 @@ export async function getWebAuthnPubkey(): Promise<any> {
 
 export async function computeMessage(webAuthnInputs: any): Promise<string> {
 	return await plugin._computeMessage(webAuthnInputs);
+}
+
+export async function getGuardiansRoot(): Promise<string> {
+	return await plugin.guardiansRoot();
 }
 
 async function sleep(ms) {

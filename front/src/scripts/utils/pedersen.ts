@@ -13,14 +13,7 @@ export async function pedersen_new(
 	const program = pedersenNewCircuit as CompiledCircuit;
 	const noir = new Noir(program);
 
-	let array =
-		_length === 1
-			? [_inputs[0], "0", "0"]
-			: _length === 2
-			? [_inputs[0], _inputs[1], "0"]
-			: _length === 3
-			? [_inputs[0], _inputs[1], _inputs[2]]
-			: ["0"];
+	const array = await paddArray(_inputs, _length);
 
 	const inputs = {
 		input: array,
@@ -34,39 +27,47 @@ export async function pedersen_new(
 	return returnValue.toString();
 }
 
-export async function pedersen(_x: string, _y: string): Promise<string> {
-	const program = pedersenCircuit as CompiledCircuit;
-	const noir = new Noir(program);
-
-	const inputs = {
-		x: _x,
-		y: _y,
-	};
-
-	const { returnValue } = await noir.execute(inputs);
-
-	console.log("return: ", returnValue);
-	return returnValue.toString();
+async function paddArray(array: string[], length: number): Promise<string[]> {
+	const complement = 10 - length;
+	for (let i = 0; i < complement; i++) {
+		array.push("0");
+	}
+	return array;
 }
 
-export async function pedersen3(
-	_x: string,
-	_y: string,
-	_z: string
-): Promise<string> {
-	const program = pedersen3Circuit as CompiledCircuit;
-	const noir = new Noir(program);
+// export async function pedersen(_x: string, _y: string): Promise<string> {
+// 	const program = pedersenCircuit as CompiledCircuit;
+// 	const noir = new Noir(program);
 
-	const inputs = {
-		x: _x,
-		y: _y,
-		z: _z,
-	};
+// 	const inputs = {
+// 		x: _x,
+// 		y: _y,
+// 	};
 
-	const { returnValue } = await noir.execute(inputs);
-	// console.log("return: ", returnValue);
-	return returnValue.toString();
-}
+// 	const { returnValue } = await noir.execute(inputs);
+
+// 	console.log("return: ", returnValue);
+// 	return returnValue.toString();
+// }
+
+// export async function pedersen3(
+// 	_x: string,
+// 	_y: string,
+// 	_z: string
+// ): Promise<string> {
+// 	const program = pedersen3Circuit as CompiledCircuit;
+// 	const noir = new Noir(program);
+
+// 	const inputs = {
+// 		x: _x,
+// 		y: _y,
+// 		z: _z,
+// 	};
+
+// 	const { returnValue } = await noir.execute(inputs);
+// 	// console.log("return: ", returnValue);
+// 	return returnValue.toString();
+// }
 
 // export async function merkleRoot(
 // 	_leaf: string,
@@ -94,16 +95,21 @@ type Merkle = {
 	hashed_nodes0: string[];
 };
 
-export async function getMerkleRoot(nodes: string[]): Promise<Merkle> {
-	const hash1_0 = await pedersen(nodes[0], nodes[1]);
-	const hash1_1 = await pedersen(nodes[2], nodes[3]);
-	const root = await pedersen(hash1_0, hash1_1);
+export async function getMerkleTree(nodes: string[]): Promise<Merkle> {
+	// const hash1_0 = await pedersen(nodes[0], nodes[1]);
+	// const hash1_1 = await pedersen(nodes[2], nodes[3]);
+	// const root = await pedersen(hash1_0, hash1_1);
+	const hash1_0 = await pedersen_new([nodes[0], nodes[1]], 2);
+	const hash1_1 = await pedersen_new([nodes[2], nodes[3]], 2);
+	const root = await pedersen_new([hash1_0, hash1_1], 2);
 
 	let merkle: Merkle = {
 		root: root,
 		hashed_nodes1: [hash1_0, hash1_1],
 		hashed_nodes0: nodes,
 	};
+
+	console.log("merkle: ", merkle);
 
 	return merkle;
 }
