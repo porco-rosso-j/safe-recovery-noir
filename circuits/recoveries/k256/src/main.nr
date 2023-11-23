@@ -18,7 +18,7 @@ fn main(
 
     //std::println(recovered_addr);
 
-    let computed_hash = std::hash::pedersen([recovered_addr])[0];
+    let computed_hash = std::hash::pedersen_hash([recovered_addr]);
     // std::println(computed_hash);
     // std::println(hashedAddr);
 
@@ -44,7 +44,7 @@ fn test_main() {
     245, 159,  97, 254, 245, 123, 13,  42, 165
   ];
 
-  let hashedAddr = 0x11afe536a3d158d626aabefad9dc7a70ef5f23280d262cd7db5da5bd8d5f87e6;
+  let hashedAddr = 0x01e32ef55c3585d88ccf0201b61bd7dea1f69b13f251ba9082cf0cb190d47071;
     
   let signature = [
     117, 243, 201, 212, 4, 53, 177, 246, 42, 131, 162, 141, 

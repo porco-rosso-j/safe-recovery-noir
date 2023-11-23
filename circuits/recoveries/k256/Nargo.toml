@@ -2,7 +2,7 @@
 name = "k256"
 type = "bin"
 authors = ["porco"]
-compiler_version = "0.18.0"
+compiler_version = ">=0.19.2"
 
 [dependencies]
-ecrecover = { tag = "v0.10.1", git = "https://github.com/colinnielsen/ecrecover-noir" }
+ecrecover = { tag = "main", git = "https://github.com/porco-rosso-j/ecrecover-noir" }
