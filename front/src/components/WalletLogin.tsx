@@ -1,10 +1,9 @@
 import { Box, Input, Button, Text, useColorModeValue } from "@chakra-ui/react";
 import React, { useState, useContext } from "react";
-import UserCredentialContext from 'src/contexts/userCredential';
+import UserDataContext from 'src/contexts/userData';
 // import * as ethers from "ethers"
 import {ethers, providers, Signer} from "ethers"
 import Safe, {EthersAdapter} from '@safe-global/protocol-kit'
-// import {EthAdapter} from '@safe-global/safe-core-sdk-types'
 
 declare global {
   interface Window {
@@ -14,7 +13,7 @@ declare global {
 
 const WalletLogin: React.FC = () => {
 
-  const { saveSafeAddress, saveSafeSDK, saveSigner } = useContext(UserCredentialContext);
+  const { saveSafeAddress, saveSafeSDK, saveSigner } = useContext(UserDataContext);
   const [safeAddressInput, setSafeAddressInput] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string>('')
 

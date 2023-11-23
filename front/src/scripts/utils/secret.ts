@@ -1,8 +1,5 @@
-import { parseUint8ArrayToStrArray } from "../noir/proof";
-import pedersen from "../artifacts/circuits/pedersen_new.json";
-import { CompiledCircuit } from "@noir-lang/types";
-import { BarretenbergBackend } from "@noir-lang/backend_barretenberg";
-import { Noir } from "@noir-lang/noir_js";
+import { parseUint8ArrayToStrArray } from "./parser";
+import { pedersenHash } from "./pedersen";
 
 export async function getHashFromSecret(_secret: string): Promise<string> {
 	const textEncoder = new TextEncoder();
@@ -17,7 +14,7 @@ export async function getHashFromSecret(_secret: string): Promise<string> {
 		secretBytes32Array[length + i] = "0";
 	}
 
-	const hash = await pedersenSecret(secretBytes32Array, length);
+	const hash = await pedersenHash(secretBytes32Array);
 	console.log("hash: ", hash);
 	return hash;
 }
@@ -42,24 +39,7 @@ export async function getSecretBytesAndHashFromSecret(
 		secretBytes32Array[length + i] = "0";
 	}
 
-	const _hash = await pedersenSecret(secretBytes32Array, length);
+	const _hash = await pedersenHash(secretBytes32Array);
 	console.log("hash: ", _hash);
 	return { secretBytes: secretBytes32Array, hash: _hash };
-}
-
-async function pedersenSecret(
-	secretBytes: string[],
-	_length: number
-): Promise<string> {
-	const program = pedersen as CompiledCircuit;
-	const backend = new BarretenbergBackend(program);
-	const noir = new Noir(program, backend);
-
-	const inputs = {
-		input: secretBytes,
-		length: _length.toString(),
-	};
-
-	const { returnValue } = await noir.execute(inputs);
-	return returnValue.toString();
 }

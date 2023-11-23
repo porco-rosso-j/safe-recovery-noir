@@ -1,7 +1,5 @@
-// import { _proposeRecoveryWebAuthn } from "./safe";
-import { getCredentialID } from "./plugin";
-import { register, authenticate, getPublicKey } from "./webauthn/client";
-import * as utils from "./webauthn/helper";
+import { register, authenticate, getPublicKey } from "./client";
+import * as utils from "./helper";
 import * as ethers from "ethers";
 
 export async function getKeyPairAndID(safeAddr: string): Promise<any> {
@@ -31,45 +29,6 @@ export async function getKeyPairAndID(safeAddr: string): Promise<any> {
 		id: res.credential.id.toString(),
 	};
 }
-
-// export async function changeOwner(
-// 	safeAddr,
-// 	safeSdk,
-// 	pluginAddr,
-// 	currentOwner,
-// 	pendingNewOwner,
-// 	newThreshold
-// ) {
-// 	const credentialId = await getCredentialID(safeAddr);
-// 	let result;
-// 	try {
-// 		result = await authenticate(
-// 			credentialId ? [credentialId] : [],
-// 			utils.data.challenge,
-// 			utils.data.authOptions
-// 		);
-// 	} catch (e) {
-// 		console.warn(e);
-// 	}
-
-// 	console.log("result: ", result);
-
-// 	const [signature, webauthnInputs] = await getWebAuthnInputs(
-// 		result?.signature,
-// 		result?.authenticatorData,
-// 		result?.clientData
-// 	);
-
-// 	await _proposeRecoveryWebAuthn(
-// 		pluginAddr,
-// 		currentOwner,
-// 		pendingNewOwner,
-// 		newThreshold,
-// 		webauthnInputs
-// 	);
-
-// 	return safeSdk.getOwners()[0];
-// }
 
 export async function authenticateWebAuthn(credentialId: string) {
 	let result;
@@ -135,25 +94,3 @@ async function getWebAuthnInputs(_signature, _authenticatorData, _clientData) {
 
 	return [signature, ethers.utils.arrayify(webauthnInputs)];
 }
-
-// async function getPublicKey(creadentialId: string): Promise<any> {
-// 	const publicKey = {
-// 		challenge: utils.data.challenge,
-// 		allowCredentials: [
-// 			{
-// 				type: "public-key",
-// 				id: creadentialId,
-// 			},
-// 		],
-// 	};
-
-// 	navigator.credentials
-// 		.get({ publicKey })
-// 		.then((credentialInfo) => {
-// 			// Credential information is available in credentialInfo
-// 			console.log(credentialInfo);
-// 		})
-// 		.catch((error) => {
-// 			console.error(error);
-// 		});
-// }

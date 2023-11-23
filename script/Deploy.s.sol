@@ -52,12 +52,12 @@ contract Deploy is Script {
 
         registry.addModule(address(recoveryPlugin), 1);
 
-        // console.logString("recoveryPlugin");
-        // console.logAddress(address(recoveryPlugin));
-        // console.logString("factory");
-        // console.logAddress(address(factory));
-        // console.logString("manager");
-        // console.logAddress(address(manager));
+        console.logString("recoveryPlugin");
+        console.logAddress(address(recoveryPlugin));
+        console.logString("factory");
+        console.logAddress(address(factory));
+        console.logString("manager");
+        console.logAddress(address(manager));
 
         string memory path = "./front/src/scripts/constants/addresses.json";
         string memory valueKey = "contracts";

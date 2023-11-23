@@ -8,8 +8,8 @@ import {
   Text,
   useColorModeValue
 } from "@chakra-ui/react";
-import useUserCredential from 'src/hooks/useUserCredential';
-import UserCredentialContext from 'src/contexts/userCredential';
+import useUserData from 'src/hooks/useUserData';
+import UserDataContext from 'src/contexts/userData';
 
 import Onboard from 'src/components/Onboard';
 import { useEffect } from 'react';
@@ -30,7 +30,7 @@ function App() {
     saveIsPluginEnabled,
     saveCurrentOwner,
     logout
-  } = useUserCredential();
+  } = useUserData();
 
   const getShowLoginPage = () => {
     //if (safeSDK === null || signer === null || safeAddress === '') {
@@ -42,7 +42,7 @@ function App() {
   }
 
   return <ChakraProvider theme={chakraDefaultTheme}>
-    <UserCredentialContext.Provider value={{
+    <UserDataContext.Provider value={{
     safeAddress,
     safeSDK,
     signer,
@@ -74,7 +74,7 @@ function App() {
         </Box>
       </Container>
      <Footer/>
-    </UserCredentialContext.Provider>
+    </UserDataContext.Provider>
   </ChakraProvider>
 
 }

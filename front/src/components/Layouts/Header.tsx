@@ -1,11 +1,11 @@
 // import { Flex, Box, Button } from '@chakra-ui/react'
 import { useContext } from 'react'
-import UserCredentialContext from 'src/contexts/userCredential';
+import UserDataContext from 'src/contexts/userData';
 import logo from "../../assets/logo.png";
 
 import { Box, Button, Flex, Text, HStack, useColorModeValue } from '@chakra-ui/react';
 export default function Header() {
-  const { signer, logout } = useContext(UserCredentialContext);
+  const { signer, logout } = useContext(UserDataContext);
   return  <Box>
    {/* <Box bg={useColorModeValue('#01796F', 'gray.700')}> */}
   <Flex justify="space-between" p={4}>

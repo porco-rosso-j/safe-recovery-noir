@@ -3,11 +3,11 @@ import {
     Input, Flex, Button, StatNumber, Stat, StatLabel, Text, VStack
 } from "@chakra-ui/react";
 import { useContext, useState, useEffect } from 'react'
-import UserCredentialContext from 'src/contexts/userCredential';
-import { _isMethodEnabled, _executeRecover, getNewOwnerForPoposal, _getIsRecoveryExecutable } from '../scripts/plugin'
+import UserDataContext from 'src/contexts/userData';
+import { _isMethodEnabled, _executeRecover, getNewOwnerForPoposal, _getIsRecoveryExecutable } from '../scripts/plugins/index'
 
 const ExecuteRecovery = (props) => {
-    const { safeAddress, safeSDK, signer, currentOwner, saveCurrentOwner } = useContext(UserCredentialContext);
+    const { safeAddress, safeSDK, signer, currentOwner, saveCurrentOwner } = useContext(UserDataContext);
     const [expectedNewOwner, setExpectedNewOwner] = useState<string>("");
     const [proposalId, setProposalId] = useState<number>(0);
     const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false)

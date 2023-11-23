@@ -2,14 +2,14 @@
 // TransferTabs.tsx
 import { Box, Flex, Button, VStack, Divider, Tabs, TabList, Tab, TabPanels, TabPanel, Text, Select } from "@chakra-ui/react";
 import { useContext, useState, useEffect } from 'react'
-import UserCredentialContext from 'src/contexts/userCredential';
-import {isPluginEnabled, enablePlugin} from '../scripts/safe'
+import UserDataContext from 'src/contexts/userData';
+import {isPluginEnabled, enablePlugin} from '../scripts/utils/safe'
 import AddressInfo from './AddressInfo'
 import { shortenAddress } from "src/scripts/utils/address";
 import MethodHeader from './MethodHeader'
 
 const Onboard = () => {
-  const { safeAddress, safeSDK, pluginAddress, isPluinEnabled, saveIsPluginEnabled} = useContext(UserCredentialContext);
+  const { safeAddress, safeSDK, pluginAddress, isPluinEnabled, saveIsPluginEnabled} = useContext(UserDataContext);
   const [method, setMethod] = useState<number>(1)
   const [tabIndex, setTabIndex] = useState(0)
 
@@ -51,7 +51,7 @@ const Onboard = () => {
         
             <Button sx={{ mt: "10px", mb: "10px" }}  colorScheme="teal" w="50%"  onClick={async () => {
               await enablePlugin(safeAddress, safeSDK)
-              const _isPluginEnabled = await isPluginEnabled(safeAddress, pluginAddress);
+              const _isPluginEnabled = await isPluginEnabled(safeAddress);
               console.log("isPluginEnabled: ", _isPluginEnabled)
               if (_isPluginEnabled) {
                 saveIsPluginEnabled(_isPluginEnabled)

@@ -2,7 +2,7 @@ import { useState } from "react"
 import {Signer} from "ethers"
 import Safe from '@safe-global/protocol-kit'
 
-const useUserCredential = () => {
+const useUserData = () => {
   const [safeAddress, setSafeAddress] = useState<string | null>('');
   const [safeSDK, setSafeSDK] = useState<Safe | null>(null);
   const [signer, setSigner] = useState<Signer | null>(null);
@@ -59,4 +59,4 @@ const useUserCredential = () => {
   };
 };
 
-export default useUserCredential;
+export default useUserData;

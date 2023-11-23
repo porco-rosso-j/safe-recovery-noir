@@ -1,13 +1,9 @@
 import { BarretenbergBackend } from "@noir-lang/backend_barretenberg";
 import { Noir } from "@noir-lang/noir_js";
-import { CompiledCircuit, ProofData } from "@noir-lang/types";
-import k256 from "../artifacts/circuits/k256.json";
-import p256 from "../artifacts/circuits/p256.json";
-import secret from "../artifacts/circuits/secret.json";
-import social from "../artifacts/circuits/social.json";
-import pedersen from "../artifacts/circuits/pedersen_new.json";
+import { CompiledCircuit } from "@noir-lang/types";
+import { k256, p256, secret, social } from "../artifacts/circuits/index";
 import { getSecretBytesAndHashFromSecret } from "../utils/secret";
-import { utils } from "ethers";
+import { parseUint8ArrayToStrArray } from "./parser";
 
 export async function generateProofK256(
 	hashedAddress: string,
@@ -164,53 +160,4 @@ export async function generateProofSocial(
 	// console.log("result: ", result);
 
 	return proof;
-}
-
-export async function parseUint8ArrayToStrArray(
-	value: Uint8Array
-): Promise<string[]> {
-	let array: string[] = [];
-	let i = 0;
-	for (i; i < value.length; i++) {
-		// array[i] = utils.hexZeroPad(`0x${value[i].toString(16)}`, 32);
-		array[i] = value[i].toString();
-	}
-	return array;
-}
-
-async function concatAllInputs(
-	hashedAddr: string,
-	pubkey: string[],
-	signature: string[],
-	msgHash: string[]
-): Promise<any> {
-	let inputArray = new Map<string, string>();
-	let total;
-
-	inputArray.set("0", hashedAddr);
-	total += 1;
-
-	let i = 0;
-	let key;
-
-	for (i; i < 64; i++) {
-		key = (total + i).toString();
-		inputArray.set(key, pubkey[i]);
-	}
-	total += 64;
-
-	let j = 0;
-	for (j; j < 64; j++) {
-		key = (total + j).toString();
-		inputArray.set(key, signature[j]);
-	}
-	total += 64;
-
-	let k = 0;
-	for (k; k < 32; k++) {
-		key = (total + i).toString();
-		inputArray.set(key, msgHash[k]);
-	}
-
-	return inputArray;
 }

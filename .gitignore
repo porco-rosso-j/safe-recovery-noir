@@ -13,10 +13,7 @@ docs/
 
 # Circuits
 circuits/**/crs/
-circuits/target/
-circuits/ecrecover-k256/contract/.DS_Store
-circuits/secret/contract/.DS_Store
-circuits/p256/contract.DS_Store
+circuits/utils/
 
 # Misc
 trash

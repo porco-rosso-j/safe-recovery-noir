@@ -13,10 +13,11 @@ module.exports = {
       "path": false,
       "stream": false,
       "url": false,
-      "os": false,
       "crypto": false,
       "assert": false,
-      util: require.resolve("util/")
+      util: require.resolve("util/"),
+      os: false,
+      // os: require.resolve("os-browserify/browser")
     }
 
     config.plugins = (config.plugins || []).concat([
@@ -32,6 +33,7 @@ module.exports = {
       alias: {
         ...config.resolve.alias,
         // "./node_modules/@graphql-tools/url-loader/cjs$": path.resolve(__dirname, "index.js")
+        os: "./node_modules/os-browserify/browser.js"
       },
     }
 

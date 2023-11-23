@@ -3,11 +3,11 @@ import {
     Input, Flex, Button, StatNumber, Stat, StatLabel, Text, VStack
 } from "@chakra-ui/react";
 import { useContext, useState, useEffect } from 'react'
-import UserCredentialContext from 'src/contexts/userCredential';
-import { _isMethodEnabled, _addSocialRecover } from '../../scripts/plugin'
+import UserDataContext from 'src/contexts/userData';
+import { _isMethodEnabled, _addSocialRecover } from '../../scripts/plugins/index'
 
 const SocialRecovery = () => {
-    const { safeAddress, safeSDK, signer } = useContext(UserCredentialContext);
+    const { safeAddress, safeSDK, signer } = useContext(UserDataContext);
     const [threshold, setThreshold] = useState<number>(0);
     const [guardians, setGuardians] = useState<string[]>(['']);
     // const [newOwner, setNewOwner] = useState<string>("");

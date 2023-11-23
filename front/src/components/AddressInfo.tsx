@@ -3,9 +3,8 @@ import { Flex, Text, VStack, Box,  Button, IconButton, CheckboxIcon, Spacer} fro
 import {ChevronDownIcon} from '@chakra-ui/icons'
 import { useContext, useState, useEffect } from 'react'
 import * as ethers from "ethers"
-import {shortenAddress} from '../scripts/utils/address'
-import UserCredentialContext from 'src/contexts/userCredential';
-import {getSafePluginAddress, isPluginEnabled, getSafeOwners} from '../scripts/safe'
+import UserDataContext from 'src/contexts/userData';
+import {getSafePluginAddress, isPluginEnabled, getSafeOwners} from '../scripts/utils/safe'
 
 const AddressInfo = () => {
   const { 
@@ -16,7 +15,7 @@ const AddressInfo = () => {
     savePluginAdddress, 
     saveIsPluginEnabled, 
     saveCurrentOwner
-} = useContext(UserCredentialContext);
+} = useContext(UserDataContext);
 //   const [currentOwner, setCurrentOwner] = useState<string>("")
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -37,7 +36,7 @@ const AddressInfo = () => {
   useEffect(() => {
     ;(async () => {
       if(pluginAddress !== "" && !isPluinEnabled) {
-          const _isPluginEnabled = await isPluginEnabled(safeAddress, pluginAddress);
+          const _isPluginEnabled = await isPluginEnabled(safeAddress);
           console.log("isPluginEnabled: ", _isPluginEnabled)
           if (_isPluginEnabled) {
             saveIsPluginEnabled(_isPluginEnabled)
