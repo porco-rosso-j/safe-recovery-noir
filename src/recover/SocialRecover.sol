@@ -30,10 +30,10 @@ contract SocialRecover is RecoverBase {
     }
 
     function _incrementApprovalCount(
-        uint _recoveryId,
+        uint _proposalId,
         bytes32 _nullifierHash
     ) internal returns (uint) {
-        Recovery storage recovery = recoveries[_recoveryId];
+        Recovery storage recovery = recoveries[_proposalId];
         require(!recovery.nullifierHash[_nullifierHash], "INVALID_NULLIFIER");
         recovery.nullifierHash[_nullifierHash] = true;
         recovery.approvalCount += 1;
@@ -42,13 +42,13 @@ contract SocialRecover is RecoverBase {
     }
 
     function _getPublicInputSocial(
-        uint _recoveryId,
+        uint _proposalId,
         bytes32[] memory _publicInputs,
         bytes32[] memory _message,
         bytes32 _nullifierHash
     ) internal view returns (bytes32[] memory) {
         _publicInputs[0] = guardiansRoot;
-        _publicInputs[1] = bytes32(_recoveryId);
+        _publicInputs[1] = bytes32(_proposalId);
         //_publicInputs[1] = bytes32(0);
         _publicInputs[2] = _nullifierHash;
 

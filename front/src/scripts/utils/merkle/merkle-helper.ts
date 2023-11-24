@@ -6,18 +6,24 @@ export async function getMerkleRootFromAddresses(
 	addresses: string[]
 ): Promise<string> {
 	const depth = await calculateDepth(addresses.length);
+	console.log("depth: ", depth);
 	let merkleTree = new MerkleTree(depth);
 
+	let hashed_nodes: string[] = [];
+	for (let i = 0; i < addresses.length; i++) {
+		hashed_nodes.push(await pedersenHash([addresses[i]]));
+	}
+	console.log("hashed_nodes: ", hashed_nodes);
+
 	// const tree = await getMerkleTree(hashed_node);
-	await merkleTree.initialize(addresses.map((addr) => Fr.fromString(addr)));
-	const root = merkleTree.root.toString();
+	const mappedAddrs = hashed_nodes.map((nodes) => Fr.fromString(nodes));
+	await merkleTree.initialize(mappedAddrs);
+	const root = await merkleTree.getRoot();
 	console.log("root: ", root);
+	console.log("leaves: ", await merkleTree.getLeaves());
 
 	// store it in local storage. this is only in test. ipfs/arweave in prod
-	localStorage.setItem(
-		`${merkleTree.root.toString()}`,
-		JSON.stringify(merkleTree.getLeaves())
-	);
+	localStorage.setItem(`${root}`, JSON.stringify(await merkleTree.getLeaves()));
 
 	const storedData = localStorage.getItem(`${root}`);
 	const nodes = storedData ? JSON.parse(storedData) : [];
@@ -26,7 +32,7 @@ export async function getMerkleRootFromAddresses(
 	return root;
 }
 
-export function calculateDepth(numLeaves: number): number {
+function calculateDepth(numLeaves: number): number {
 	return Math.ceil(Math.log2(numLeaves));
 }
 

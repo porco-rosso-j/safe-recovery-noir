@@ -34,7 +34,17 @@
     jsonpointer "^5.0.0"
     leven "^3.1.0"
 
-"@aztec/bb.js@0.15.1", "@aztec/bb.js@^0.15.0":
+"@aztec/bb.js@0.14.2":
+  version "0.14.2"
+  resolved "https://registry.yarnpkg.com/@aztec/bb.js/-/bb.js-0.14.2.tgz#f77e5b4769436df7e50e5ae56c9b034afbbc6e6a"
+  integrity sha512-XvXC75MPF3wGykstMX6cDNb0lWjT2zKkxn7tqfVnt9ibHXmiMivwwnN1iUlVRHtJaADVDntHi7/OuBBKkHAoMg==
+  dependencies:
+    comlink "^4.4.1"
+    commander "^10.0.1"
+    debug "^4.3.4"
+    tslib "^2.4.0"
+
+"@aztec/bb.js@0.15.1":
   version "0.15.1"
   resolved "https://registry.yarnpkg.com/@aztec/bb.js/-/bb.js-0.15.1.tgz#3fb9837a3cc56cbb5069a38e69c8440e83bbe8ad"
   integrity sha512-auim5Mlk/fQiCTysJkms42UE0HZdk3aqyWamCLsDsdTs2ao9Avmb3cBsOsikuPQ5w9JlfvKu5D2x3T9/nMEIoQ==

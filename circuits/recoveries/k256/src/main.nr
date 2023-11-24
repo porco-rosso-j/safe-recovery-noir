@@ -16,11 +16,11 @@ fn main(
         hashed_message
     );
 
-    //std::println(recovered_addr);
+    std::println(recovered_addr);
 
     let computed_hash = std::hash::pedersen_hash([recovered_addr]);
-    // std::println(computed_hash);
-    // std::println(hashedAddr);
+    std::println(computed_hash);
+    std::println(hashedAddr);
 
     assert(computed_hash == hashedAddr);
 }
@@ -54,7 +54,6 @@ fn test_main() {
     164, 145, 77, 73, 58, 143, 198, 53, 20, 11, 19, 23, 136, 
     166, 185
   ];
-    
 
   main(hashedAddr, pub_key, signature, hashed_message);
 }

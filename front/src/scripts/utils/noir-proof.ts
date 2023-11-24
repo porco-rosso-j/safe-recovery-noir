@@ -1,5 +1,5 @@
 import { BarretenbergBackend } from "@noir-lang/backend_barretenberg";
-import { Noir } from "@noir-lang/noir_js";
+import { Noir, ProofData } from "@noir-lang/noir_js";
 import { CompiledCircuit } from "@noir-lang/types";
 import { k256, p256, secret, social } from "../artifacts/circuits/index";
 import { getSecretBytesAndHashFromSecret } from "../utils/secret";

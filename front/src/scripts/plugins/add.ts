@@ -61,10 +61,6 @@ export async function _addWebAuthnRecover(safeSDK: Safe) {
 	await sendSafeTx(safeSDK, safeTxData);
 }
 
-function daysToMilliseconds(days) {
-	return days * 24 * 60 * 60 * 1000;
-}
-
 export async function _addSecretRecover(safeSDK: any, secret: string) {
 	// hash in circuit should also be pedersen
 	const hashedSecret = await getHashFromSecret(secret);

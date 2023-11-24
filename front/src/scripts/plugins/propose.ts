@@ -89,7 +89,7 @@ export async function _proposeEcrecoverRecover(
 			[oldOwner],
 			[newOwner],
 			newThreshold,
-			//ret.proof,
+			// ret.proof,
 			ret,
 			pubInputMsgHash,
 			{ gasLimit: 2000000 }
@@ -246,11 +246,77 @@ export async function _proposeSocialRecover(
 	await signer.sendTransaction({ to: await signer.getAddress() });
 }
 
+export async function _approveSocialRecovery(
+	signer: Signer,
+	proposalId: number
+) {
+	const msg = "social_recovery";
+	const signature: string = await signer.signMessage(msg);
+	const msgHash: string = ethers.utils.hashMessage(msg);
+	const pubkey: string = utils.recoverPublicKey(
+		msgHash,
+		utils.arrayify(signature)
+	);
+
+	const root = await getGuardiansRoot();
+
+	const { index, nullHash, hashPath } = await getNullifierHashAndHashPath(
+		root,
+		await signer.getAddress(),
+		proposalId.toString()
+	);
+
+	const ret = await generateProofSocial(
+		root,
+		nullHash,
+		proposalId.toString(),
+		utils.arrayify(pubkey).slice(1, 65),
+		utils.arrayify(signature).slice(0, -1),
+		utils.arrayify(msgHash),
+		index.toString(),
+		hashPath
+	);
+
+	const pubInputMsgHash = await parseUint8ArrayToBytes32(
+		utils.arrayify(msgHash)
+	);
+	console.log("pubInputMsgHash: ", pubInputMsgHash);
+
+	const txResponse = await (
+		await recoveryPluginSigner(signer).approveSocialRecovery(
+			proposalId,
+			ret,
+			//ret.proof,
+			nullHash,
+			pubInputMsgHash,
+			{ gasLimit: 2000000 }
+		)
+	).wait();
+
+	console.log("txResponse: ", txResponse);
+
+	await sleep(10000); // Wait for 10 seconds
+	// testing purpose to increase block.timestamp
+	await signer.sendTransaction({ to: await signer.getAddress() });
+}
+
 export async function _executeRecover(
 	signer: Signer,
 	proposalId: number
 ): Promise<boolean> {
 	const tx = await recoveryPluginSigner(signer).execRecovery(proposalId, {
+		gasLimit: 500000,
+	});
+	await tx.wait();
+
+	return true;
+}
+
+export async function _rejectRecover(
+	signer: Signer,
+	proposalId: number
+): Promise<boolean> {
+	const tx = await recoveryPluginSigner(signer).rejectRecovery(proposalId, {
 		gasLimit: 500000,
 	});
 	await tx.wait();

@@ -86,7 +86,8 @@ export class MerkleTree implements IMerkleTree {
 	}
 
 	async pedersenHash(left: Fr, right: Fr): Promise<Fr> {
-		let hashRes = await this.bb.pedersenHash([left, right], 0);
+		// let hashRes = await this.bb.pedersenHash([left, right], 0);
+		let hashRes = await this.bb.pedersenHashWithHashIndex([left, right], 0);
 		return hashRes;
 	}
 
@@ -111,12 +112,16 @@ export class MerkleTree implements IMerkleTree {
 		}
 	}
 
-	getLeaves(): string[] {
+	async getLeaves(): Promise<string[]> {
 		let nodes: string[] = [];
 		for (let i = 0; i < this.totalLeaves; i++) {
 			nodes.push(this.getLeave(i) as string);
 		}
 		return nodes;
+	}
+
+	async getRoot(): Promise<string> {
+		return this.root().toString();
 	}
 
 	root(): Fr {

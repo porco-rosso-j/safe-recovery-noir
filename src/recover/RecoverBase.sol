@@ -58,13 +58,29 @@ contract RecoverBase {
 
     function getRecoveryByProposalId(
         uint _proposalId
-    ) public view returns (uint8, address[] memory, uint) {
+    )
+        public
+        view
+        returns (
+            uint8,
+            address[] memory,
+            address[] memory,
+            uint,
+            uint,
+            bool,
+            uint
+        )
+    {
         require(_proposalId != 0 && _proposalId <= recoveryCount, "INVALID_ID");
         Recovery storage recovery = recoveries[_proposalId];
         return (
             recovery.recoveryType,
             recovery.pendingNewOwners,
-            recovery.newThreshold
+            recovery.ownersReplaced,
+            recovery.newThreshold,
+            recovery.deadline,
+            recovery.rejected,
+            recovery.approvalCount
         );
     }
 

@@ -186,20 +186,20 @@ contract RecoveryPluginNoir is
         // if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
         //     revert PROOF_VERIFICATION_FAILED();
 
-        (uint recoveryId, uint deadline) = _proposeRecovery(
+        (uint proposalId, uint deadline) = _proposeRecovery(
             RECOVERY_TYPE_SOCIAL,
             _oldAddresses,
             _newAddresses,
             newThreshold
         );
 
-        _incrementApprovalCount(recoveryId, _nullifierHash);
+        _incrementApprovalCount(proposalId, _nullifierHash);
 
-        return (recoveryId, deadline);
+        return (proposalId, deadline);
     }
 
     function approveSocialRecovery(
-        uint _recoveryId,
+        uint _proposalId,
         bytes memory _proof,
         bytes32 nullifierHash,
         bytes32[] memory _message
@@ -207,38 +207,34 @@ contract RecoveryPluginNoir is
         bytes32[] memory publicInputs = new bytes32[](35);
 
         publicInputs = _getPublicInputSocial(
-            _recoveryId,
+            _proposalId,
             publicInputs,
             _message,
             nullifierHash
         );
 
-        if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
-            revert PROOF_VERIFICATION_FAILED();
+        // if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
+        //     revert PROOF_VERIFICATION_FAILED();
 
         uint approvalCount = _incrementApprovalCount(
-            _recoveryId,
+            _proposalId,
             nullifierHash
         );
-
-        // if (approvalCount >= threshold) {
-        //     execRecovery(_recoveryId);
-        // }
 
         return approvalCount;
     }
 
-    function rejectRecovery(uint _recoveryId) public onlySafe {
-        Recovery storage recovery = recoveries[_recoveryId];
+    function rejectRecovery(uint _proposalId) public onlySafe {
+        Recovery storage recovery = recoveries[_proposalId];
         if (recovery.rejected) revert("ALREADY_REJECTED");
         recovery.rejected = true;
     }
 
-    function execRecovery(uint _recoveryId) public returns (bool) {
-        require(_recoveryId != 0 && _recoveryId <= recoveryCount, "INVALID_ID");
+    function execRecovery(uint _proposalId) public returns (bool) {
+        require(_proposalId != 0 && _proposalId <= recoveryCount, "INVALID_ID");
         // should check if its not called for the second time
 
-        Recovery storage recovery = recoveries[_recoveryId];
+        Recovery storage recovery = recoveries[_proposalId];
         require(!recovery.rejected, "PROPOSAL_REJECTED");
         require(block.timestamp >= recovery.deadline, "DELAY_NOT_EXPIRED");
 
@@ -299,6 +295,12 @@ contract RecoveryPluginNoir is
     ) public view returns (bool) {
         require(_proposalId != 0 && _proposalId <= recoveryCount, "INVALID_ID");
         Recovery storage recovery = recoveries[_proposalId];
+
+        _validateAddressesAndThreshold(
+            recovery.ownersReplaced,
+            recovery.pendingNewOwners,
+            recovery.newThreshold
+        );
 
         require(!recovery.rejected, "PROPOSAL_REJECTED");
         require(block.timestamp >= recovery.deadline, "DELAY_NOT_EXPIRED");

@@ -20,7 +20,6 @@ export async function enablePlugin(
 
 	await sendSafeTx(safeSDK, enableModuleTx);
 
-	// const managerIface = new ethers.utils.Interface(SafeProtocolManager.abi);
 	const enablePluginTx = managerIface.encodeFunctionData("enablePlugin", [
 		contracts.recoveryPlugin,
 		2,
