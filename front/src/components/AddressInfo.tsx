@@ -19,7 +19,6 @@ const AddressInfo = () => {
 		saveIsPluginEnabled,
 		saveCurrentOwner,
 	} = useContext(UserDataContext);
-	//   const [currentOwner, setCurrentOwner] = useState<string>("")
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 
 	const toggle = () => {
@@ -81,17 +80,17 @@ const AddressInfo = () => {
 					Address Info
 				</Text>
 				<ChevronDownIcon boxSize={5} onClick={toggle} color="white" />
-				<Text fontSize={15} color="white">
-					- Safe: {safeAddress}
+				<Text fontSize={14} color="white">
+					・ Safe: {safeAddress}
 				</Text>
 				{currentOwner !== "" && (
-					<Text fontSize={15} color="white">
-						- Owner: {currentOwner}
+					<Text fontSize={14} color="white">
+						・ Owner: {currentOwner}
 					</Text>
 				)}
 				{pluginAddress !== "" && (
-					<Text fontSize={15} color="white">
-						- Plugin: {pluginAddress}
+					<Text fontSize={14} color="white">
+						・ SafeRecover: {pluginAddress}
 					</Text>
 				)}
 			</VStack>

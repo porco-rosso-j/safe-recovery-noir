@@ -1,4 +1,11 @@
-import { Box, Input, Button, Text, useColorModeValue } from "@chakra-ui/react";
+import {
+	Box,
+	Input,
+	Button,
+	Text,
+	useColorModeValue,
+	Link,
+} from "@chakra-ui/react";
 import React, { useState, useContext } from "react";
 import UserDataContext from "src/contexts/userData";
 import { ethers, providers, Signer } from "ethers";
@@ -80,11 +87,11 @@ const WalletLogin: React.FC = () => {
 					Login to your wallet with Safe Address
 				</Text>
 				<Box mb={4}>
-					<Text mb={2}>safe address:</Text>
-					0x786458FBFa964E34e417F305EDa3dbC02cA7a13D
+					<Text mb={2}>Safe address:</Text>
 					<Input
 						placeholder="0xAbCd..."
 						type="address"
+						defaultValue={""}
 						onChange={(e) => setSafeAddressInput(e.target.value)}
 					/>
 				</Box>
@@ -94,6 +101,18 @@ const WalletLogin: React.FC = () => {
 				<Button w="100%" onClick={onClickLogin}>
 					Login
 				</Button>
+				<Text mt={7}>
+					Don't have a Safe wallet?{" "}
+					<Link
+						ml={2}
+						color="yellow.500"
+						href="https://app.safe.global/new-safe/create"
+						isExternal
+						textDecoration="underline"
+					>
+						Create a new Safe
+					</Link>
+				</Text>
 				{/* */}
 			</Box>
 		</Box>

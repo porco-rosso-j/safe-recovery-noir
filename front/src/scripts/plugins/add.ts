@@ -12,7 +12,8 @@ const delay = 10; // 10 sec
 
 export async function _addEcrecoverRecover(
 	safeSDK: any,
-	address: string
+	address: string,
+	delay: number = 1
 ): Promise<string> {
 	// hash in circuit should also be pedersen
 	const hashedAddr = await pedersenHash([address]);
@@ -35,18 +36,18 @@ export async function _addEcrecoverRecover(
 }
 
 // costs about 1.6m gas
-export async function _addWebAuthnRecover(safeSDK: Safe) {
+export async function _addWebAuthnRecover(safeSDK: Safe, delay: number = 1) {
 	const safeAddr = await safeSDK.getAddress();
 	const res = await getKeyPairAndID(safeAddr);
 
 	console.log("res.id: ", res.id);
-	console.log("res.pubkey: ", res.pubkey);
+	// console.log("res.pubkey: ", res.pubkey);
 	console.log("res.pubkey: ", res.pubkeyHex);
 
 	// const pluginIface = new ethers.utils.Interface(RecoveryPlugin.abi);
 	const addRecoveryData = pluginIface.encodeFunctionData("addWebAuthnRecover", [
 		delay,
-		res.pubkey,
+		// res.pubkey,
 		res.pubkeyHex[0],
 		res.pubkeyHex[1],
 		res.id,
@@ -61,7 +62,11 @@ export async function _addWebAuthnRecover(safeSDK: Safe) {
 	await sendSafeTx(safeSDK, safeTxData);
 }
 
-export async function _addSecretRecover(safeSDK: any, secret: string) {
+export async function _addSecretRecover(
+	safeSDK: any,
+	delay: number = 1,
+	secret: string
+) {
 	// hash in circuit should also be pedersen
 	const hashedSecret = await getHashFromSecret(secret);
 	console.log("hashedSecret: ", hashedSecret);
@@ -83,6 +88,7 @@ export async function _addSecretRecover(safeSDK: any, secret: string) {
 
 export async function _addSocialRecover(
 	safeSDK: any,
+	delay: number = 1,
 	threshold: number,
 	guardians: string[]
 ) {
@@ -90,8 +96,6 @@ export async function _addSocialRecover(
 
 	// hash in circuit should also be pedersen
 	const merkleRoot = await getMerkleRootFromAddresses(guardians);
-
-	// const pluginIface = new ethers.utils.Interface(RecoveryPlugin.abi);
 	const addSocialRecoverTx = pluginIface.encodeFunctionData(
 		"addSocialRecover",
 		[delay, threshold, merkleRoot]

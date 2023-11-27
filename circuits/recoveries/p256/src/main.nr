@@ -1,8 +1,8 @@
 use dep::std;
 
 fn main(
-    pub_key_x: pub [u8;32], 
-    pub_key_y: pub [u8;32], 
+    pub_key_x: [u8;32], 
+    pub_key_y: [u8;32], 
     signature: [u8;64],
     message: pub [u8;32],
 ) {

@@ -64,6 +64,13 @@ const Onboard = () => {
 					<TabPanel>
 						{safeSDK !== null && !isPluinEnabled ? (
 							<Box>
+								<Text mb={4}>
+									You will sign two transactions consecuritvely.<br></br>
+									<br></br>
+									1: Enable SafeRecover module on Safe Protocol Manager.{" "}
+									<br></br>
+									2: Enable Safe Protocol Manager as a module on your Safe.
+								</Text>
 								<Box textAlign="center" alignItems="center">
 									<Button
 										sx={{ mt: "10px", mb: "10px" }}

@@ -16,9 +16,9 @@ const MethodHeader = (props) => {
 					mt={2}
 					mb={4}
 					onChange={(e) => props.updateMethod(Number(e.target.value))}
+					defaultValue={"1"}
 				>
 					<option value="1" selected>
-						{" "}
 						1. Backup Address Recovery
 					</option>
 					<option value="2"> 2. FingerPrint Recovery</option>

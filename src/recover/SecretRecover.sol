@@ -6,7 +6,7 @@ import "./RecoverBase.sol";
 contract SecretRecover is RecoverBase {
     address public secretVerifier;
     bool public isSecretRecoverEnabled;
-    bytes32[] public hashed_secret;
+    bytes32 public hashed_secret;
 
     // should call basic recovery setup func that determines pending period, etc...
     function addSecretRecover(
@@ -14,7 +14,7 @@ contract SecretRecover is RecoverBase {
         bytes32 _hashed_secret
     ) public onlySafe {
         require(_hashed_secret != bytes32(0), "INVALID_HASH");
-        hashed_secret = _convertBytes32ToBytes32Array(_hashed_secret);
+        hashed_secret = _hashed_secret;
         _setTimeLock(_recoveryTimeLock);
         isSecretRecoverEnabled = true;
     }

@@ -6,12 +6,13 @@ import {
 	getRecoveryCount,
 	_proposeRecovery,
 } from "../scripts/plugins/index";
+import { addresses } from "src/scripts/constants/addresses";
 
 const ProposeRecovery = (props) => {
-	const { safeAddress, signer } = useContext(UserDataContext);
-	const [ownerReplaced, setOwnerReplaced] = useState<string>("");
+	const { safeAddress, signer, currentOwner } = useContext(UserDataContext);
+	const [ownerReplaced, setOwnerReplaced] = useState<string>(currentOwner);
+	const [pendingNewOwner, setPendingNewOwner] = useState<string>(addresses[0]);
 	const [threshold, setThreshold] = useState<number>(0);
-	const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
 	const [secret, setSecret] = useState<string>("");
 	const [recoveryCount, setRecoveryCount] = useState<number>(0);
 	const [closeSuccess, setCloseSuccess] = useState<boolean>(true);
@@ -26,10 +27,6 @@ const ProposeRecovery = (props) => {
 		})();
 	});
 
-	console.log("recoveryCount: ", recoveryCount);
-	console.log("closeSuccess: ", closeSuccess);
-	console.log("_recoveryCount: ", recoveryCount);
-
 	const handleCloseSuccess = () => {
 		setCloseSuccess(true);
 	};
@@ -40,7 +37,6 @@ const ProposeRecovery = (props) => {
 				<Box>
 					<Text mb={3} fontSize={15} mx="75px">
 						Propose recovery. The old owner will be replaced with the new owner.
-						0xAB256C9d6aAE9ee6118A1531d43751996541799D
 					</Text>
 					<Box mt="10px" textAlign="center" alignItems="center">
 						<Flex justifyContent="space-between">
@@ -53,6 +49,7 @@ const ProposeRecovery = (props) => {
 										size="sm"
 										type="address"
 										placeholder="0xAbCd..."
+										defaultValue={currentOwner}
 										onChange={(e) => setOwnerReplaced(e.target.value)}
 									/>
 								</Box>
@@ -64,6 +61,7 @@ const ProposeRecovery = (props) => {
 										size="sm"
 										type="address"
 										placeholder="0xAbCd..."
+										defaultValue={addresses[0]}
 										onChange={(e) => setPendingNewOwner(e.target.value)}
 									/>
 								</Box>
@@ -84,7 +82,7 @@ const ProposeRecovery = (props) => {
 											ml={3}
 											sx={{ w: "300px" }}
 											size="sm"
-											placeholder="password"
+											placeholder="satoshi123"
 											onChange={(e) => setSecret(e.target.value)}
 										/>
 									</Box>

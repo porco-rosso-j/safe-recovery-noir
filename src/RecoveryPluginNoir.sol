@@ -71,6 +71,11 @@ contract RecoveryPluginNoir is
     ) public returns (uint, uint) {
         require(msg.sender != safe, "INVALID_SENDER");
         require(isEcrecoverRecoverEnabled, "NOT_ENABLED");
+        bytes32 proofNullifier = keccak256(_proof);
+        require(
+            !recoveryNullifiers[RECOVERY_TYPE_K256][proofNullifier],
+            "DUPLICATED_PROOF"
+        );
 
         uint newThreshold = _validateAddressesAndThreshold(
             _oldAddresses,
@@ -84,6 +89,8 @@ contract RecoveryPluginNoir is
 
         // if (!IUltraVerifier(ecrecoverVerifier).verify(_proof, publicInputs))
         //     revert PROOF_VERIFICATION_FAILED();
+
+        recoveryNullifiers[RECOVERY_TYPE_K256][proofNullifier] = true;
 
         return
             _proposeRecovery(
@@ -103,6 +110,11 @@ contract RecoveryPluginNoir is
     ) public returns (uint, uint) {
         require(msg.sender != safe, "INVALID_SENDER");
         require(isWebAuthnRecoverEnabled, "NOT_ENABLED");
+        bytes32 proofNullifier = keccak256(_proof);
+        require(
+            !recoveryNullifiers[RECOVERY_TYPE_P256][proofNullifier],
+            "DUPLICATED_PROOF"
+        );
 
         uint newThreshold = _validateAddressesAndThreshold(
             _oldAddresses,
@@ -112,11 +124,13 @@ contract RecoveryPluginNoir is
 
         bytes32 message = _computeMessage(_webAuthnInputs);
 
-        bytes32[] memory publicInputs = new bytes32[](96);
+        bytes32[] memory publicInputs = new bytes32[](32);
         publicInputs = _getPublicInputWebAuthn(message);
 
         // if (!IUltraVerifier(webAuthnVerifier).verify(_proof, publicInputs))
         //     revert PROOF_VERIFICATION_FAILED();
+
+        recoveryNullifiers[RECOVERY_TYPE_P256][proofNullifier] = true;
 
         return
             _proposeRecovery(
@@ -136,17 +150,25 @@ contract RecoveryPluginNoir is
         require(msg.sender != safe, "INVALID_SENDER");
         require(isSecretRecoverEnabled, "NOT_ENABLED");
 
+        bytes32 proofNullifier = keccak256(_proof);
+        require(
+            !recoveryNullifiers[RECOVERY_TYPE_SECRET][proofNullifier],
+            "DUPLICATED_PROOF"
+        );
+
         uint newThreshold = _validateAddressesAndThreshold(
             _oldAddresses,
             _newAddresses,
             _newThreshold
         );
 
-        bytes32[] memory publicInputs = new bytes32[](32);
-        publicInputs = hashed_secret;
+        bytes32[] memory publicInputs = new bytes32[](1);
+        publicInputs[0] = hashed_secret;
 
-        // if (!IUltraVerifier(secretVerifier).verify(_proof, publicInputs))
-        //     revert PROOF_VERIFICATION_FAILED();
+        if (!IUltraVerifier(secretVerifier).verify(_proof, publicInputs))
+            revert PROOF_VERIFICATION_FAILED();
+
+        recoveryNullifiers[RECOVERY_TYPE_SECRET][proofNullifier] = true;
 
         return
             _proposeRecovery(
@@ -167,6 +189,11 @@ contract RecoveryPluginNoir is
     ) public returns (uint, uint) {
         require(msg.sender != safe, "INVALID_SENDER");
         require(isSocialRecoverEnabled, "NOT_ENABLED");
+        bytes32 proofNullifier = keccak256(_proof);
+        require(
+            !recoveryNullifiers[RECOVERY_TYPE_SOCIAL][proofNullifier],
+            "DUPLICATED_PROOF"
+        );
 
         uint newThreshold = _validateAddressesAndThreshold(
             _oldAddresses,
@@ -185,6 +212,8 @@ contract RecoveryPluginNoir is
 
         // if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
         //     revert PROOF_VERIFICATION_FAILED();
+
+        recoveryNullifiers[RECOVERY_TYPE_SOCIAL][proofNullifier] = true;
 
         (uint proposalId, uint deadline) = _proposeRecovery(
             RECOVERY_TYPE_SOCIAL,
@@ -206,6 +235,12 @@ contract RecoveryPluginNoir is
     ) public returns (uint) {
         bytes32[] memory publicInputs = new bytes32[](35);
 
+        bytes32 proofNullifier = keccak256(_proof);
+        require(
+            !recoveryNullifiers[RECOVERY_TYPE_SOCIAL][proofNullifier],
+            "DUPLICATED_PROOF"
+        );
+
         publicInputs = _getPublicInputSocial(
             _proposalId,
             publicInputs,
@@ -215,6 +250,8 @@ contract RecoveryPluginNoir is
 
         // if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
         //     revert PROOF_VERIFICATION_FAILED();
+
+        recoveryNullifiers[RECOVERY_TYPE_SOCIAL][proofNullifier] = true;
 
         uint approvalCount = _incrementApprovalCount(
             _proposalId,

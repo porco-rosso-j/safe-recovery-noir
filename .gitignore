@@ -18,5 +18,7 @@ circuits/utils/
 # Misc
 trash
 .idea
+.DS_Store
+**/.DS_Store
 
 cargo.lock

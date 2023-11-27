@@ -5,7 +5,7 @@ use dep::std;
 fn main(preimage: [Field;10], hash: pub Field) {
     // let h = std::hash::keccak256(preimage, 10);
     let h = std::hash::pedersen_hash(preimage);
-    // std::println(h);
+    std::println(h);
     assert(h == hash);
 }
 

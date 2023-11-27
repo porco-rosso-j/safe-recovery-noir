@@ -4,6 +4,7 @@ import {
 	_addSecretRecover,
 	_addSocialRecover,
 } from "./add";
+import { _removeRecover } from "./remove";
 import {
 	_proposeRecovery,
 	_approveSocialRecovery,
@@ -25,6 +26,7 @@ export {
 	_addWebAuthnRecover,
 	_addSecretRecover,
 	_addSocialRecover,
+	_removeRecover,
 	_proposeRecovery,
 	_approveSocialRecovery,
 	_executeRecover,

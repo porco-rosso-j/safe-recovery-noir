@@ -4,6 +4,7 @@ import { CompiledCircuit } from "@noir-lang/types";
 import { k256, p256, secret, social } from "../artifacts/circuits/index";
 import { getSecretBytesAndHashFromSecret } from "../utils/secret";
 import { parseUint8ArrayToStrArray } from "./parser";
+import { recoveryPlugin } from "./contracts";
 
 export async function generateProofK256(
 	hashedAddress: string,
@@ -35,7 +36,8 @@ export async function generateProofK256(
 
 	// const proof: ProofData = await noir.generateFinalProof(input);
 	// console.log("proof: ", proof);
-	const proof = Buffer.from("0x");
+	const proof = dummyProof;
+	// /
 	// // const { witness } = await noir.execute(input);
 	// // const proof = await backend.generateFinalProof(witness);
 
@@ -77,9 +79,13 @@ export async function generateProofP256(
 
 	console.log("input: ", input);
 
+	console.log("Math.random(): ", Math.random());
+
 	// const proof: ProofData = await noir.generateFinalProof(input);
 	// console.log("proof: ", proof);
-	const proof = Buffer.from("0x");
+	// console.log("proof: ", proof.publicInputs);
+	const proof = dummyProof;
+	console.log("proof: ", proof);
 	// // const { witness } = await noir.execute(input);
 	// // const proof = await backend.generateFinalProof(witness);
 
@@ -102,14 +108,8 @@ export async function generateProofSecret(_secret: string): Promise<any> {
 
 	console.log("input: ", input);
 
-	// const proof: ProofData = await noir.generateFinalProof(input);
-	// console.log("proof: ", proof);
-	const proof = Buffer.from("0x");
-	// // const { witness } = await noir.execute(input);
-	// // const proof = await backend.generateFinalProof(witness);
-
-	// const result = await noir.verifyFinalProof(proof);
-	// console.log("result: ", result);
+	const proof: ProofData = await noir.generateFinalProof(input);
+	console.log("proof: ", proof);
 
 	return proof;
 }
@@ -152,7 +152,8 @@ export async function generateProofSocial(
 
 	// const proof: ProofData = await noir.generateFinalProof(input);
 	// console.log("proof: ", proof);
-	const proof = Buffer.from("0x");
+	const proof = dummyProof;
+
 	// // const { witness } = await noir.execute(input);
 	// // const proof = await backend.generateFinalProof(witness);
 
@@ -161,3 +162,8 @@ export async function generateProofSocial(
 
 	return proof;
 }
+
+const dummyProof: ProofData = {
+	proof: new Uint8Array(Math.floor(Math.random() * 121321)),
+	publicInputs: [new Uint8Array(0)],
+};

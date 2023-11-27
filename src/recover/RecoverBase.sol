@@ -22,6 +22,7 @@ contract RecoverBase {
 
     uint public recoveryCount;
     mapping(uint => Recovery) public recoveries;
+    mapping(uint8 => mapping(bytes32 => bool)) public recoveryNullifiers;
 
     modifier onlySafe() {
         require(msg.sender == safe, "SENDER_NOT_SAFE");

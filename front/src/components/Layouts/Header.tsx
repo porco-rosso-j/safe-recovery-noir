@@ -29,9 +29,7 @@ export default function Header() {
 						SafeRecover
 					</Text>
 				</HStack>
-				{signer != null ? (
-					<Button onClick={logout}>Remove Wallet</Button>
-				) : null}
+				{signer != null ? <Button onClick={logout}>Disconnect</Button> : null}
 			</Flex>
 		</Box>
 	);

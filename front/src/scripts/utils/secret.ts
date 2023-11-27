@@ -1,20 +1,10 @@
-import { parseUint8ArrayToStrArray } from "./parser";
+import { parseUint8ArrayToBytes32 } from "./parser";
 import { pedersenHash } from "./pedersen";
 
 export async function getHashFromSecret(_secret: string): Promise<string> {
-	const textEncoder = new TextEncoder();
-	const secretBytes = textEncoder.encode(_secret);
-	console.log("secretBytes: ", secretBytes);
+	const PaddedSecretBytes = await getPaddedSecretBytes(_secret);
 
-	let secretBytes32Array = await parseUint8ArrayToStrArray(secretBytes);
-	console.log("secretBytes32Array: ", secretBytes32Array);
-	const length = secretBytes32Array.length;
-	const lengthComplement = 10 - length;
-	for (let i = 0; i < lengthComplement; i++) {
-		secretBytes32Array[length + i] = "0";
-	}
-
-	const hash = await pedersenHash(secretBytes32Array);
+	const hash = await pedersenHash(PaddedSecretBytes);
 	console.log("hash: ", hash);
 	return hash;
 }
@@ -27,19 +17,26 @@ type SecretBytesAndHash = {
 export async function getSecretBytesAndHashFromSecret(
 	_secret: string
 ): Promise<SecretBytesAndHash> {
+	const PaddedSecretBytes = await getPaddedSecretBytes(_secret);
+	console.log("PaddedSecretBytes: ", PaddedSecretBytes);
+
+	const _hash = await pedersenHash(PaddedSecretBytes);
+	console.log("hash: ", _hash);
+	return { secretBytes: PaddedSecretBytes, hash: _hash };
+}
+
+async function getPaddedSecretBytes(_secret: string): Promise<string[]> {
 	const textEncoder = new TextEncoder();
 	const secretBytes = textEncoder.encode(_secret);
 	console.log("secretBytes: ", secretBytes);
 
-	let secretBytes32Array = await parseUint8ArrayToStrArray(secretBytes);
+	let secretBytes32Array = await parseUint8ArrayToBytes32(secretBytes);
 	console.log("secretBytes32Array: ", secretBytes32Array);
-	const length = secretBytes32Array.length;
+	const length = secretBytes.length;
 	const lengthComplement = 10 - length;
 	for (let i = 0; i < lengthComplement; i++) {
-		secretBytes32Array[length + i] = "0";
+		secretBytes32Array[length + i] = "0x0";
 	}
 
-	const _hash = await pedersenHash(secretBytes32Array);
-	console.log("hash: ", _hash);
-	return { secretBytes: secretBytes32Array, hash: _hash };
+	return secretBytes32Array;
 }

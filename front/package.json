@@ -7,7 +7,7 @@
     "@chakra-ui/react": "^2.8.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@noir-lang/backend_barretenberg": "^0.19.2",
+    "@noir-lang/backend_barretenberg": "0.19.2",
     "@noir-lang/noir_js": "0.19.2",
     "@noir-lang/types": "0.19.2",
     "@safe-global/protocol-kit": "^1.2.0",

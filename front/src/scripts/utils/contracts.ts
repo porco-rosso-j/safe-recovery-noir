@@ -1,13 +1,20 @@
-import { Signer, ethers } from "ethers";
+import { Signer, ethers, Wallet } from "ethers";
 import {
 	RecoveryPlugin,
 	RecoveryPluginFac,
 	SafeProtocolManager,
 	SafeAbi,
 } from "../artifacts/contracts/index";
-import { contracts } from "../constants/addresses";
+import { contracts, privatekeys } from "../constants/addresses";
 
-const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
+export const provider = new ethers.providers.JsonRpcProvider(
+	"http://127.0.0.1:8545"
+);
+
+export const nonce = async (address: string): Promise<number> => {
+	return await provider.getTransactionCount(address);
+};
+export const dummyWallet = new Wallet(privatekeys[0], provider);
 
 export const managerIface = new ethers.utils.Interface(SafeProtocolManager.abi);
 

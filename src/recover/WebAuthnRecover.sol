@@ -7,25 +7,24 @@ contract WebAuthnRecover is RecoverBase {
     using WebAuthnHelper for bytes;
     address public webAuthnVerifier;
     bool public isWebAuthnRecoverEnabled;
-    bytes32[] public pubkeyForVerifier;
     bytes32 public pubkey_x;
     bytes32 public pubkey_y;
     string public credentialId;
 
     function addWebAuthnRecover(
         uint _recoveryTimeLock,
-        bytes32[] memory _pubkeyForVerifier,
+        // bytes32[] memory _pubkeyForVerifier,
         bytes32 _pubkey_x,
         bytes32 _pubkey_y,
         string memory _credentialId
-    ) public {
+    ) public onlySafe {
         //require(_pubkey.length != 0, "INVALID_PUBKEY");
         require(
             keccak256(abi.encodePacked(_credentialId)) !=
                 keccak256(abi.encodePacked("")),
             "INVALID_CREDENTIAL_ID"
         );
-        pubkeyForVerifier = _pubkeyForVerifier;
+        // pubkeyForVerifier = _pubkeyForVerifier;
         pubkey_x = _pubkey_x;
         pubkey_y = _pubkey_y;
         credentialId = _credentialId;
@@ -33,7 +32,7 @@ contract WebAuthnRecover is RecoverBase {
         isWebAuthnRecoverEnabled = true;
     }
 
-    function removeWebAuthnRecover() public {
+    function removeWebAuthnRecover() public onlySafe {
         require(isWebAuthnRecoverEnabled, "NOT_ENABLED");
         isWebAuthnRecoverEnabled = false;
     }
@@ -47,12 +46,10 @@ contract WebAuthnRecover is RecoverBase {
     function _getPublicInputWebAuthn(
         bytes32 _message
     ) internal view returns (bytes32[] memory) {
-        bytes32[] memory pubInputs = new bytes32[](96);
+        bytes32[] memory pubInputs = new bytes32[](32);
 
         for (uint256 i; i < 32; i++) {
-            pubInputs[i] = pubkeyForVerifier[i];
-            pubInputs[i + 32] = pubkeyForVerifier[i + 32];
-            pubInputs[i + 64] = bytes32(uint(uint8(_message[i])));
+            pubInputs[i] = bytes32(uint(uint8(_message[i])));
         }
 
         return pubInputs;

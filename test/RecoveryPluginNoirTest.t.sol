@@ -101,6 +101,7 @@
 //             45 days,
 //             keccak256(bytes("nyanko1234"))
 //         );
+//         // should be rewritten: pedersen instead of keccak!
 
 //         recoveryPlugin.addWebAuthnRecover(
 //             45 days,
