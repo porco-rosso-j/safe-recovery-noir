@@ -3,11 +3,10 @@ import { SafeTransactionDataPartial } from "@safe-global/safe-core-sdk-types";
 import { ethers } from "ethers";
 import { contracts } from "../constants/addresses";
 import { managerIface, manager, pluginFac, safeContract } from "./contracts";
+import { _isSafeModuleEnabled } from "../plugins/view";
+import { txResult, error } from "../plugins/types";
 
-export async function enablePlugin(
-	safeAddr: string,
-	safeSDK: Safe
-): Promise<any> {
+export async function enableModuleOnSafe(safeSDK: Safe): Promise<txResult> {
 	const enableModuletx = await safeSDK.createEnableModuleTx(
 		contracts.safeProotcolManager
 	);
@@ -18,8 +17,26 @@ export async function enablePlugin(
 		value: enableModuletx.data.value,
 	};
 
-	await sendSafeTx(safeSDK, enableModuleTx);
+	const enableModuleResult = await sendSafeTx(safeSDK, enableModuleTx);
+	const isModuleEnabled = await _isSafeModuleEnabled(
+		safeSDK,
+		contracts.safeProotcolManager
+	);
+	console.log("isModuleEnabled: ", isModuleEnabled);
+	if (!isModuleEnabled) {
+		return {
+			result: enableModuleResult.result,
+			txHash: enableModuleResult.txHash,
+		};
+	}
 
+	return enableModuleResult;
+}
+
+export async function enablePluginOnProtocolManager(
+	safeAddr: string,
+	safeSDK: Safe
+): Promise<txResult> {
 	const enablePluginTx = managerIface.encodeFunctionData("enablePlugin", [
 		contracts.recoveryPlugin,
 		2,
@@ -32,30 +49,37 @@ export async function enablePlugin(
 	);
 	console.log("data: ", _data);
 
-	// enablePlugin(plugin)
 	const enablePluginTxData: SafeTransactionDataPartial = {
 		to: contracts.safeProotcolManager,
 		data: _data,
 		value: "0",
 	};
 
-	await sendSafeTx(safeSDK, enablePluginTxData);
+	return await sendSafeTx(safeSDK, enablePluginTxData);
 }
 
 export async function sendSafeTx(
 	safeSDK: Safe,
 	safeTx: SafeTransactionDataPartial
-): Promise<any> {
-	const safeTransaction = await safeSDK.createTransaction({
-		safeTransactionData: safeTx,
-	});
-	console.log("safeTransaction: ", safeTransaction);
-	const txResponse = await safeSDK.executeTransaction(safeTransaction, {
-		gasLimit: 3000000,
-	});
-	console.log("txResponse: ", txResponse);
-	const res = await txResponse.transactionResponse?.wait();
-	console.log("res:", res);
+): Promise<txResult> {
+	try {
+		const safeTransaction = await safeSDK.createTransaction({
+			safeTransactionData: safeTx,
+		});
+		console.log("safeTransaction: ", safeTransaction);
+		const txResponse = await safeSDK.executeTransaction(safeTransaction, {
+			gasLimit: 3000000,
+		});
+		console.log("txResponse: ", txResponse);
+		const res: ethers.ContractReceipt =
+			await txResponse.transactionResponse?.wait();
+		console.log("res:", res);
+
+		return { result: true, txHash: res.transactionHash };
+	} catch (e) {
+		console.log("error: ", e);
+		return error;
+	}
 }
 
 export async function getSafePluginAddress(safeAddr: any): Promise<string> {

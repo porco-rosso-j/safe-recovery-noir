@@ -1,5 +1,13 @@
+import Safe from "@safe-global/protocol-kit";
 import { recoveryPlugin } from "../utils/contracts";
 import { Proposal } from "./types";
+
+export async function _isSafeModuleEnabled(
+	safeSDK: Safe,
+	address: string
+): Promise<boolean> {
+	return await safeSDK.isModuleEnabled(address);
+}
 
 export async function _isMethodEnabled(moduleId: number): Promise<boolean> {
 	let ret;

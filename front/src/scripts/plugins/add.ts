@@ -6,20 +6,17 @@ import { getKeyPairAndID } from "../utils/webauthn/webauthn";
 import { getMerkleRootFromAddresses } from "../utils/merkle/merkle-helper";
 import { getHashFromSecret } from "../utils/secret";
 import { pluginIface } from "../utils/contracts";
-
-// const delay = daysToMilliseconds(45);
-const delay = 10; // 10 sec
+import { txResult, error } from "./types";
 
 export async function _addEcrecoverRecover(
 	safeSDK: any,
 	address: string,
 	delay: number = 1
-): Promise<string> {
+): Promise<txResult> {
 	// hash in circuit should also be pedersen
 	const hashedAddr = await pedersenHash([address]);
 	console.log("hashedAddr: ", hashedAddr);
 
-	// const pluginIface = new ethers.utils.Interface(RecoveryPlugin.abi);
 	const addK256RecoverTx = pluginIface.encodeFunctionData(
 		"addEcrecoverRecover",
 		[delay, hashedAddr]
@@ -31,20 +28,27 @@ export async function _addEcrecoverRecover(
 		value: "0",
 	};
 
-	await sendSafeTx(safeSDK, safeTxData);
-	return address;
+	return await sendSafeTx(safeSDK, safeTxData);
 }
 
 // costs about 1.6m gas
-export async function _addWebAuthnRecover(safeSDK: Safe, delay: number = 1) {
+export async function _addWebAuthnRecover(
+	safeSDK: Safe,
+	delay: number = 1
+): Promise<txResult> {
 	const safeAddr = await safeSDK.getAddress();
-	const res = await getKeyPairAndID(safeAddr);
+
+	let res;
+	try {
+		res = await getKeyPairAndID(safeAddr);
+	} catch (e) {
+		console.log("res: ", res);
+		return error;
+	}
 
 	console.log("res.id: ", res.id);
-	// console.log("res.pubkey: ", res.pubkey);
 	console.log("res.pubkey: ", res.pubkeyHex);
 
-	// const pluginIface = new ethers.utils.Interface(RecoveryPlugin.abi);
 	const addRecoveryData = pluginIface.encodeFunctionData("addWebAuthnRecover", [
 		delay,
 		// res.pubkey,
@@ -59,14 +63,14 @@ export async function _addWebAuthnRecover(safeSDK: Safe, delay: number = 1) {
 		value: "0",
 	};
 
-	await sendSafeTx(safeSDK, safeTxData);
+	return await sendSafeTx(safeSDK, safeTxData);
 }
 
 export async function _addSecretRecover(
 	safeSDK: any,
 	delay: number = 1,
 	secret: string
-) {
+): Promise<txResult> {
 	// hash in circuit should also be pedersen
 	const hashedSecret = await getHashFromSecret(secret);
 	console.log("hashedSecret: ", hashedSecret);
@@ -83,7 +87,7 @@ export async function _addSecretRecover(
 		value: "0",
 	};
 
-	await sendSafeTx(safeSDK, safeTxData);
+	return await sendSafeTx(safeSDK, safeTxData);
 }
 
 export async function _addSocialRecover(
@@ -91,7 +95,7 @@ export async function _addSocialRecover(
 	delay: number = 1,
 	threshold: number,
 	guardians: string[]
-) {
+): Promise<txResult> {
 	console.log("guardians: ", guardians);
 
 	// hash in circuit should also be pedersen
@@ -107,5 +111,5 @@ export async function _addSocialRecover(
 		value: "0",
 	};
 
-	await sendSafeTx(safeSDK, safeTxData);
+	return await sendSafeTx(safeSDK, safeTxData);
 }

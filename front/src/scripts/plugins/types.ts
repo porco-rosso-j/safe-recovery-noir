@@ -9,3 +9,10 @@ export type Proposal = {
 	approvals: number;
 	isExecutable: boolean;
 };
+
+export type txResult = {
+	result: boolean;
+	txHash: string;
+};
+
+export const error: txResult = { result: false, txHash: "" };

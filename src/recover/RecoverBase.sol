@@ -16,8 +16,8 @@ contract RecoverBase {
     address public safe;
     address internal constant SENTINEL_DELEGATES = address(0x1);
     // uint256 public constant MIN_TIMELOCK = 30 days;
-    // set to 10 secds for testing
-    uint256 public constant MIN_TIMELOCK = 10 seconds;
+    // set to 0 for testing
+    uint256 public constant MIN_TIMELOCK = 0;
     uint256 public recoveryTimeLock;
 
     uint public recoveryCount;

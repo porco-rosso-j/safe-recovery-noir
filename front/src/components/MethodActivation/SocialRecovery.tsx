@@ -10,6 +10,8 @@ import {
 	Select,
 	IconButton,
 	CloseButton,
+	Spinner,
+	useDisclosure,
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { useContext, useState, useEffect } from "react";
@@ -19,6 +21,7 @@ import {
 	_addSocialRecover,
 } from "../../scripts/plugins/index";
 import MethodRemoval from "./Removal";
+import EnabledModal from "../Modals/EnabledModal";
 
 const SocialRecovery = () => {
 	const { safeSDK } = useContext(UserDataContext);
@@ -27,6 +30,13 @@ const SocialRecovery = () => {
 	const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false);
 	const [unit, setUnit] = useState<number>(1);
 	const [delayValue, setDelayValue] = useState(0);
+	const [loading, setLoading] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<string>("");
+	const [errorMessage2, setErrorMessage2] = useState<string>("");
+	const [txHash, setTxHash] = useState<string>("");
+	const { isOpen, onOpen, onClose } = useDisclosure();
+	const [openProposedModal, setOpenProposedModal] = useState(false);
+	const [result, setResult] = useState<boolean>(false);
 
 	useEffect(() => {
 		(async () => {
@@ -40,6 +50,11 @@ const SocialRecovery = () => {
 
 	const addGuardian = (newValue, index) => {
 		const updatedGuardians = [...guardians];
+		setErrorMessage2("");
+		if (updatedGuardians.includes(newValue) || newValue === "") {
+			setErrorMessage2("Invalid/Duplicated guardian address");
+			return;
+		}
 		updatedGuardians[index] = newValue;
 		setGuardians(updatedGuardians);
 	};
@@ -51,6 +66,18 @@ const SocialRecovery = () => {
 	};
 	const handleAddGuardian = () => {
 		setGuardians([...guardians, ""]);
+	};
+
+	// Function to open the modal from the parent
+	const openModal = () => {
+		setOpenProposedModal(true);
+		onOpen();
+	};
+
+	// Function to close the modal from the parent
+	const closeModal = () => {
+		setOpenProposedModal(false);
+		onClose();
 	};
 
 	return (
@@ -70,6 +97,9 @@ const SocialRecovery = () => {
 					<Box mt="10px" textAlign="center" alignItems="center">
 						<Flex justifyContent="space-between">
 							<VStack spacing={1} flex={1}>
+								<Text color="red.500" mb={2}>
+									{errorMessage2}
+								</Text>
 								{guardians.map((address, index) => (
 									<Box key={index} display="flex" alignItems="center" mt={3}>
 										<label>{index + 1}:</label>
@@ -170,24 +200,50 @@ const SocialRecovery = () => {
 							colorScheme="teal"
 							w="55%"
 							onClick={async () => {
-								if (guardians[0] !== "" && threshold !== 0) {
-									await _addSocialRecover(
-										safeSDK,
-										delayValue,
-										threshold,
-										guardians
-									);
-									const _isMthodEnabled = await _isMethodEnabled(4);
-									if (_isMthodEnabled) {
-										setIsMethodEnabled(_isMthodEnabled);
-									}
-								} else {
-									console.log("pending owner address not set");
+								setErrorMessage("");
+								if (threshold === 0) {
+									setErrorMessage("threshold not set");
+									return;
 								}
+								console.log("guardians.length: ", guardians.length);
+								console.log("threshold: ", threshold);
+								if (threshold > guardians.length) {
+									setErrorMessage(
+										"threshold should be lower than the number of guardins"
+									);
+									return;
+								}
+								setLoading(true);
+								const ret = await _addSocialRecover(
+									safeSDK,
+									delayValue,
+									threshold,
+									guardians
+								);
+								console.log("ret: ", ret);
+								if (ret.result) {
+									setResult(true);
+								} else if (!ret.result && ret.txHash === "") {
+									console.log("ret.result: ", ret.result);
+									setErrorMessage("Something went wrong");
+									setLoading(false);
+									return;
+								}
+								setTxHash(ret.txHash);
+								openModal();
+								setLoading(false);
 							}}
 						>
 							Enable this method
 						</Button>
+						{loading && (
+							<Flex justifyContent="center" alignItems="center">
+								<Spinner mt={10} color="gray.300" />
+							</Flex>
+						)}
+						<Text mt={4} color="red.500" mb={4}>
+							{errorMessage}
+						</Text>
 					</Box>
 				</Box>
 			) : (
@@ -196,6 +252,13 @@ const SocialRecovery = () => {
 					<MethodRemoval method={4} />
 				</Box>
 			)}
+			<EnabledModal
+				isOpen={isOpen || openProposedModal}
+				onOpen={onOpen}
+				onClose={closeModal}
+				result={result}
+				txHash={txHash}
+			/>
 		</Box>
 	);
 };

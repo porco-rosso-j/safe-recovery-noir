@@ -36,7 +36,8 @@ export async function generateProofK256(
 
 	// const proof: ProofData = await noir.generateFinalProof(input);
 	// console.log("proof: ", proof);
-	const proof = dummyProof;
+	const proof = dummyProof();
+	console.log("new Date().valueOf(): ", new Date().valueOf());
 	// /
 	// // const { witness } = await noir.execute(input);
 	// // const proof = await backend.generateFinalProof(witness);
@@ -84,7 +85,7 @@ export async function generateProofP256(
 	// const proof: ProofData = await noir.generateFinalProof(input);
 	// console.log("proof: ", proof);
 	// console.log("proof: ", proof.publicInputs);
-	const proof = dummyProof;
+	const proof = dummyProof();
 	console.log("proof: ", proof);
 	// // const { witness } = await noir.execute(input);
 	// // const proof = await backend.generateFinalProof(witness);
@@ -152,7 +153,8 @@ export async function generateProofSocial(
 
 	// const proof: ProofData = await noir.generateFinalProof(input);
 	// console.log("proof: ", proof);
-	const proof = dummyProof;
+	const proof = dummyProof();
+	console.log("proof: ", proof);
 
 	// // const { witness } = await noir.execute(input);
 	// // const proof = await backend.generateFinalProof(witness);
@@ -163,7 +165,10 @@ export async function generateProofSocial(
 	return proof;
 }
 
-const dummyProof: ProofData = {
-	proof: new Uint8Array(Math.floor(Math.random() * 121321)),
-	publicInputs: [new Uint8Array(0)],
+const dummyProof = (): ProofData => {
+	const dummy: ProofData = {
+		proof: new Uint8Array(new Date().valueOf() % 1000),
+		publicInputs: [new Uint8Array(0)],
+	};
+	return dummy;
 };

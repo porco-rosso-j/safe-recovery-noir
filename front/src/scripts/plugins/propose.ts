@@ -7,8 +7,14 @@ import {
 	generateProofSecret,
 	generateProofSocial,
 } from "../utils/noir-proof";
-import { recoveryPluginSigner, dummyWallet, nonce } from "../utils/contracts";
+import {
+	recoveryPluginSigner,
+	dummyWallet,
+	nonce,
+	pluginIface,
+} from "../utils/contracts";
 import { parseUint8ArrayToBytes32 } from "../utils/parser";
+import { txResult, error } from "./types";
 import {
 	computeMessage,
 	getCredentialID,
@@ -17,6 +23,9 @@ import {
 	getRecoveryCount,
 	getWebAuthnPubkey,
 } from "./view";
+import { contracts } from "../constants/addresses";
+import Safe from "@safe-global/protocol-kit";
+import { sendSafeTx } from "../utils/safe";
 
 export async function _proposeRecovery(
 	method: number,
@@ -26,11 +35,18 @@ export async function _proposeRecovery(
 	newOwner: string,
 	secret: string,
 	safeAddr: string
-): Promise<string> {
+): Promise<txResult> {
+	let result: txResult;
+
 	if (method === 1) {
-		await _proposeEcrecoverRecover(signer, newThreshold, oldOwner, newOwner);
+		result = await _proposeEcrecoverRecover(
+			signer,
+			newThreshold,
+			oldOwner,
+			newOwner
+		);
 	} else if (method === 2) {
-		await _proposeFingerPrintRecover(
+		result = await _proposeFingerPrintRecover(
 			signer,
 			newThreshold,
 			oldOwner,
@@ -38,7 +54,7 @@ export async function _proposeRecovery(
 			safeAddr
 		);
 	} else if (method === 3) {
-		await _proposeSecretRecover(
+		result = await _proposeSecretRecover(
 			signer,
 			newThreshold,
 			oldOwner,
@@ -46,13 +62,28 @@ export async function _proposeRecovery(
 			secret
 		);
 	} else if (method === 4) {
-		await _proposeSocialRecover(signer, newThreshold, oldOwner, newOwner);
+		result = await _proposeSocialRecover(
+			signer,
+			newThreshold,
+			oldOwner,
+			newOwner
+		);
 	} else {
 		console.log("unrecognized method index");
-		return "";
+		return error;
 	}
 
-	return newOwner;
+	return result;
+}
+
+async function sendTx(tx: any): Promise<txResult> {
+	try {
+		const txResponse = await tx.wait();
+		console.log("txResponse: ", txResponse);
+		return { result: true, txHash: txResponse.transactionHash };
+	} catch (e) {
+		return { result: false, txHash: tx.hash };
+	}
 }
 
 export async function _proposeEcrecoverRecover(
@@ -60,10 +91,14 @@ export async function _proposeEcrecoverRecover(
 	newThreshold: number,
 	oldOwner: string,
 	newOwner: string
-): Promise<string> {
-	const msg = await getMsg(1, await signer.getAddress());
-	console.log("msg: ", msg);
-	const signature: string = await signer.signMessage(msg);
+): Promise<txResult> {
+	const [msg, signature] = await getMsgAndSig(
+		signer,
+		1,
+		await signer.getAddress()
+	);
+	if (msg === "" || signature === "") return error;
+
 	const msgHash: string = ethers.utils.hashMessage(msg);
 	const pubkey: string = utils.recoverPublicKey(
 		msgHash,
@@ -83,21 +118,24 @@ export async function _proposeEcrecoverRecover(
 		utils.arrayify(msgHash)
 	);
 	console.log("pubInputMsgHash: ", pubInputMsgHash);
+	console.log("ret.proof: ", ret.proof);
 
-	const txResponse = await (
-		await recoveryPluginSigner(signer).proposeEcrecoverRecover(
+	try {
+		const tx = await recoveryPluginSigner(signer).proposeEcrecoverRecover(
 			[oldOwner],
 			[newOwner],
 			newThreshold,
 			ret.proof,
 			pubInputMsgHash,
 			{ gasLimit: 2000000 }
-		)
-	).wait();
+		);
 
-	console.log("txResponse: ", txResponse);
-
-	return newOwner;
+		console.log("tx: ", tx);
+		return await sendTx(tx);
+	} catch (e) {
+		console.log("e: ", e);
+		return error;
+	}
 }
 
 export async function _proposeFingerPrintRecover(
@@ -106,7 +144,7 @@ export async function _proposeFingerPrintRecover(
 	oldOwner: string,
 	newOwner: string,
 	safeAddr: string
-) {
+): Promise<txResult> {
 	const credentialId = await getCredentialID();
 	const [signature, webauthnInputs] = await authenticateWebAuthn(credentialId);
 	const pubkey = await getWebAuthnPubkey();
@@ -126,18 +164,21 @@ export async function _proposeFingerPrintRecover(
 		utils.arrayify(message)
 	);
 
-	const txResponse = await (
-		await recoveryPluginSigner(signer).proposeWebAuthnRecover(
+	try {
+		const tx = await recoveryPluginSigner(signer).proposeWebAuthnRecover(
 			[oldOwner],
 			[newOwner],
 			newThreshold,
 			ret.proof,
 			webauthnInputs,
 			{ gasLimit: 2000000 }
-		)
-	).wait();
-
-	console.log("txResponse: ", txResponse);
+		);
+		console.log("tx: ", tx);
+		return await sendTx(tx);
+	} catch (e) {
+		console.log("e: ", e);
+		return error;
+	}
 }
 export async function _proposeSecretRecover(
 	signer: Signer,
@@ -145,7 +186,7 @@ export async function _proposeSecretRecover(
 	oldOwner: string,
 	newOwner: string,
 	secret: string
-) {
+): Promise<txResult> {
 	console.log("oldOwner: ", oldOwner);
 	console.log("newOwner: ", newOwner);
 	console.log("newThreshold: ", newThreshold);
@@ -153,17 +194,20 @@ export async function _proposeSecretRecover(
 	const ret = await generateProofSecret(secret);
 	console.log("ret: ", ret);
 
-	const txResponse = await (
-		await recoveryPluginSigner(signer).proposeSecretRecover(
+	try {
+		const tx = await recoveryPluginSigner(signer).proposeSecretRecover(
 			[oldOwner],
 			[newOwner],
 			newThreshold,
 			ret.proof,
 			{ gasLimit: 2000000 }
-		)
-	).wait();
-
-	console.log("txResponse: ", txResponse);
+		);
+		console.log("tx: ", tx);
+		return await sendTx(tx);
+	} catch (e) {
+		console.log("e: ", e);
+		return error;
+	}
 }
 
 export async function _proposeSocialRecover(
@@ -171,10 +215,13 @@ export async function _proposeSocialRecover(
 	newThreshold: number,
 	oldOwner: string,
 	newOwner: string
-) {
-	const msg = await getMsg(4, await signer.getAddress());
-	console.log("msg: ", msg);
-	const signature: string = await signer.signMessage(msg);
+): Promise<txResult> {
+	const [msg, signature] = await getMsgAndSig(
+		signer,
+		4,
+		await signer.getAddress()
+	);
+	if (msg === "" || signature === "") return error;
 	const msgHash: string = ethers.utils.hashMessage(msg);
 	const pubkey: string = utils.recoverPublicKey(
 		msgHash,
@@ -206,8 +253,12 @@ export async function _proposeSocialRecover(
 	);
 	console.log("pubInputMsgHash: ", pubInputMsgHash);
 
-	const txResponse = await (
-		await recoveryPluginSigner(signer).proposeSocialRecover(
+	try {
+		console.log("here?");
+		console.log("oldOwner: ", oldOwner);
+		console.log("newOwner: ", newOwner);
+		console.log("ret.proof: ", ret.proof);
+		const tx = await recoveryPluginSigner(signer).proposeSocialRecover(
 			[oldOwner],
 			[newOwner],
 			newThreshold,
@@ -215,19 +266,25 @@ export async function _proposeSocialRecover(
 			nullHash,
 			pubInputMsgHash,
 			{ gasLimit: 2000000 }
-		)
-	).wait();
-
-	console.log("txResponse: ", txResponse);
+		);
+		console.log("tx: ", tx);
+		return await sendTx(tx);
+	} catch (e) {
+		console.log("e: ", e);
+		return error;
+	}
 }
 
 export async function _approveSocialRecovery(
 	signer: Signer,
 	proposalId: number
-) {
-	const msg = await getMsg(4, await signer.getAddress());
-	console.log("msg: ", msg);
-	const signature: string = await signer.signMessage(msg);
+): Promise<txResult> {
+	const [msg, signature] = await getMsgAndSig(
+		signer,
+		4,
+		await signer.getAddress()
+	);
+	if (msg === "" || signature === "") return error;
 	const msgHash: string = ethers.utils.hashMessage(msg);
 	const pubkey: string = utils.recoverPublicKey(
 		msgHash,
@@ -258,47 +315,70 @@ export async function _approveSocialRecovery(
 	);
 	console.log("pubInputMsgHash: ", pubInputMsgHash);
 
-	const txResponse = await (
-		await recoveryPluginSigner(signer).approveSocialRecovery(
+	try {
+		const tx = await recoveryPluginSigner(signer).approveSocialRecovery(
 			proposalId,
 			ret.proof,
 			nullHash,
 			pubInputMsgHash,
 			{ gasLimit: 2000000 }
-		)
-	).wait();
-
-	console.log("txResponse: ", txResponse);
+		);
+		console.log("tx: ", tx);
+		return await sendTx(tx);
+	} catch (e) {
+		console.log("e: ", e);
+		return error;
+	}
 }
 
 export async function _executeRecover(
 	signer: Signer,
 	proposalId: number
-): Promise<boolean> {
+): Promise<txResult> {
 	// dummy tx to move blocks in local test
 	await dummyWallet.sendTransaction({ to: await dummyWallet.getAddress() });
 
-	const tx = await recoveryPluginSigner(signer).execRecovery(proposalId, {
-		gasLimit: 500000,
-	});
-	await tx.wait();
-
-	return true;
+	try {
+		const tx = await recoveryPluginSigner(signer).execRecovery(proposalId, {
+			gasLimit: 500000,
+		});
+		console.log("tx: ", tx);
+		return await sendTx(tx);
+	} catch (e) {
+		console.log("e: ", e);
+		return error;
+	}
 }
 
 export async function _rejectRecover(
-	signer: Signer,
+	safeSDK: Safe,
+	safeAddr: string,
 	proposalId: number
-): Promise<boolean> {
-	const tx = await recoveryPluginSigner(signer).rejectRecovery(proposalId, {
-		gasLimit: 500000,
-	});
-	await tx.wait();
+): Promise<txResult> {
+	const rejectionTx = pluginIface.encodeFunctionData("rejectRecovery", [
+		proposalId,
+	]);
 
-	return true;
+	const _data = ethers.utils.solidityPack(
+		["bytes", "address"],
+		[rejectionTx, safeAddr]
+	);
+	console.log("data: ", _data);
+
+	const rejectionTxnTxData = {
+		to: contracts.recoveryPlugin,
+		data: _data,
+		value: "0",
+	};
+
+	return await sendSafeTx(safeSDK, rejectionTxnTxData);
 }
 
-const getMsg = async (type: number, address: string) => {
+const getMsgAndSig = async (
+	signer: Signer,
+	type: number,
+	address: string
+): Promise<any> => {
 	let methodStr;
 	if (type === 1) {
 		methodStr = "ecrecover_recovery";
@@ -314,5 +394,14 @@ const getMsg = async (type: number, address: string) => {
 		address +
 		"_nonce_" +
 		user_nonce;
-	return msg;
+
+	let signature: string;
+	try {
+		signature = await signer.signMessage(msg);
+	} catch (e) {
+		console.log("error: ", e);
+		return ["", ""];
+	}
+
+	return [msg, signature];
 };

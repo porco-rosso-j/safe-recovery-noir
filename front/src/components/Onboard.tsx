@@ -7,10 +7,17 @@ import {
 	TabPanels,
 	TabPanel,
 	Text,
+	Flex,
+	Link,
+	Spinner,
 } from "@chakra-ui/react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import UserDataContext from "src/contexts/userData";
-import { isPluginEnabled, enablePlugin } from "../scripts/utils/safe";
+import {
+	isPluginEnabled,
+	enableModuleOnSafe,
+	enablePluginOnProtocolManager,
+} from "../scripts/utils/safe";
 import AddressInfo from "./AddressInfo";
 import { shortenAddress } from "src/scripts/utils/address";
 import MethodHeader from "./MethodHeader";
@@ -20,6 +27,18 @@ const Onboard = () => {
 		useContext(UserDataContext);
 	const [method, setMethod] = useState<number>(1);
 	const [tabIndex, setTabIndex] = useState(0);
+	const [loading, setLoading] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<string>("");
+
+	useEffect(() => {
+		(async () => {
+			const _isPluginEnabled = await isPluginEnabled(safeAddress);
+			console.log("_isPluginEnabled: ", _isPluginEnabled);
+			if (_isPluginEnabled) {
+				saveIsPluginEnabled(_isPluginEnabled);
+			}
+		})();
+	});
 
 	const updateMethod = (index: number) => {
 		setMethod(index);
@@ -58,7 +77,6 @@ const Onboard = () => {
 					<Tab w="33%" color="white">
 						Proposals
 					</Tab>
-					{/* <Tab w="33%" color="white">{safeSDK !== null ? "Execute/Reject" : "Execute"}</Tab> */}
 				</TabList>
 				<TabPanels>
 					<TabPanel>
@@ -67,9 +85,9 @@ const Onboard = () => {
 								<Text mb={4}>
 									You will sign two transactions consecuritvely.<br></br>
 									<br></br>
-									1: Enable SafeRecover module on Safe Protocol Manager.{" "}
+									1: Enable Safe Protocol Manager as a module on your Safe.{" "}
 									<br></br>
-									2: Enable Safe Protocol Manager as a module on your Safe.
+									2: Enable SafeRecover module on Safe Protocol Manager.
 								</Text>
 								<Box textAlign="center" alignItems="center">
 									<Button
@@ -77,18 +95,33 @@ const Onboard = () => {
 										colorScheme="teal"
 										w="50%"
 										onClick={async () => {
-											await enablePlugin(safeAddress, safeSDK);
-											const _isPluginEnabled = await isPluginEnabled(
-												safeAddress
-											);
-											console.log("isPluginEnabled: ", _isPluginEnabled);
-											if (_isPluginEnabled) {
-												saveIsPluginEnabled(_isPluginEnabled);
+											setLoading(true);
+											const res1 = await enableModuleOnSafe(safeSDK);
+											if (!res1.result) {
+												setErrorMessage("Tx Failed: " + res1.txHash);
 											}
+
+											const res2 = await enablePluginOnProtocolManager(
+												safeAddress,
+												safeSDK
+											);
+											if (!res2.result) {
+												setErrorMessage("Tx Failed: " + res2.txHash);
+											}
+
+											setLoading(false);
 										}}
 									>
 										Enable SafeRecover Plugin
 									</Button>
+									{loading && (
+										<Flex justifyContent="center" alignItems="center">
+											<Spinner mt={10} color="gray.300" />
+										</Flex>
+									)}
+									<Text mt={4} color="red.500" mb={4}>
+										{errorMessage}
+									</Text>
 								</Box>
 							</Box>
 						) : safeSDK !== null ? (

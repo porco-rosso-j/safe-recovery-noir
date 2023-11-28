@@ -84,7 +84,7 @@ const WalletLogin: React.FC = () => {
 				backgroundColor={"#2e2e2e"}
 			>
 				<Text fontSize="xl" fontWeight="bold" mb={6}>
-					Login to your wallet with Safe Address
+					Connect to wallet with your Safe Address
 				</Text>
 				<Box mb={4}>
 					<Text mb={2}>Safe address:</Text>

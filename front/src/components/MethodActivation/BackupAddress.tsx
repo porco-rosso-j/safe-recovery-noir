@@ -7,7 +7,9 @@ import {
 	Select,
 	Tooltip,
 	FormControl,
-	FormLabel,
+	Flex,
+	Spinner,
+	useDisclosure,
 } from "@chakra-ui/react";
 import { useContext, useState, useEffect } from "react";
 import UserDataContext from "src/contexts/userData";
@@ -16,6 +18,7 @@ import {
 	_addEcrecoverRecover,
 } from "../../scripts/plugins/index";
 import MethodRemoval from "./Removal";
+import EnabledModal from "../Modals/EnabledModal";
 
 const EnableBackupAddress = () => {
 	const { safeSDK } = useContext(UserDataContext);
@@ -23,16 +26,34 @@ const EnableBackupAddress = () => {
 	const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false);
 	const [unit, setUnit] = useState<number>(1);
 	const [delayValue, setDelayValue] = useState(0);
+	const [loading, setLoading] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<string>("");
+	const [txHash, setTxHash] = useState<string>("");
+	const { isOpen, onOpen, onClose } = useDisclosure();
+	const [openProposedModal, setOpenProposedModal] = useState(false);
+	const [result, setResult] = useState<boolean>(false);
 
 	useEffect(() => {
 		(async () => {
-			const _isPluginEnabled = await _isMethodEnabled(1);
-			console.log("isPluginEnabled: ", _isPluginEnabled);
-			if (_isPluginEnabled) {
-				setIsMethodEnabled(_isPluginEnabled);
+			const isMethodEnabled = await _isMethodEnabled(1);
+			console.log("isMethodEnabled: ", isMethodEnabled);
+			if (isMethodEnabled) {
+				setIsMethodEnabled(isMethodEnabled);
 			}
 		})();
 	});
+
+	// Function to open the modal from the parent
+	const openModal = () => {
+		setOpenProposedModal(true);
+		onOpen();
+	};
+
+	// Function to close the modal from the parent
+	const closeModal = () => {
+		setOpenProposedModal(false);
+		onClose();
+	};
 
 	return (
 		<Box pt="3px">
@@ -92,22 +113,39 @@ const EnableBackupAddress = () => {
 							w="55%"
 							onClick={async () => {
 								if (pendingNewOwner !== "") {
-									await _addEcrecoverRecover(
+									setLoading(true);
+									const ret = await _addEcrecoverRecover(
 										safeSDK,
 										pendingNewOwner,
 										delayValue
 									);
-									const _isMthodEnabled = await _isMethodEnabled(1);
-									if (_isMthodEnabled) {
-										setIsMethodEnabled(_isMthodEnabled);
+									console.log("ret: ", ret);
+									if (ret.result) {
+										setResult(true);
+									} else if (!ret.result && ret.txHash === "") {
+										console.log("ret.result: ", ret.result);
+										setErrorMessage("Something went wrong");
+										setLoading(false);
+										return;
 									}
+									setTxHash(ret.txHash);
+									openModal();
+									setLoading(false);
 								} else {
-									console.log("pending owner address not set");
+									setErrorMessage("New owner address not set");
 								}
 							}}
 						>
 							Enable this method
 						</Button>
+						{loading && (
+							<Flex justifyContent="center" alignItems="center">
+								<Spinner mt={10} color="gray.300" />
+							</Flex>
+						)}
+						<Text mt={4} color="red.500" mb={4}>
+							{errorMessage}
+						</Text>
 					</Box>
 				</Box>
 			) : (
@@ -116,6 +154,14 @@ const EnableBackupAddress = () => {
 					<MethodRemoval method={1} />
 				</Box>
 			)}
+			<EnabledModal
+				isOpen={isOpen || openProposedModal}
+				onOpen={onOpen}
+				onClose={closeModal}
+				result={result}
+				txHash={txHash}
+				loading={loading}
+			/>
 		</Box>
 	);
 };

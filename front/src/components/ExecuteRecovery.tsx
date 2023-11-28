@@ -6,6 +6,8 @@ import {
 	Text,
 	VStack,
 	HStack,
+	Spinner,
+	useDisclosure,
 } from "@chakra-ui/react";
 import { useContext, useState, useEffect } from "react";
 import UserDataContext from "src/contexts/userData";
@@ -20,9 +22,11 @@ import {
 	getSocialRecoveryThreshold,
 } from "../scripts/plugins/index";
 import { Proposal } from "../scripts/plugins/types";
+import ExecutedModal from "./Modals/ExecuteModal";
 
 const ExecuteRecovery = (props) => {
-	const { safeSDK, signer, saveCurrentOwner } = useContext(UserDataContext);
+	const { safeSDK, safeAddress, signer, saveCurrentOwner } =
+		useContext(UserDataContext);
 	const [expectedNewOwner, setExpectedNewOwner] = useState<string>("");
 	const [proposalId, setProposalId] = useState<number>(0);
 	const [isRecoveryExecutable, setIsRecoveryExecutable] =
@@ -31,6 +35,12 @@ const ExecuteRecovery = (props) => {
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const [socialRecoveryThreshold, setSocialRecoveryThreshold] =
 		useState<number>(0);
+	const [loading, setLoading] = useState(false);
+	const [txHash, setTxHash] = useState<string>("");
+	const { isOpen, onOpen, onClose } = useDisclosure();
+	const [openProposedModal, setOpenProposedModal] = useState(false);
+	const [result, setResult] = useState<boolean>(false);
+	const [functionType, setFunctionType] = useState<number>(0);
 
 	useEffect(() => {
 		const fetchProposals = async () => {
@@ -73,6 +83,18 @@ const ExecuteRecovery = (props) => {
 			}
 		})();
 	});
+
+	// Function to open the modal from the parent
+	const openModal = () => {
+		setOpenProposedModal(true);
+		onOpen();
+	};
+
+	// Function to close the modal from the parent
+	const closeModal = () => {
+		setOpenProposedModal(false);
+		onClose();
+	};
 
 	const typeName = (type: number) => {
 		if (type === 1) {
@@ -189,14 +211,33 @@ const ExecuteRecovery = (props) => {
 								</VStack>
 							</Flex>
 							<HStack>
-								{safeSDK ? (
+								{safeSDK && safeAddress !== "" ? (
 									<Button
 										sx={{ mt: "35px", mr: "30px" }}
 										colorScheme="red"
-										// w="55%"
 										onClick={async () => {
+											setErrorMessage("");
 											if (!proposals[proposalId].rejected) {
-												await _rejectRecover(signer, proposalId);
+												setLoading(true);
+												console.log("safeAddress: ", safeAddress);
+												const ret = await _rejectRecover(
+													safeSDK,
+													safeAddress,
+													proposalId
+												);
+												console.log("ret: ", ret);
+												if (ret.result) {
+													setResult(true);
+												} else if (!ret.result && ret.txHash === "") {
+													console.log("ret.result: ", ret.result);
+													setErrorMessage("Something went wrong");
+													setLoading(false);
+													return;
+												}
+												setTxHash(ret.txHash);
+												setFunctionType(3);
+												openModal();
+												setLoading(false);
 											} else {
 												setErrorMessage(
 													"This proposal has already been rejected"
@@ -212,15 +253,28 @@ const ExecuteRecovery = (props) => {
 									<Button
 										sx={{ mt: "35px" }}
 										colorScheme="teal"
-										// w="55%"
 										onClick={async () => {
-											if (true) {
-												// double-approve should fail.
-												await _approveSocialRecovery(signer, proposalId);
+											// double-approve should fail.
+											setErrorMessage("");
+											setLoading(true);
+											const ret = await _approveSocialRecovery(
+												signer,
+												proposalId
+											);
+											console.log("ret: ", ret);
+											if (ret.result) {
+												setResult(true);
 												proposals[proposalId].approvals += 1;
-											} else {
-												setErrorMessage("This proposal can't be executed");
+											} else if (!ret.result && ret.txHash === "") {
+												console.log("ret.result: ", ret.result);
+												setErrorMessage("Something went wrong");
+												setLoading(false);
+												return;
 											}
+											setTxHash(ret.txHash);
+											setFunctionType(2);
+											openModal();
+											setLoading(false);
 										}}
 									>
 										Approve
@@ -232,10 +286,23 @@ const ExecuteRecovery = (props) => {
 										// w="55%"
 										onClick={async () => {
 											if (isRecoveryExecutable) {
-												const res = await _executeRecover(signer, proposalId);
-												if (res) {
+												setErrorMessage("");
+												setLoading(true);
+												const ret = await _executeRecover(signer, proposalId);
+												console.log("ret: ", ret);
+												if (ret.result) {
+													setResult(true);
 													saveCurrentOwner(expectedNewOwner);
+												} else if (!ret.result && ret.txHash === "") {
+													console.log("ret.result: ", ret.result);
+													setErrorMessage("Something went wrong");
+													setLoading(false);
+													return;
 												}
+												setTxHash(ret.txHash);
+												setFunctionType(1);
+												openModal();
+												setLoading(false);
 											} else {
 												setErrorMessage("This proposal can't be executed");
 											}
@@ -245,7 +312,11 @@ const ExecuteRecovery = (props) => {
 									</Button>
 								)}
 							</HStack>
-
+							{loading && (
+								<Flex justifyContent="center" alignItems="center">
+									<Spinner mt={10} mb={5} color="gray.300" />
+								</Flex>
+							)}
 							{errorMessage !== "" ? (
 								<Text mt={4} color="red.500" mb={4}>
 									{errorMessage}
@@ -267,6 +338,15 @@ const ExecuteRecovery = (props) => {
 						</Flex>
 					</Box>
 				)}
+				<ExecutedModal
+					isOpen={isOpen || openProposedModal}
+					onOpen={onOpen}
+					onClose={closeModal}
+					result={result}
+					txHash={txHash}
+					functionType={functionType}
+					setFunctionType={setFunctionType}
+				/>
 			</Box>
 		</Box>
 	);
