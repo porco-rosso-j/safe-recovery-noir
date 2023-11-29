@@ -69,7 +69,7 @@ function EnabledModal(props) {
 						</Flex>
 					</ModalBody>
 					<ModalFooter>
-						<Button mb={5} onClick={props.onClose}>
+						<Button mb={5} bg="#CBD5E0" onClick={props.onClose}>
 							Close
 						</Button>
 					</ModalFooter>

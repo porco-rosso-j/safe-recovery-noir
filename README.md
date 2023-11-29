@@ -11,7 +11,7 @@ A safe plugin that allows Safe owners to recover account ownership in the case w
 Available recovery methods:
 
 - Private Backup Address Recovery:
-  This method allows backup signer, whose eth address is hashed and stored in smart contract, to recover account by proving that the the hashed hidden address matches the the hash of an eth address that is ec-recovered with provided public keys, signature, and message in `k256` circuit.
+  This method allows backup signer, whose eth address is hashed and stored in smart contract, to recover account by proving that the the hashed hidden address matches the the hash of an eth address that is ec-recovered with provided public keys, signature, and message in k256 circuit.
 
 - TouchID Recovery:
   This method allows for account recovery via the correct verification of ECDSA with p256 curve for a provided fingerprint signature generated through WebAuthn on user device.
@@ -34,8 +34,17 @@ This recovery app is built on top of [safe-core-protocol](https://github.com/5af
 
 Noir circuits
 
+- Noir version: `0.19.2+47f0130c0d154f1b70eb23f376783beb3f23ad72`
+
+- To install
+
 ```shell
-cd circuits/recoveries/{CIRCUIT_NAME}
+noirup -v 0.19.2
+```
+
+```shell
+cd circuits/{CIRCUIT_NAME}
+nargo compile
 nargo test --show-output
 nargo prove
 nargo verify
@@ -48,7 +57,7 @@ forge build
 forge test --match-contract RecoveryPluginNoirTest -vvv
 ```
 
-## Deployment
+## Deploy
 
 run forked goerli chain
 
@@ -64,6 +73,14 @@ cd front
 yarn
 yarn start
 ```
+
+### Deployment
+
+#### Goerli
+
+- SafeProtocolRegistry: `0x5113029053Df917bCeE92ae05e7508a9C4c2efDc`
+- SafeProtocolManager: `0xC3666058ca18deF6F6F535e34583c71D6082fF84`
+- SafeRecoverFactory: `0x1F1a1B5Da88e67e78d1bAdbd7857e3113AE56CDc`
 
 ## References
 

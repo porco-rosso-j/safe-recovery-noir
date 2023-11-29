@@ -11,9 +11,9 @@ import { contracts, privatekeys } from "../constants/addresses";
 const ALCHEMY_GOERLI = process.env.REACT_APP_ALCHEMY_GOERLI;
 const PRIVATE_KEY = process.env.REACT_APP_PRIVATE_KEY;
 export const provider = new ethers.providers.JsonRpcProvider(
-	"http://127.0.0.1:8545"
+	// "http://127.0.0.1:8545"
 	// "https://rpc.ankr.com/eth_goerli"
-	// ALCHEMY_GOERLI
+	ALCHEMY_GOERLI
 );
 
 export const nonce = async (address: string): Promise<number> => {

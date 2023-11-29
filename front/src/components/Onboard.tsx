@@ -114,7 +114,9 @@ const Onboard = () => {
 					<TabPanel>
 						{!isPluinEnabled && safeSDK !== null ? (
 							<Box>
-								<Text mb={4}>You need to proceed the following setups.</Text>
+								<Text mt={5} mb={5}>
+									Proceed the following steps to setup the recovery plugin.
+								</Text>
 
 								<VStack spacing={1} fontSize={13} align="start" ml={65} mb={7}>
 									<Text>1: Deploy SafeRecover plugin.</Text>

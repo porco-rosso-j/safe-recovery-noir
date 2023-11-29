@@ -6,10 +6,10 @@ import {SafeTestTools, DeployedSafe, SafeInstance, SafeTestLib} from "safe-tools
 import {RecoveryPluginNoir} from "../src/RecoveryPluginNoir.sol";
 import {RecoveryPluginNoirFactory} from "../src/RecoveryPluginNoirFactory.sol";
 
-import {UltraVerifier as EcrecoverVerifier} from "../circuits/recoveries/k256/contract/k256/plonk_vk.sol";
-import {UltraVerifier as WebAuthnVerifier} from "../circuits/recoveries/p256/contract/p256/plonk_vk.sol";
-import {UltraVerifier as SecretVerifier} from "../circuits/recoveries/secret/contract/secret/plonk_vk.sol";
-import {UltraVerifier as SocialVerifier} from "../circuits/recoveries/social/contract/social/plonk_vk.sol";
+import {UltraVerifier as EcrecoverVerifier} from "../circuits/k256/contract/k256/plonk_vk.sol";
+import {UltraVerifier as WebAuthnVerifier} from "../circuits/p256/contract/p256/plonk_vk.sol";
+import {UltraVerifier as SecretVerifier} from "../circuits/secret/contract/secret/plonk_vk.sol";
+import {UltraVerifier as SocialVerifier} from "../circuits/social/contract/social/plonk_vk.sol";
 
 import "forge-std/Script.sol";
 

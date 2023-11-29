@@ -49,7 +49,7 @@ function ProposedModal(props) {
 											<Text>Proposal Id:</Text>
 											<Text>Transaction:</Text>
 										</VStack>
-										<VStack spacing={1} fontSize={16} align="end">
+										<VStack spacing={1} fontSize={16} textAlign={"center"}>
 											<Text>{props.recoveryCount}</Text>
 											<Link
 												ml={2}
@@ -96,7 +96,7 @@ function ProposedModal(props) {
 						</Box>
 					)}
 					<ModalFooter>
-						<Button mb={5} onClick={props.onClose}>
+						<Button mb={5} bg="#CBD5E0" onClick={props.onClose}>
 							Close
 						</Button>
 					</ModalFooter>

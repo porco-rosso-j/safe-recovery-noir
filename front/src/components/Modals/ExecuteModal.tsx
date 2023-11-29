@@ -84,7 +84,7 @@ function ExecutedModal(props) {
 						</Flex>
 					</ModalBody>
 					<ModalFooter>
-						<Button mb={5} onClick={handleClose}>
+						<Button mb={5} bg="#CBD5E0" onClick={handleClose}>
 							Close
 						</Button>
 					</ModalFooter>

@@ -21,7 +21,6 @@ export async function _removeRecover(
 	);
 
 	const safeTxData = {
-		// to: contracts.recoveryPlugin,
 		to: pluginAddress,
 		data: removeRecoverTx,
 		value: "0",

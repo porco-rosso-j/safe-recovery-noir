@@ -117,7 +117,7 @@ export async function sendSafeTx(
 		});
 		console.log("safeTransaction: ", safeTransaction);
 		const txResponse = await safeSDK.executeTransaction(safeTransaction, {
-			gasLimit: 1500000,
+			// gasLimit: 1500000,
 		});
 		console.log("txResponse: ", txResponse);
 		const res: ethers.ContractReceipt =

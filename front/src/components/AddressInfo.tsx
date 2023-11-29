@@ -103,7 +103,7 @@ const AddressInfo = () => {
 						{currentOwner !== "" && <Text>・ Safe Owner :</Text>}
 						{pluginAddress !== "" && <Text>・ SafeRecover :</Text>}
 					</VStack>
-					<VStack spacing={1} fontSize={14} color="white" align="end">
+					<VStack spacing={1} fontSize={14} color="white" align="end" ml={3}>
 						<Text>{safeAddress}</Text>
 						{currentOwner !== "" && <Text>{currentOwner}</Text>}
 						{pluginAddress !== "" && <Text>{pluginAddress}</Text>}
