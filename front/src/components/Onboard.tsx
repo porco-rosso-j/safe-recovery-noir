@@ -10,6 +10,7 @@ import {
 	Flex,
 	Link,
 	Spinner,
+	VStack,
 } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import UserDataContext from "src/contexts/userData";
@@ -37,16 +38,20 @@ const Onboard = () => {
 	const [loading, setLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const [isPluginDeployed, setIsPluginDeployed] = useState<boolean>(false);
+	const [setupStatus, setSetupStatus] = useState<string>("");
 
 	useEffect(() => {
 		(async () => {
-			const [_isPluginDeployed, pluginAddr] = await getIsPluginDeployed(
-				safeAddress
-			);
-			console.log("_isPluginDeployed: ", _isPluginDeployed);
-			setIsPluginDeployed(_isPluginDeployed);
-			if (_isPluginDeployed) {
-				savePluginAdddress(pluginAddr);
+			console.log("safeAddress: ", safeAddress);
+			if (safeAddress !== "") {
+				const [_isPluginDeployed, pluginAddr] = await getIsPluginDeployed(
+					safeAddress
+				);
+				console.log("_isPluginDeployed: ", _isPluginDeployed);
+				setIsPluginDeployed(_isPluginDeployed);
+				if (_isPluginDeployed) {
+					savePluginAdddress(pluginAddr);
+				}
 			}
 		})();
 	});
@@ -84,7 +89,7 @@ const Onboard = () => {
 			mt="5"
 			textAlign="center"
 			maxW="1024px"
-			width="550px"
+			width="600px"
 			mx="auto"
 		>
 			<AddressInfo />
@@ -109,13 +114,22 @@ const Onboard = () => {
 					<TabPanel>
 						{!isPluinEnabled && safeSDK !== null ? (
 							<Box>
-								<Text mb={4}>
-									You will sign two transactions consecuritvely.<br></br>
-									<br></br>
-									1: Enable Safe Protocol Manager as a module on your Safe.{" "}
-									<br></br>
-									2: Enable SafeRecover module on Safe Protocol Manager.
-								</Text>
+								<Text mb={4}>You need to proceed the following setups.</Text>
+
+								<VStack spacing={1} fontSize={13} align="start" ml={65} mb={7}>
+									<Text>1: Deploy SafeRecover plugin.</Text>
+									<Text>
+										2: Enable Safe Protocol Manager as a module on your Safe.
+									</Text>
+									<Text>
+										3: Enable SafeRecover plugin on Safe Protocol Manager.
+									</Text>
+									<Text mt={2}>
+										*1 & 2 are batched. So you only need to sign two
+										trancations.
+									</Text>
+								</VStack>
+
 								<Box textAlign="center" alignItems="center">
 									<Button
 										sx={{ mt: "10px", mb: "10px" }}
@@ -123,14 +137,22 @@ const Onboard = () => {
 										w="50%"
 										onClick={async () => {
 											setLoading(true);
+											setErrorMessage("");
 											console.log("isPluinEnabled: ", isPluinEnabled);
 											// if (isPluinEnabled) {
+											setSetupStatus(
+												"1. SafeRecover plugin is being deployed & Safe is adding the module..."
+											);
 											const [res1, _pluginAddress] = await enableModuleOnSafe(
 												safeSDK,
 												safeAddress
 											);
+
 											if (!res1.result) {
-												setErrorMessage("Tx Failed: " + res1.txHash);
+												setErrorMessage("Something went wrong: " + res1.txHash);
+												setSetupStatus("");
+												setLoading(false);
+												return;
 											}
 											// }
 
@@ -140,24 +162,37 @@ const Onboard = () => {
 											console.log("safeAddress: ", safeAddress);
 											console.log("safeSDK: ", safeSDK);
 
+											setSetupStatus(
+												"2. Enabling SafeRecover on SafeProtocolManager..."
+											);
 											const res2 = await enablePluginOnProtocolManager(
 												safeAddress,
 												safeSDK,
 												_pluginAddress
 											);
 											if (!res2.result) {
-												setErrorMessage("Tx Failed: " + res2.txHash);
+												setErrorMessage("Something went wrong: " + res1.txHash);
+												setSetupStatus("");
+												setLoading(false);
+												return;
 											}
-
+											setSetupStatus("");
 											setLoading(false);
 										}}
 									>
 										Enable SafeRecover Plugin
 									</Button>
 									{loading && (
-										<Flex justifyContent="center" alignItems="center">
-											<Spinner mt={10} color="gray.300" />
-										</Flex>
+										<Box>
+											<VStack spacing={1} align="center">
+												<Text mt={7} fontSize={14}>
+													{setupStatus}
+												</Text>
+												<Flex justifyContent="center" alignItems="center">
+													<Spinner mt={10} color="gray.300" />
+												</Flex>
+											</VStack>
+										</Box>
 									)}
 									<Text mt={4} color="red.500" mb={4}>
 										{errorMessage}

@@ -55,7 +55,7 @@ contract RecoverBase {
         return (newRecoveryCount, recovery.deadline);
     }
 
-    // getter
+    // view
 
     function getRecoveryByProposalId(
         uint _proposalId

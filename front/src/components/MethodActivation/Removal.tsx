@@ -36,10 +36,12 @@ const MethodRemoval = (props) => {
 		<Box textAlign="center" alignItems="center">
 			<Button
 				sx={{ mt: "35px" }}
-				// colorScheme="red"
 				bg="#C53030"
 				color="white"
-				w="55%"
+				_hover={{
+					bg: "#9B2C2C",
+				}}
+				w="35%"
 				onClick={async () => {
 					setErrorMessage("");
 

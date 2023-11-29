@@ -24,33 +24,28 @@ export async function enableModuleOnSafe(
 ): Promise<[txResult, any]> {
 	console.log("safeSDK: ", safeSDK);
 	console.log("contracts.safeProotcolManager: ", contracts.safeProotcolManager);
-	const enableModuletx = await safeSDK.createEnableModuleTx(
-		contracts.safeProotcolManager
-	);
-
 	console.log("safeAddress: ", safeAddress);
 	const pluginDeployTx = pluginFacIface.encodeFunctionData(
 		"createRecoveryPluginNoir",
 		[safeAddress, 0]
 	);
-	// const enableModuleTx: SafeTransactionDataPartial = {
-	// 	to: enableModuletx.data.to,
-	// 	data: enableModuletx.data.data,
-	// 	value: enableModuletx.data.value,
-	// };
+
+	const enableModuletx = await safeSDK.createEnableModuleTx(
+		contracts.safeProotcolManager
+	);
 
 	const safeTransactionData: MetaTransactionData[] = [
-		// safe.enableModule(manager)
-		{
-			to: enableModuletx.data.to,
-			data: enableModuletx.data.data,
-			value: enableModuletx.data.value,
-		},
 		// factory.createRecoveryPluginNoir()
 		{
 			to: contracts.recoveryPluginFac,
 			data: pluginDeployTx,
 			value: "0",
+		},
+		// safe.enableModule(manager)
+		{
+			to: enableModuletx.data.to,
+			data: enableModuletx.data.data,
+			value: enableModuletx.data.value,
 		},
 	];
 
@@ -70,7 +65,9 @@ export async function enableModuleOnSafe(
 	if (isModuleEnabled && pluginAddress !== ethers.constants.AddressZero) {
 		// addModule
 		try {
-			const tx = await registry.addModule(pluginAddress, 1);
+			const tx = await registry.addModule(pluginAddress, 1, {
+				gasLimit: 200000,
+			});
 			await tx.wait();
 		} catch (e) {
 			console.log("error:", e);
@@ -135,7 +132,13 @@ export async function sendSafeTx(
 }
 
 export async function getSafePluginAddress(safeAddr: string): Promise<string> {
-	return await pluginFac.getPluginAddr(safeAddr);
+	try {
+		return await pluginFac.getPluginAddr(safeAddr);
+	} catch (e) {
+		console.log("erorr:", e);
+		return "";
+	}
+	// return await pluginFac.getPluginAddr(safeAddr);
 }
 
 export async function getIsPluginDeployed(
@@ -158,5 +161,15 @@ export async function isPluginEnabled(
 }
 
 export async function getSafeOwners(safe: string): Promise<string[]> {
+	// try {
+	// 	return await safeContract(safe).getOwners();
+	// } catch (e) {
+	// 	console.log("erorr:", e);
+	// 	return [""];
+	// }
 	return await safeContract(safe).getOwners();
+}
+
+async function computePluginAddr(safeAddr: string): Promise<string> {
+	return await pluginFac.getAddress(safeAddr, 0);
 }

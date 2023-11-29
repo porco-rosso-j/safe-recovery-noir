@@ -44,4 +44,14 @@ const chakraDefaultTheme = extendTheme({
 	// },
 });
 
+export const inputStyle = {
+	border: "none",
+	borderBottom: "1px solid gray", // Underline style
+	borderColor: "gray", // Border color
+	outline: "none", // Remove focus outline
+	_focus: {
+		boxShadow: "none", // Remove focus box shadow
+	},
+};
+
 export default chakraDefaultTheme;

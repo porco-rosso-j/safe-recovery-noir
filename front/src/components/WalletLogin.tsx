@@ -24,18 +24,22 @@ const WalletLogin: React.FC = () => {
 
 	useEffect(() => {
 		(async () => {
-			const signer = await getSigner();
-			if (signer) saveSigner(signer);
+			try {
+				const signer = await getSigner();
+				if (signer) saveSigner(signer);
 
-			const storedData = localStorage.getItem(`safe_address`);
-			const _safeAddress = storedData ? JSON.parse(storedData) : undefined;
-			console.log("_safeAddress: ", _safeAddress);
-			if (_safeAddress) {
-				saveSafeAddress(_safeAddress);
-				const safeSDK = await getSafeSDK(safeAddressInput, signer);
-				if (safeSDK) {
-					saveSafeSDK(safeSDK);
+				const storedData = localStorage.getItem(`safe_address`);
+				const _safeAddress = storedData ? JSON.parse(storedData) : undefined;
+				console.log("_safeAddress: ", _safeAddress);
+				if (_safeAddress) {
+					saveSafeAddress(_safeAddress);
+					const safeSDK = await getSafeSDK(_safeAddress, signer);
+					if (safeSDK) {
+						saveSafeSDK(safeSDK);
+					}
 				}
+			} catch (e) {
+				console.log("e:", e);
 			}
 		})();
 	});

@@ -25,7 +25,15 @@ function ProposedModal(props) {
 				onClose={props.onClose}
 			>
 				<ModalOverlay />
-				<ModalContent color={"black"} textAlign="center" alignItems="center">
+				<ModalContent
+					bg={"#2e2e2e"}
+					color={"white"}
+					borderRadius="lg"
+					borderColor={"#00796F"}
+					borderWidth={"1px"}
+					textAlign="center"
+					alignItems="center"
+				>
 					{props.result ? (
 						<Box>
 							<ModalHeader mt={4}>Successfully proposed!</ModalHeader>
@@ -88,7 +96,9 @@ function ProposedModal(props) {
 						</Box>
 					)}
 					<ModalFooter>
-						<Button onClick={props.onClose}>Close</Button>
+						<Button mb={5} onClick={props.onClose}>
+							Close
+						</Button>
 					</ModalFooter>
 				</ModalContent>
 			</Modal>

@@ -1,5 +1,5 @@
-import { Flex, Text, VStack } from "@chakra-ui/react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import { Box, Flex, Text, VStack } from "@chakra-ui/react";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { useContext, useState, useEffect } from "react";
 import * as ethers from "ethers";
 import UserDataContext from "src/contexts/userData";
@@ -8,9 +8,11 @@ import {
 	isPluginEnabled,
 	getSafeOwners,
 } from "../scripts/utils/safe";
+import { getSigner } from "src/scripts/utils/login";
 
 const AddressInfo = () => {
 	const {
+		signer,
 		safeAddress,
 		pluginAddress,
 		isPluinEnabled,
@@ -27,10 +29,14 @@ const AddressInfo = () => {
 
 	useEffect(() => {
 		(async () => {
-			if (pluginAddress === "") {
-				const PluginAddr = await getSafePluginAddress(safeAddress);
-				if (PluginAddr !== ethers.constants.AddressZero) {
-					savePluginAdddress(PluginAddr);
+			if (safeAddress !== "" && pluginAddress === "" && isPluinEnabled) {
+				try {
+					const PluginAddr = await getSafePluginAddress(safeAddress);
+					if (PluginAddr !== ethers.constants.AddressZero) {
+						savePluginAdddress(PluginAddr);
+					}
+				} catch (e) {
+					console.log(e);
 				}
 			}
 		})();
@@ -38,7 +44,7 @@ const AddressInfo = () => {
 
 	useEffect(() => {
 		(async () => {
-			if (pluginAddress !== "" && !isPluinEnabled) {
+			if (pluginAddress === "" && isPluinEnabled) {
 				const _isPluginEnabled = await isPluginEnabled(
 					safeAddress,
 					pluginAddress
@@ -54,16 +60,20 @@ const AddressInfo = () => {
 	useEffect(() => {
 		(async () => {
 			if (safeAddress !== "") {
-				const owners = await getSafeOwners(safeAddress);
-				console.log("owners; ", owners);
-				const owner = owners[0];
-				console.log("owner; ", owner);
-				saveCurrentOwner(owner);
+				try {
+					const owners = await getSafeOwners(safeAddress);
+					console.log("owners; ", owners);
+					const owner = owners[0];
+					console.log("owner; ", owner);
+					saveCurrentOwner(owner);
+				} catch (e) {
+					console.log(e);
+				}
 			}
 		})();
 	});
 
-	return isOpen ? (
+	return (
 		<Flex
 			p={5}
 			mx="auto"
@@ -73,43 +83,7 @@ const AddressInfo = () => {
 			boxShadow="lg"
 			borderColor={"#00796F"}
 			borderTopWidth={"1px"}
-			pb="30px"
-			justifyContent="space-between" // Align the button to the right
-			alignItems="center" // Vertically center the button
-			flexDirection="column"
-		>
-			<VStack spacing={1}>
-				<Text as="b" fontSize={15} justifyContent="center">
-					Address Info
-				</Text>
-				<ChevronDownIcon boxSize={5} onClick={toggle} color="white" />
-				<Text fontSize={14} color="white">
-					・ Safe: {safeAddress}
-				</Text>
-				{currentOwner !== "" && (
-					<Text fontSize={14} color="white">
-						・ Owner: {currentOwner}
-					</Text>
-				)}
-				{pluginAddress !== "" && (
-					<Text fontSize={14} color="white">
-						・ SafeRecover: {pluginAddress}
-					</Text>
-				)}
-			</VStack>
-		</Flex>
-	) : (
-		<Flex
-			p={3}
-			mx="auto"
-			mt="3"
-			mb="5"
-			borderRadius="lg"
-			boxShadow="lg"
-			// backgroundColor={"gray.800"}
-			borderColor={"#00796F"}
-			borderTopWidth={"1px"}
-			pb="10px"
+			pb="20px"
 			justifyContent="space-between"
 			alignItems="center"
 			flexDirection="column"
@@ -117,7 +91,25 @@ const AddressInfo = () => {
 			<Text as="b" fontSize={15} justifyContent="center">
 				Address Info
 			</Text>
-			<ChevronDownIcon boxSize={5} onClick={toggle} color="white" />
+			{!isOpen ? (
+				<ChevronDownIcon boxSize={5} onClick={toggle} color="white" />
+			) : (
+				<ChevronUpIcon boxSize={5} onClick={toggle} color="white" />
+			)}
+			{isOpen ? (
+				<Flex alignItems="strech">
+					<VStack spacing={1} fontSize={14} align="start">
+						<Text>・ Safe :</Text>
+						{currentOwner !== "" && <Text>・ Safe Owner :</Text>}
+						{pluginAddress !== "" && <Text>・ SafeRecover :</Text>}
+					</VStack>
+					<VStack spacing={1} fontSize={14} color="white" align="end">
+						<Text>{safeAddress}</Text>
+						{currentOwner !== "" && <Text>{currentOwner}</Text>}
+						{pluginAddress !== "" && <Text>{pluginAddress}</Text>}
+					</VStack>
+				</Flex>
+			) : null}
 		</Flex>
 	);
 };

@@ -29,7 +29,15 @@ function ExecutedModal(props) {
 				onClose={props.onClose}
 			>
 				<ModalOverlay />
-				<ModalContent color={"black"} textAlign="center" alignItems="center">
+				<ModalContent
+					bg={"#2e2e2e"}
+					color={"white"}
+					borderRadius="lg"
+					borderColor={"#00796F"}
+					borderWidth={"1px"}
+					textAlign="center"
+					alignItems="center"
+				>
 					{props.result ? (
 						<ModalHeader mt={4}>
 							{props.functionType === 1
@@ -76,7 +84,9 @@ function ExecutedModal(props) {
 						</Flex>
 					</ModalBody>
 					<ModalFooter>
-						<Button onClick={handleClose}>Close</Button>
+						<Button mb={5} onClick={handleClose}>
+							Close
+						</Button>
 					</ModalFooter>
 				</ModalContent>
 			</Modal>

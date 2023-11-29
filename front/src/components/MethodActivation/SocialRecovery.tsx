@@ -12,8 +12,10 @@ import {
 	CloseButton,
 	Spinner,
 	useDisclosure,
+	Icon,
 } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
+import { InfoIcon, AddIcon } from "@chakra-ui/icons";
+import { inputStyle } from "src/theme";
 import { useContext, useState, useEffect } from "react";
 import UserDataContext from "src/contexts/userData";
 import {
@@ -91,22 +93,26 @@ const SocialRecovery = () => {
                         It's recommended to set, at least, more than three guardians"
 					>
 						<Text mb={3} fontSize={15} mx="25px">
-							Set guardian addresses.
+							1. Guardian addresses. <br></br>
+							*Should include addresses controlled by your family, friend, and
+							people closed to you as well as your back up addresses.
 						</Text>
 					</Tooltip>
 					<Box mt="10px" textAlign="center" alignItems="center">
 						<Flex justifyContent="space-between">
-							<VStack spacing={1} flex={1}>
+							<VStack spacing={1} flex={1} fontSize={14}>
 								<Text color="red.500" mb={2}>
 									{errorMessage2}
 								</Text>
 								{guardians.map((address, index) => (
-									<Box key={index} display="flex" alignItems="center" mt={3}>
+									<Box key={index} display="flex" alignItems="center" mt={1}>
 										<label>{index + 1}:</label>
 										<Input
 											ml={3}
-											sx={{ w: "300px" }}
-											size="sm"
+											sx={inputStyle}
+											textAlign="center"
+											w="350px"
+											size="xl"
 											type="address"
 											placeholder={`0x...`}
 											value={address}
@@ -121,7 +127,7 @@ const SocialRecovery = () => {
 										/>
 										<IconButton
 											ml={1}
-											size="sm"
+											size="xl"
 											icon={<CloseButton />}
 											colorScheme="black"
 											onClick={() => removeGuardian(index)}
@@ -133,60 +139,91 @@ const SocialRecovery = () => {
 									mt={2}
 									mb={4}
 									w="15%"
-									size="sm"
+									size="xl"
 									icon={<AddIcon />}
 									colorScheme="black"
 									onClick={handleAddGuardian}
 									aria-label="Add Guardian"
 								/>
-								<Box display="flex" alignItems="center" mt={3}>
-									<label>Approval threshold by guardians:</label>
-									<Input
-										ml={4}
-										sx={{ w: "70px" }}
-										size="sm"
-										placeholder="2"
-										onChange={(e) => {
-											const threshold = Number(e.target.value);
-											if (threshold <= guardians.length) {
-												setThreshold(threshold);
-											} else {
-												console.log("threshold > guardians.length");
-											}
-										}}
-									/>
-								</Box>
-								<Box display="flex" alignItems="center" mt={3}>
+							</VStack>
+						</Flex>
+						<Flex
+							mt="20px"
+							mx="auto"
+							justifyContent="center"
+							alignItems="strech"
+							w="100%"
+						>
+							<VStack spacing={4} fontSize={14} align="start">
+								<Flex justifyContent="space-between" alignItems="center">
 									<Tooltip
-										placement="right-start"
-										label="`Delay` refers to the period of time before a recovery proposal can be executed. 
-                                        (Recommendaed => prod: >30 days | test: <10 sec)"
+										placement="bottom-start"
+										label="Guardian threshold is the minimum approval count that is necessary to execute social recovery proposal."
 									>
-										<label>Delay:</label>
+										<InfoIcon mr={2} mt={0.5} boxSize={3} />
 									</Tooltip>
-									<FormControl px={3}>
-										<Box display="flex" alignItems="center">
-											<Input
-												size="sm"
-												type="number"
-												placeholder="10"
-												onChange={(e) =>
-													setDelayValue(Number(e.target.value) * unit)
-												}
-											/>
-
-											<Select
-												size="sm"
-												onChange={(e) => setUnit(Number(e.target.value))}
-											>
-												<option value="1">sec</option>
-												<option value="60">min</option>
-												<option value="3600">hour</option>
-												<option value="86400">day</option>
-											</Select>
-										</Box>
-									</FormControl>
-								</Box>
+									<Text>2. Guardian threshold :</Text>
+								</Flex>
+								<Flex justifyContent="space-between" alignItems="center">
+									<Tooltip
+										placement="bottom-start"
+										label="`Delay Period` refers to the period of time until a recovery proposal becomes executable after the proposal is made.
+                  *Recommendation: >30 days in prod. <10 seconds in test."
+									>
+										<InfoIcon mr={2} mt={0.5} boxSize={3} />
+									</Tooltip>
+									<Text>3. Delay period :</Text>
+								</Flex>
+							</VStack>
+							<VStack spacing={3.5} fontSize={14} align="end" w="300px" ml={2}>
+								<Input
+									sx={inputStyle}
+									textAlign="center"
+									size="xl"
+									type="address"
+									placeholder="2"
+									onChange={(e) => {
+										const threshold = Number(e.target.value);
+										if (threshold <= guardians.length) {
+											setThreshold(threshold);
+										} else {
+											setErrorMessage(
+												"threshold should be lower than the number of guardins"
+											);
+										}
+									}}
+								/>
+								<FormControl>
+									<Box display="flex" alignItems="center">
+										<Input
+											sx={inputStyle}
+											textAlign="center"
+											size="xl"
+											mr="10px"
+											type="number"
+											placeholder="10"
+											onChange={(e) =>
+												setDelayValue(Number(e.target.value) * unit)
+											}
+										/>
+										<Select
+											w={"30%"}
+											size="xl"
+											borderRadius={"2px"}
+											sx={{
+												textAlign: "center", // Center the text horizontally
+												pr: "15px", // Add padding on the left side
+												pb: "4px",
+											}}
+											onChange={(e) => setUnit(Number(e.target.value))}
+										>
+											<option value="1">sec</option>
+											<option value="60">min</option>
+											<option value="3600">hour</option>
+											<option value="86400">day</option>
+										</Select>
+									</Box>
+								</FormControl>
 							</VStack>
 						</Flex>
 					</Box>
@@ -198,21 +235,16 @@ const SocialRecovery = () => {
 						<Button
 							sx={{ mt: "35px" }}
 							colorScheme="teal"
-							w="55%"
+							w="35%"
 							onClick={async () => {
 								setErrorMessage("");
-								if (threshold === 0) {
-									setErrorMessage("threshold not set");
+								if (threshold === 0 || threshold > guardians.length) {
+									setErrorMessage("Invalid threshold");
 									return;
 								}
 								console.log("guardians.length: ", guardians.length);
 								console.log("threshold: ", threshold);
-								if (threshold > guardians.length) {
-									setErrorMessage(
-										"threshold should be lower than the number of guardins"
-									);
-									return;
-								}
+
 								setLoading(true);
 								const ret = await _addSocialRecover(
 									safeSDK,
@@ -235,7 +267,7 @@ const SocialRecovery = () => {
 								setLoading(false);
 							}}
 						>
-							Enable this method
+							Enable method
 						</Button>
 						{loading && (
 							<Flex justifyContent="center" alignItems="center">

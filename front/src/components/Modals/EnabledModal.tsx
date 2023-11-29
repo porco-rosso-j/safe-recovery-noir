@@ -25,7 +25,15 @@ function EnabledModal(props) {
 				onClose={props.onClose}
 			>
 				<ModalOverlay />
-				<ModalContent color={"black"} textAlign="center" alignItems="center">
+				<ModalContent
+					bg={"#2e2e2e"}
+					color={"white"}
+					borderRadius="lg"
+					borderColor={"#00796F"}
+					borderWidth={"1px"}
+					textAlign="center"
+					alignItems="center"
+				>
 					{props.result ? (
 						<ModalHeader mt={4}>
 							{props.enable ? "Successfully Enabled!" : "Method Disabled"}
@@ -61,7 +69,9 @@ function EnabledModal(props) {
 						</Flex>
 					</ModalBody>
 					<ModalFooter>
-						<Button onClick={props.onClose}>Close</Button>
+						<Button mb={5} onClick={props.onClose}>
+							Close
+						</Button>
 					</ModalFooter>
 				</ModalContent>
 			</Modal>

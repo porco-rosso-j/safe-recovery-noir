@@ -243,6 +243,9 @@ const ExecuteRecovery = (props) => {
 										// colorScheme="#F56565"
 										bg="#C53030"
 										color="white"
+										_hover={{
+											bg: "#9B2C2C",
+										}}
 										onClick={async () => {
 											setErrorMessage("");
 											if (!proposals[proposalId].rejected) {
@@ -313,7 +316,7 @@ const ExecuteRecovery = (props) => {
 									<Button
 										sx={{ mt: "35px" }}
 										colorScheme="teal"
-										// w="55%"
+										// w="35%"
 										onClick={async () => {
 											if (isRecoveryExecutable) {
 												setErrorMessage("");
