@@ -42,6 +42,7 @@ Noir circuits
 noirup -v 0.19.2
 ```
 
+- Nargo commands
 ```shell
 cd circuits/{CIRCUIT_NAME}
 nargo compile
