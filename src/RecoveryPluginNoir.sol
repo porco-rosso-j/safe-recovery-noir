@@ -327,6 +327,10 @@ contract RecoveryPluginNoir is
         return true;
     }
 
+    // TODO
+    // 0: return false instead of reverting
+    // 1: return false if the method type of the proposal has been disabled
+    // 2: return false if epoc is not the latest
     function getIsRecoveryExecutable(
         uint _proposalId
     ) public view returns (bool) {

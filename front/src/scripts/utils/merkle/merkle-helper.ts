@@ -5,7 +5,8 @@ import { pedersenHash } from "../pedersen";
 export async function getMerkleRootFromAddresses(
 	addresses: string[]
 ): Promise<string> {
-	const depth = await calculateDepth(addresses.length);
+	const isOdd = addresses.length % 2 !== 0;
+	const depth = await calculateDepth(addresses.length + 1);
 	console.log("depth: ", depth);
 	let merkleTree = new MerkleTree(depth);
 
@@ -13,6 +14,11 @@ export async function getMerkleRootFromAddresses(
 	for (let i = 0; i < addresses.length; i++) {
 		hashed_nodes.push(await pedersenHash([addresses[i]]));
 	}
+
+	if (isOdd) {
+		hashed_nodes[hashed_nodes.length] = hashed_nodes[hashed_nodes.length - 1];
+	}
+
 	console.log("hashed_nodes: ", hashed_nodes);
 
 	// const tree = await getMerkleTree(hashed_node);
@@ -36,7 +42,7 @@ function calculateDepth(numLeaves: number): number {
 	return Math.ceil(Math.log2(numLeaves));
 }
 
-type NullifierHashAndHashPath = {
+export type NullifierHashAndHashPath = {
 	index: number;
 	nullHash: string;
 	hashPath: string[];
@@ -65,16 +71,20 @@ export async function getNullifierHashAndHashPath(
 		nodesFr.push(Fr.fromString(nodes[i]));
 	}
 
+	console.log("nodesFr: ", nodesFr);
+
 	let merkleTree: MerkleTree;
 	const depth = calculateDepth(nodes.length);
+	console.log("depth: ", depth);
 	merkleTree = new MerkleTree(depth);
 	await merkleTree.initializeFromRootAndLeaves(Fr.fromString(root), nodesFr);
-
+	console.log("merkleTree: ", merkleTree);
 	let hash_path: string[] = [];
 	const { pathElements } = await merkleTree.proof(index);
 	for (let i = 0; i < pathElements.length; i++) {
 		hash_path.push(pathElements[i].toString());
 	}
+	console.log("hash_path: ", hash_path);
 
 	const nullifierHash = await pedersenHash([
 		nodes[index],

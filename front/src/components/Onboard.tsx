@@ -15,6 +15,7 @@ import { useContext, useEffect, useState } from "react";
 import UserDataContext from "src/contexts/userData";
 import {
 	isPluginEnabled,
+	getIsPluginDeployed,
 	enableModuleOnSafe,
 	enablePluginOnProtocolManager,
 } from "../scripts/utils/safe";
@@ -23,19 +24,45 @@ import { shortenAddress } from "src/scripts/utils/address";
 import MethodHeader from "./MethodHeader";
 
 const Onboard = () => {
-	const { safeAddress, safeSDK, isPluinEnabled, saveIsPluginEnabled } =
-		useContext(UserDataContext);
+	const {
+		safeAddress,
+		safeSDK,
+		isPluinEnabled,
+		saveIsPluginEnabled,
+		pluginAddress,
+		savePluginAdddress,
+	} = useContext(UserDataContext);
 	const [method, setMethod] = useState<number>(1);
 	const [tabIndex, setTabIndex] = useState(0);
 	const [loading, setLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string>("");
+	const [isPluginDeployed, setIsPluginDeployed] = useState<boolean>(false);
 
 	useEffect(() => {
 		(async () => {
-			const _isPluginEnabled = await isPluginEnabled(safeAddress);
-			console.log("_isPluginEnabled: ", _isPluginEnabled);
-			if (_isPluginEnabled) {
-				saveIsPluginEnabled(_isPluginEnabled);
+			const [_isPluginDeployed, pluginAddr] = await getIsPluginDeployed(
+				safeAddress
+			);
+			console.log("_isPluginDeployed: ", _isPluginDeployed);
+			setIsPluginDeployed(_isPluginDeployed);
+			if (_isPluginDeployed) {
+				savePluginAdddress(pluginAddr);
+			}
+		})();
+	});
+
+	useEffect(() => {
+		(async () => {
+			if (isPluginDeployed) {
+				const _isPluginEnabled = await isPluginEnabled(
+					safeAddress,
+					pluginAddress
+				);
+				console.log("here???");
+				console.log("_isPluginEnabled: ", _isPluginEnabled);
+				if (_isPluginEnabled) {
+					saveIsPluginEnabled(_isPluginEnabled);
+				}
 			}
 		})();
 	});
@@ -80,7 +107,7 @@ const Onboard = () => {
 				</TabList>
 				<TabPanels>
 					<TabPanel>
-						{safeSDK !== null && !isPluinEnabled ? (
+						{!isPluinEnabled && safeSDK !== null ? (
 							<Box>
 								<Text mb={4}>
 									You will sign two transactions consecuritvely.<br></br>
@@ -96,14 +123,27 @@ const Onboard = () => {
 										w="50%"
 										onClick={async () => {
 											setLoading(true);
-											const res1 = await enableModuleOnSafe(safeSDK);
+											console.log("isPluinEnabled: ", isPluinEnabled);
+											// if (isPluinEnabled) {
+											const [res1, _pluginAddress] = await enableModuleOnSafe(
+												safeSDK,
+												safeAddress
+											);
 											if (!res1.result) {
 												setErrorMessage("Tx Failed: " + res1.txHash);
 											}
+											// }
+
+											savePluginAdddress(_pluginAddress);
+
+											console.log("eh");
+											console.log("safeAddress: ", safeAddress);
+											console.log("safeSDK: ", safeSDK);
 
 											const res2 = await enablePluginOnProtocolManager(
 												safeAddress,
-												safeSDK
+												safeSDK,
+												_pluginAddress
 											);
 											if (!res2.result) {
 												setErrorMessage("Tx Failed: " + res2.txHash);
@@ -124,7 +164,7 @@ const Onboard = () => {
 									</Text>
 								</Box>
 							</Box>
-						) : safeSDK !== null ? (
+						) : isPluinEnabled && safeSDK !== null ? (
 							<MethodHeader
 								updateMethod={updateMethod}
 								method={method}

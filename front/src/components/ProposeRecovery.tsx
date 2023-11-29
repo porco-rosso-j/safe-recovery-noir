@@ -20,9 +20,11 @@ import { addresses } from "src/scripts/constants/addresses";
 import ProposedModal from "./Modals/ProposedModal";
 
 const ProposeRecovery = (props) => {
-	const { safeAddress, signer, currentOwner } = useContext(UserDataContext);
+	const { safeAddress, signer, currentOwner, pluginAddress } =
+		useContext(UserDataContext);
 	const [ownerReplaced, setOwnerReplaced] = useState<string>(currentOwner);
-	const [pendingNewOwner, setPendingNewOwner] = useState<string>(addresses[0]);
+	// const [pendingNewOwner, setPendingNewOwner] = useState<string>(addresses[0]);
+	const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
 	const [threshold, setThreshold] = useState<number>(0);
 	const [secret, setSecret] = useState<string>("");
 	const [recoveryCount, setRecoveryCount] = useState<number>(0);
@@ -36,7 +38,7 @@ const ProposeRecovery = (props) => {
 
 	useEffect(() => {
 		(async () => {
-			const isEnabled = await _isMethodEnabled(props.method);
+			const isEnabled = await _isMethodEnabled(props.method, pluginAddress);
 			console.log("isEnabled: ", isEnabled);
 			setIsMethodEnabled(isEnabled);
 		})();
@@ -84,7 +86,7 @@ const ProposeRecovery = (props) => {
 									size="sm"
 									type="address"
 									placeholder="0xAbCd..."
-									defaultValue={addresses[0]} // should delete in testnet
+									// defaultValue={addresses[0]} // should delete in testnet
 									onChange={(e) => setPendingNewOwner(e.target.value)}
 								/>
 							</Box>
@@ -137,15 +139,17 @@ const ProposeRecovery = (props) => {
 									const ret = await _proposeRecovery(
 										props.method,
 										signer,
+										pluginAddress,
 										threshold,
 										ownerReplaced,
 										pendingNewOwner,
-										secret,
-										safeAddress
+										secret
 									);
 									console.log("ret: ", ret);
 									if (ret.result) {
-										const _recoveryCount = await getRecoveryCount();
+										const _recoveryCount = await getRecoveryCount(
+											pluginAddress
+										);
 										setRecoveryCount(Number(_recoveryCount));
 										setResult(true);
 									} else if (!ret.result && ret.txHash === "") {

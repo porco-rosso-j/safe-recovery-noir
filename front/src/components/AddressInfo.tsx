@@ -39,7 +39,10 @@ const AddressInfo = () => {
 	useEffect(() => {
 		(async () => {
 			if (pluginAddress !== "" && !isPluinEnabled) {
-				const _isPluginEnabled = await isPluginEnabled(safeAddress);
+				const _isPluginEnabled = await isPluginEnabled(
+					safeAddress,
+					pluginAddress
+				);
 				console.log("isPluginEnabled: ", _isPluginEnabled);
 				if (_isPluginEnabled) {
 					saveIsPluginEnabled(_isPluginEnabled);

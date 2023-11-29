@@ -4,7 +4,7 @@ import { CompiledCircuit } from "@noir-lang/types";
 import { k256, p256, secret, social } from "../artifacts/circuits/index";
 import { getSecretBytesAndHashFromSecret } from "../utils/secret";
 import { parseUint8ArrayToStrArray } from "./parser";
-import { recoveryPlugin } from "./contracts";
+// import { recoveryPlugin } from "./contracts";
 
 export async function generateProofK256(
 	hashedAddress: string,

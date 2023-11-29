@@ -20,7 +20,7 @@ import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
 
 const SecretWord = () => {
-	const { safeSDK } = useContext(UserDataContext);
+	const { safeSDK, pluginAddress } = useContext(UserDataContext);
 	const [secretWord, setSecretWord] = useState<string>("");
 	const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false);
 	const [unit, setUnit] = useState<number>(1);
@@ -34,7 +34,7 @@ const SecretWord = () => {
 
 	useEffect(() => {
 		(async () => {
-			const _isPluginEnabled = await _isMethodEnabled(3);
+			const _isPluginEnabled = await _isMethodEnabled(3, pluginAddress);
 			console.log("isPluginEnabled: ", _isPluginEnabled);
 			if (_isPluginEnabled) {
 				setIsMethodEnabled(_isPluginEnabled);
@@ -113,6 +113,7 @@ const SecretWord = () => {
 									setLoading(true);
 									const ret = await _addSecretRecover(
 										safeSDK,
+										pluginAddress,
 										delayValue,
 										secretWord
 									);
@@ -157,6 +158,7 @@ const SecretWord = () => {
 				onClose={closeModal}
 				result={result}
 				txHash={txHash}
+				enable={true}
 			/>
 		</Box>
 	);

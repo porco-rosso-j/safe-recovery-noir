@@ -26,7 +26,6 @@ function App() {
 	} = useUserData();
 
 	const getShowLoginPage = () => {
-		//if (safeSDK === null || signer === null || safeAddress === '') {
 		if (signer === null || safeAddress === "") {
 			return true;
 		}

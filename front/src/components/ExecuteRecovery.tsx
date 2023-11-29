@@ -25,7 +25,7 @@ import { Proposal } from "../scripts/plugins/types";
 import ExecutedModal from "./Modals/ExecuteModal";
 
 const ExecuteRecovery = (props) => {
-	const { safeSDK, safeAddress, signer, saveCurrentOwner } =
+	const { safeSDK, safeAddress, signer, saveCurrentOwner, pluginAddress } =
 		useContext(UserDataContext);
 	const [expectedNewOwner, setExpectedNewOwner] = useState<string>("");
 	const [proposalId, setProposalId] = useState<number>(0);
@@ -41,24 +41,31 @@ const ExecuteRecovery = (props) => {
 	const [openProposedModal, setOpenProposedModal] = useState(false);
 	const [result, setResult] = useState<boolean>(false);
 	const [functionType, setFunctionType] = useState<number>(0);
-
+	const [loadingProposals, setLoadingProposals] = useState<boolean>(true);
 	useEffect(() => {
 		const fetchProposals = async () => {
 			try {
-				const proposalsFetched = await getProposals();
+				const proposalsFetched = await getProposals(pluginAddress);
 				setProposals(proposalsFetched);
+				setLoadingProposals(false);
 			} catch (error) {
 				console.error("Error fetching proposals:", error);
 			}
 		};
 
+		// setLoadingProposals(true);
+		// console.log("loadingProposals before: ", loadingProposals);
 		fetchProposals();
+		setLoadingProposals(true);
+		console.log("loadingProposals after: ", loadingProposals);
 	}, []);
 
 	useEffect(() => {
 		(async () => {
 			if (proposalId !== 0 && proposals[proposalId].type === 4) {
-				setSocialRecoveryThreshold(await getSocialRecoveryThreshold());
+				setSocialRecoveryThreshold(
+					await getSocialRecoveryThreshold(pluginAddress)
+				);
 			}
 		})();
 	});
@@ -66,7 +73,10 @@ const ExecuteRecovery = (props) => {
 	useEffect(() => {
 		(async () => {
 			if (proposalId !== 0) {
-				const expectedNewOwner = await getNewOwnerForPoposal(proposalId);
+				const expectedNewOwner = await getNewOwnerForPoposal(
+					proposalId,
+					pluginAddress
+				);
 				console.log("expectedNewOwner: ", expectedNewOwner);
 				setExpectedNewOwner(expectedNewOwner);
 			}
@@ -76,7 +86,10 @@ const ExecuteRecovery = (props) => {
 	useEffect(() => {
 		(async () => {
 			if (proposalId !== 0) {
-				const IsRecoveryExecutable = await _getIsRecoveryExecutable(proposalId);
+				const IsRecoveryExecutable = await _getIsRecoveryExecutable(
+					pluginAddress,
+					proposalId
+				);
 				// const IsRecoveryExecutable = await _getIsRecoveryExecutable(signer, proposalId);
 				console.log("IsRecoveryExecutable: ", IsRecoveryExecutable);
 				setIsRecoveryExecutable(IsRecoveryExecutable);
@@ -130,36 +143,49 @@ const ExecuteRecovery = (props) => {
 					sx={{ w: "50px" }}
 					size="sm"
 					placeholder="2"
-					onChange={(e) => handleSetProposalId(Number(e.target.value))}
+					onChange={(e) => {
+						handleSetProposalId(Number(e.target.value));
+					}}
 				/>
 			</Box>
 			<Box>
 				{proposalId === 0 ? (
 					<Box>
-						<VStack spacing={4} align="stretch">
-							{proposals.map((proposal) => (
-								<Box
-									key={proposal.id}
-									p={2}
-									borderWidth="1px"
-									borderRadius="md"
-									_hover={{ shadow: "md", cursor: "pointer" }}
-									onClick={() => {
-										handleSetProposalId(proposal.id);
-									}}
-								>
-									<HStack spacing={4}>
-										<Text ml={3}>ID: {proposal.id}</Text>
-										<Text flex={1}>{typeName(proposal.type)} Recovery</Text>
-										{proposal.isExecutable ? (
-											<Text color={"green"}> Executable</Text>
-										) : (
-											<Text color={"red.400"}> Non Executable</Text>
-										)}
-									</HStack>
+						<Box>
+							{!loadingProposals ? (
+								<VStack spacing={4} align="stretch">
+									{proposals.map((proposal) => (
+										<Box
+											key={proposal.id}
+											p={2}
+											borderWidth="1px"
+											borderRadius="md"
+											_hover={{ shadow: "md", cursor: "pointer" }}
+											onClick={() => {
+												handleSetProposalId(proposal.id);
+											}}
+										>
+											<HStack spacing={4}>
+												<Text ml={3}>ID: {proposal.id}</Text>
+												<Text flex={1}>{typeName(proposal.type)} Recovery</Text>
+												{proposal.isExecutable ? (
+													<Text color={"green"}> Executable</Text>
+												) : (
+													<Text color={"red.400"}> Non Executable</Text>
+												)}
+											</HStack>
+										</Box>
+									))}
+								</VStack>
+							) : (
+								<Box>
+									<Text mt={10}>Loading proposals...</Text>
+									<Flex justifyContent="center" alignItems="center">
+										<Spinner mt={10} mb={5} color="gray.300" />
+									</Flex>
 								</Box>
-							))}
-						</VStack>
+							)}
+						</Box>
 					</Box>
 				) : (
 					<Box>
@@ -214,7 +240,9 @@ const ExecuteRecovery = (props) => {
 								{safeSDK && safeAddress !== "" ? (
 									<Button
 										sx={{ mt: "35px", mr: "30px" }}
-										colorScheme="red"
+										// colorScheme="#F56565"
+										bg="#C53030"
+										color="white"
 										onClick={async () => {
 											setErrorMessage("");
 											if (!proposals[proposalId].rejected) {
@@ -222,6 +250,7 @@ const ExecuteRecovery = (props) => {
 												console.log("safeAddress: ", safeAddress);
 												const ret = await _rejectRecover(
 													safeSDK,
+													pluginAddress,
 													safeAddress,
 													proposalId
 												);
@@ -259,6 +288,7 @@ const ExecuteRecovery = (props) => {
 											setLoading(true);
 											const ret = await _approveSocialRecovery(
 												signer,
+												pluginAddress,
 												proposalId
 											);
 											console.log("ret: ", ret);
@@ -288,7 +318,11 @@ const ExecuteRecovery = (props) => {
 											if (isRecoveryExecutable) {
 												setErrorMessage("");
 												setLoading(true);
-												const ret = await _executeRecover(signer, proposalId);
+												const ret = await _executeRecover(
+													signer,
+													pluginAddress,
+													proposalId
+												);
 												console.log("ret: ", ret);
 												if (ret.result) {
 													setResult(true);

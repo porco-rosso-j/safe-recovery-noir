@@ -6,16 +6,9 @@ import {
 	useColorModeValue,
 	Link,
 } from "@chakra-ui/react";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import UserDataContext from "src/contexts/userData";
-import { ethers, providers, Signer } from "ethers";
-import Safe, { EthersAdapter } from "@safe-global/protocol-kit";
-
-declare global {
-	interface Window {
-		ethereum: any;
-	}
-}
+import { getSafeSDK, getSigner, switchNetwork } from "../scripts/utils/login";
 
 const WalletLogin: React.FC = () => {
 	const { saveSafeAddress, saveSafeSDK, saveSigner } =
@@ -23,42 +16,46 @@ const WalletLogin: React.FC = () => {
 	const [safeAddressInput, setSafeAddressInput] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
 
+	useEffect(() => {
+		(async () => {
+			await switchNetwork();
+		})();
+	});
+
+	useEffect(() => {
+		(async () => {
+			const signer = await getSigner();
+			if (signer) saveSigner(signer);
+
+			const storedData = localStorage.getItem(`safe_address`);
+			const _safeAddress = storedData ? JSON.parse(storedData) : undefined;
+			console.log("_safeAddress: ", _safeAddress);
+			if (_safeAddress) {
+				saveSafeAddress(_safeAddress);
+				const safeSDK = await getSafeSDK(safeAddressInput, signer);
+				if (safeSDK) {
+					saveSafeSDK(safeSDK);
+				}
+			}
+		})();
+	});
+
 	const onClickLogin = async () => {
-		const provider = new providers.Web3Provider(window.ethereum);
-		await provider.send("eth_requestAccounts", []);
-		const signer: Signer = provider.getSigner(0);
-		console.log("addr: ", await signer.getAddress());
+		setErrorMessage("");
+		await switchNetwork();
+		const signer = await getSigner();
+		if (signer) saveSigner(signer);
 
 		if (safeAddressInput !== "") {
-			const ethAdapter = new EthersAdapter({
-				ethers,
-				signerOrProvider: signer,
-			});
-
-			let safeSDK;
-			try {
-				console.log("safeAddressInput: ", safeAddressInput);
-				safeSDK = await Safe.create({
-					ethAdapter: ethAdapter,
-					safeAddress: safeAddressInput,
-					isL1SafeMasterCopy: true,
-				}); // L1SafeMasterCopy:tru
-				console.log("safeSDK: ", safeSDK);
-			} catch {
-				console.log("Failed to set SafeSDK", safeSDK);
-			}
-
-			saveSafeAddress(safeAddressInput);
-			saveSigner(signer);
-
-			if ((await safeSDK.getOwners())[0] === (await signer.getAddress())) {
+			saveSafeAddress(safeAddressInput, true);
+			const safeSDK = await getSafeSDK(safeAddressInput, signer);
+			if (safeSDK) {
 				saveSafeSDK(safeSDK);
 			} else {
-				console.log("not owner");
+				setErrorMessage("Failed to instantiate safeSDK");
 			}
 		} else {
-			setErrorMessage("plsease set your safe address");
-			console.log("empty safe address");
+			setErrorMessage("plsease connect wallet and set your safe address");
 			return;
 		}
 	};

@@ -40,6 +40,7 @@ export async function authenticateWebAuthn(credentialId: string) {
 		);
 	} catch (e) {
 		console.warn(e);
+		return;
 	}
 
 	console.log("result: ", result);

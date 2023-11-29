@@ -2,7 +2,7 @@ import dep from "./addresses.json";
 
 // deployed contract addresses
 export const contracts = {
-	recoveryPlugin: dep.contracts[0],
+	safeProtocolRegistry: dep.contracts[0],
 	recoveryPluginFac: dep.contracts[1],
 	safeProotcolManager: dep.contracts[2],
 };

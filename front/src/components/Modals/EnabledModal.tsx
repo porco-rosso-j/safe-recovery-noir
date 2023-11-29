@@ -12,7 +12,7 @@ import {
 	Flex,
 	Box,
 } from "@chakra-ui/react";
-import { shortenAddress } from "src/scripts/utils/address";
+import { shortenTxHash } from "src/scripts/utils/address";
 
 function EnabledModal(props) {
 	return (
@@ -27,10 +27,12 @@ function EnabledModal(props) {
 				<ModalOverlay />
 				<ModalContent color={"black"} textAlign="center" alignItems="center">
 					{props.result ? (
-						<ModalHeader mt={4}>Successfully Enabled!</ModalHeader>
+						<ModalHeader mt={4}>
+							{props.enable ? "Successfully Enabled!" : "Method Disabled"}
+						</ModalHeader>
 					) : (
 						<ModalHeader color="red" mt={4}>
-							Enable Failed
+							{props.enable ? "Enable Failed" : "Disable Failed"}
 						</ModalHeader>
 					)}
 
@@ -52,7 +54,7 @@ function EnabledModal(props) {
 										isExternal
 										textDecoration="underline"
 									>
-										{shortenAddress(props.txHash)}
+										{shortenTxHash(props.txHash)}
 									</Link>
 								</VStack>
 							</Flex>

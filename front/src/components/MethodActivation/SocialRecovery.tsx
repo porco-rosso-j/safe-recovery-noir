@@ -24,7 +24,7 @@ import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
 
 const SocialRecovery = () => {
-	const { safeSDK } = useContext(UserDataContext);
+	const { safeSDK, pluginAddress } = useContext(UserDataContext);
 	const [threshold, setThreshold] = useState<number>(0);
 	const [guardians, setGuardians] = useState<string[]>([""]);
 	const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false);
@@ -40,7 +40,7 @@ const SocialRecovery = () => {
 
 	useEffect(() => {
 		(async () => {
-			const isMethodEnabled = await _isMethodEnabled(4);
+			const isMethodEnabled = await _isMethodEnabled(4, pluginAddress);
 			console.log("isMethodEnabled: ", isMethodEnabled);
 			if (isMethodEnabled) {
 				setIsMethodEnabled(isMethodEnabled);
@@ -216,6 +216,7 @@ const SocialRecovery = () => {
 								setLoading(true);
 								const ret = await _addSocialRecover(
 									safeSDK,
+									pluginAddress,
 									delayValue,
 									threshold,
 									guardians
@@ -258,6 +259,7 @@ const SocialRecovery = () => {
 				onClose={closeModal}
 				result={result}
 				txHash={txHash}
+				enable={true}
 			/>
 		</Box>
 	);

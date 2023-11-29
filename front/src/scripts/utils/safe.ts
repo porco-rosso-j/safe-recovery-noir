@@ -1,44 +1,96 @@
 import Safe from "@safe-global/protocol-kit";
-import { SafeTransactionDataPartial } from "@safe-global/safe-core-sdk-types";
+import {
+	SafeTransactionDataPartial,
+	MetaTransactionData,
+} from "@safe-global/safe-core-sdk-types";
 import { ethers } from "ethers";
 import { contracts } from "../constants/addresses";
-import { managerIface, manager, pluginFac, safeContract } from "./contracts";
+import {
+	managerIface,
+	manager,
+	registry,
+	pluginFac,
+	pluginFacIface,
+	safeContract,
+} from "./contracts";
 import { _isSafeModuleEnabled } from "../plugins/view";
 import { txResult, error } from "../plugins/types";
 
-export async function enableModuleOnSafe(safeSDK: Safe): Promise<txResult> {
+// make this batch : enable manager on Safe & deploy safeRecover
+// add module on registry
+export async function enableModuleOnSafe(
+	safeSDK: Safe,
+	safeAddress: string
+): Promise<[txResult, any]> {
+	console.log("safeSDK: ", safeSDK);
+	console.log("contracts.safeProotcolManager: ", contracts.safeProotcolManager);
 	const enableModuletx = await safeSDK.createEnableModuleTx(
 		contracts.safeProotcolManager
 	);
 
-	const enableModuleTx: SafeTransactionDataPartial = {
-		to: enableModuletx.data.to,
-		data: enableModuletx.data.data,
-		value: enableModuletx.data.value,
-	};
+	console.log("safeAddress: ", safeAddress);
+	const pluginDeployTx = pluginFacIface.encodeFunctionData(
+		"createRecoveryPluginNoir",
+		[safeAddress, 0]
+	);
+	// const enableModuleTx: SafeTransactionDataPartial = {
+	// 	to: enableModuletx.data.to,
+	// 	data: enableModuletx.data.data,
+	// 	value: enableModuletx.data.value,
+	// };
 
-	const enableModuleResult = await sendSafeTx(safeSDK, enableModuleTx);
+	const safeTransactionData: MetaTransactionData[] = [
+		// safe.enableModule(manager)
+		{
+			to: enableModuletx.data.to,
+			data: enableModuletx.data.data,
+			value: enableModuletx.data.value,
+		},
+		// factory.createRecoveryPluginNoir()
+		{
+			to: contracts.recoveryPluginFac,
+			data: pluginDeployTx,
+			value: "0",
+		},
+	];
+
+	const batchResult = await sendSafeTx(safeSDK, safeTransactionData);
+
+	// check deployment and safe tx
 	const isModuleEnabled = await _isSafeModuleEnabled(
 		safeSDK,
 		contracts.safeProotcolManager
 	);
-	console.log("isModuleEnabled: ", isModuleEnabled);
-	if (!isModuleEnabled) {
-		return {
-			result: enableModuleResult.result,
-			txHash: enableModuleResult.txHash,
-		};
-	}
 
-	return enableModuleResult;
+	const pluginAddress = await getSafePluginAddress(safeAddress);
+	// contracts.recoveryPlugin = pluginAddress;
+
+	console.log("pluginAddress: ", pluginAddress);
+	console.log("isModuleEnabled: ", isModuleEnabled);
+	if (isModuleEnabled && pluginAddress !== ethers.constants.AddressZero) {
+		// addModule
+		try {
+			const tx = await registry.addModule(pluginAddress, 1);
+			await tx.wait();
+		} catch (e) {
+			console.log("error:", e);
+			return [error, ""];
+		}
+
+		return [batchResult, pluginAddress];
+	} else {
+		return [error, ""];
+	}
 }
 
 export async function enablePluginOnProtocolManager(
 	safeAddr: string,
-	safeSDK: Safe
+	safeSDK: Safe,
+	pluginAddr: string
 ): Promise<txResult> {
 	const enablePluginTx = managerIface.encodeFunctionData("enablePlugin", [
-		contracts.recoveryPlugin,
+		// contracts.recoveryPlugin,
+		pluginAddr,
 		2,
 	]);
 
@@ -60,7 +112,7 @@ export async function enablePluginOnProtocolManager(
 
 export async function sendSafeTx(
 	safeSDK: Safe,
-	safeTx: SafeTransactionDataPartial
+	safeTx: SafeTransactionDataPartial | MetaTransactionData[]
 ): Promise<txResult> {
 	try {
 		const safeTransaction = await safeSDK.createTransaction({
@@ -68,7 +120,7 @@ export async function sendSafeTx(
 		});
 		console.log("safeTransaction: ", safeTransaction);
 		const txResponse = await safeSDK.executeTransaction(safeTransaction, {
-			gasLimit: 3000000,
+			gasLimit: 1500000,
 		});
 		console.log("txResponse: ", txResponse);
 		const res: ethers.ContractReceipt =
@@ -82,12 +134,27 @@ export async function sendSafeTx(
 	}
 }
 
-export async function getSafePluginAddress(safeAddr: any): Promise<string> {
+export async function getSafePluginAddress(safeAddr: string): Promise<string> {
 	return await pluginFac.getPluginAddr(safeAddr);
 }
 
-export async function isPluginEnabled(safe: string): Promise<boolean> {
-	return await manager.isPluginEnabled(safe, contracts.recoveryPlugin);
+export async function getIsPluginDeployed(
+	safeAddr: string
+): Promise<[boolean, string]> {
+	const pluginAddr = await getSafePluginAddress(safeAddr);
+	if (pluginAddr === ethers.constants.AddressZero) {
+		return [false, ""];
+	} else {
+		return [true, pluginAddr];
+	}
+}
+
+export async function isPluginEnabled(
+	safe: string,
+	pluginAddr: string
+): Promise<boolean> {
+	// return await manager.isPluginEnabled(safe, contracts.recoveryPlugin);
+	return await manager.isPluginEnabled(safe, pluginAddr);
 }
 
 export async function getSafeOwners(safe: string): Promise<string[]> {

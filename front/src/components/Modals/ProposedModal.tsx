@@ -12,7 +12,7 @@ import {
 	Flex,
 	Box,
 } from "@chakra-ui/react";
-import { shortenAddress } from "src/scripts/utils/address";
+import { shortenTxHash } from "src/scripts/utils/address";
 
 function ProposedModal(props) {
 	return (
@@ -49,7 +49,7 @@ function ProposedModal(props) {
 												isExternal
 												textDecoration="underline"
 											>
-												{shortenAddress(props.txHash)}
+												{shortenTxHash(props.txHash)}
 											</Link>
 										</VStack>
 									</Flex>
@@ -79,7 +79,7 @@ function ProposedModal(props) {
 												isExternal
 												textDecoration="underline"
 											>
-												{shortenAddress(props.txHash)}
+												{shortenTxHash(props.txHash)}
 											</Link>
 										</VStack>
 									</Flex>

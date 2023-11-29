@@ -20,7 +20,7 @@ import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
 
 const EnableFingerPrint = () => {
-	const { safeSDK } = useContext(UserDataContext);
+	const { safeSDK, pluginAddress } = useContext(UserDataContext);
 	const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false);
 	const [unit, setUnit] = useState<number>(1);
 	const [delayValue, setDelayValue] = useState(0);
@@ -33,7 +33,7 @@ const EnableFingerPrint = () => {
 
 	useEffect(() => {
 		(async () => {
-			const isEnabled = await _isMethodEnabled(2);
+			const isEnabled = await _isMethodEnabled(2, pluginAddress);
 			console.log("isEnabled: ", isEnabled);
 			if (isEnabled) {
 				setIsMethodEnabled(isEnabled);
@@ -102,7 +102,11 @@ const EnableFingerPrint = () => {
 							w="55%"
 							onClick={async () => {
 								setLoading(true);
-								const ret = await _addWebAuthnRecover(safeSDK, delayValue);
+								const ret = await _addWebAuthnRecover(
+									safeSDK,
+									pluginAddress,
+									delayValue
+								);
 								console.log("ret: ", ret);
 								if (ret.result) {
 									setResult(true);
@@ -141,6 +145,7 @@ const EnableFingerPrint = () => {
 				onClose={closeModal}
 				result={result}
 				txHash={txHash}
+				enable={true}
 			/>
 		</Box>
 	);

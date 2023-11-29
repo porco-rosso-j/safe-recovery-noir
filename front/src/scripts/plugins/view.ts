@@ -1,5 +1,5 @@
 import Safe from "@safe-global/protocol-kit";
-import { recoveryPlugin } from "../utils/contracts";
+import { recoveryPluginContract } from "../utils/contracts";
 import { Proposal } from "./types";
 
 export async function _isSafeModuleEnabled(
@@ -9,16 +9,19 @@ export async function _isSafeModuleEnabled(
 	return await safeSDK.isModuleEnabled(address);
 }
 
-export async function _isMethodEnabled(moduleId: number): Promise<boolean> {
+export async function _isMethodEnabled(
+	moduleId: number,
+	pluginAddr: string
+): Promise<boolean> {
 	let ret;
 	if (moduleId === 1) {
-		ret = await recoveryPlugin.isEcrecoverRecoverEnabled();
+		ret = await recoveryPluginContract(pluginAddr).isEcrecoverRecoverEnabled();
 	} else if (moduleId === 2) {
-		ret = await recoveryPlugin.isWebAuthnRecoverEnabled();
+		ret = await recoveryPluginContract(pluginAddr).isWebAuthnRecoverEnabled();
 	} else if (moduleId === 3) {
-		ret = await recoveryPlugin.isSecretRecoverEnabled();
+		ret = await recoveryPluginContract(pluginAddr).isSecretRecoverEnabled();
 	} else if (moduleId === 4) {
-		ret = await recoveryPlugin.isSocialRecoverEnabled();
+		ret = await recoveryPluginContract(pluginAddr).isSocialRecoverEnabled();
 	} else {
 		return false;
 	}
@@ -26,9 +29,12 @@ export async function _isMethodEnabled(moduleId: number): Promise<boolean> {
 }
 
 export async function getNewOwnerForPoposal(
-	proposalId: number
+	proposalId: number,
+	pluginAddr: string
 ): Promise<string> {
-	const res = await recoveryPlugin.getPendingNewOwners(proposalId);
+	const res = await recoveryPluginContract(pluginAddr).getPendingNewOwners(
+		proposalId
+	);
 	console.log("res: ", res);
 
 	//recoveryPlugin.
@@ -37,10 +43,13 @@ export async function getNewOwnerForPoposal(
 
 export async function _getIsRecoveryExecutable(
 	//signer: Signer,
+	pluginAddr: string,
 	proposalId: number
 ): Promise<boolean> {
 	try {
-		const ret = await recoveryPlugin.getIsRecoveryExecutable(proposalId);
+		const ret = await recoveryPluginContract(
+			pluginAddr
+		).getIsRecoveryExecutable(proposalId);
 		return ret;
 	} catch (e) {
 		return false;
@@ -50,17 +59,19 @@ export async function _getIsRecoveryExecutable(
 	// previous swap execution may invalidates this one
 }
 
-export async function getProposals(): Promise<Proposal[]> {
-	const count = await getRecoveryCount();
+export async function getProposals(pluginAddr: string): Promise<Proposal[]> {
+	const count = await getRecoveryCount(pluginAddr);
 	console.log("count: ", count);
 	let proposals: Proposal[] = [];
 	for (let i = 0; i < count; i++) {
 		console.log("i: ", i);
-		const res = await recoveryPlugin.getRecoveryByProposalId(i + 1);
+		const res = await recoveryPluginContract(
+			pluginAddr
+		).getRecoveryByProposalId(i + 1);
 		// console.log("res: ", res);
 		console.log("res: ", res);
 
-		const _isExecutable = await _getIsRecoveryExecutable(i + 1);
+		const _isExecutable = await _getIsRecoveryExecutable(pluginAddr, i + 1);
 		console.log("_isExecutable: ", _isExecutable);
 
 		const proposal: Proposal = {
@@ -82,33 +93,40 @@ export async function getProposals(): Promise<Proposal[]> {
 
 	return proposals;
 }
-export async function getHashedAddr(): Promise<string> {
-	return await recoveryPlugin.hashed_address();
+export async function getHashedAddr(pluginAddr: string): Promise<string> {
+	return await recoveryPluginContract(pluginAddr).hashed_address();
 }
 
-export async function getRecoveryCount(): Promise<number> {
-	return recoveryPlugin.recoveryCount();
+export async function getRecoveryCount(pluginAddr: string): Promise<number> {
+	return recoveryPluginContract(pluginAddr).recoveryCount();
 }
 
-export async function getCredentialID(): Promise<string> {
-	return recoveryPlugin.credentialId();
+export async function getCredentialID(pluginAddr: string): Promise<string> {
+	return recoveryPluginContract(pluginAddr).credentialId();
 }
 
-export async function getWebAuthnPubkey(): Promise<any> {
-	const pubkey = await recoveryPlugin.getPubkeyXY();
+export async function getWebAuthnPubkey(pluginAddr: string): Promise<any> {
+	const pubkey = await recoveryPluginContract(pluginAddr).getPubkeyXY();
 	console.log("pubkey: ", pubkey);
 	return pubkey;
 }
 
-export async function computeMessage(webAuthnInputs: any): Promise<string> {
-	return await recoveryPlugin._computeMessage(webAuthnInputs);
+export async function computeMessage(
+	webAuthnInputs: any,
+	pluginAddr: string
+): Promise<string> {
+	return await recoveryPluginContract(pluginAddr)._computeMessage(
+		webAuthnInputs
+	);
 }
 
-export async function getGuardiansRoot(): Promise<string> {
-	return await recoveryPlugin.guardiansRoot();
+export async function getGuardiansRoot(pluginAddr: string): Promise<string> {
+	return await recoveryPluginContract(pluginAddr).guardiansRoot();
 }
 
-export async function getSocialRecoveryThreshold(): Promise<number> {
-	return Number(await recoveryPlugin.threshold());
+export async function getSocialRecoveryThreshold(
+	pluginAddr: string
+): Promise<number> {
+	return Number(await recoveryPluginContract(pluginAddr).threshold());
 	// return 2;
 }

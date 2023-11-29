@@ -71,10 +71,14 @@ export class MerkleTree implements IMerkleTree {
 				const leftChild =
 					this.storage.get(MerkleTree.indexToKey(level - 1, index * 2)) ||
 					this.zeros[level - 1];
+				console.log("level: ", level);
+				console.log("leftChild: ", leftChild);
 				const rightChild =
 					this.storage.get(MerkleTree.indexToKey(level - 1, index * 2 + 1)) ||
 					this.zeros[level - 1];
+				console.log("rightChild: ", rightChild);
 				const intermediateNode = await this.pedersenHash(leftChild, rightChild);
+				console.log("intermediateNode: ", intermediateNode);
 				this.storage.set(MerkleTree.indexToKey(level, index), intermediateNode);
 			}
 		}

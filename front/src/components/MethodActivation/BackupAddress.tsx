@@ -21,7 +21,8 @@ import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
 
 const EnableBackupAddress = () => {
-	const { safeSDK } = useContext(UserDataContext);
+	const { safeSDK, isPluinEnabled, pluginAddress } =
+		useContext(UserDataContext);
 	const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
 	const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false);
 	const [unit, setUnit] = useState<number>(1);
@@ -35,10 +36,12 @@ const EnableBackupAddress = () => {
 
 	useEffect(() => {
 		(async () => {
-			const isMethodEnabled = await _isMethodEnabled(1);
-			console.log("isMethodEnabled: ", isMethodEnabled);
-			if (isMethodEnabled) {
-				setIsMethodEnabled(isMethodEnabled);
+			if (isPluinEnabled) {
+				const isMethodEnabled = await _isMethodEnabled(1, pluginAddress);
+				console.log("isMethodEnabled: ", isMethodEnabled);
+				if (isMethodEnabled) {
+					setIsMethodEnabled(isMethodEnabled);
+				}
 			}
 		})();
 	});
@@ -116,6 +119,7 @@ const EnableBackupAddress = () => {
 									setLoading(true);
 									const ret = await _addEcrecoverRecover(
 										safeSDK,
+										pluginAddress,
 										pendingNewOwner,
 										delayValue
 									);
@@ -160,7 +164,7 @@ const EnableBackupAddress = () => {
 				onClose={closeModal}
 				result={result}
 				txHash={txHash}
-				loading={loading}
+				enable={true}
 			/>
 		</Box>
 	);

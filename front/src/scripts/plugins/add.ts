@@ -10,6 +10,7 @@ import { txResult, error } from "./types";
 
 export async function _addEcrecoverRecover(
 	safeSDK: any,
+	pluginAddr: string,
 	address: string,
 	delay: number = 1
 ): Promise<txResult> {
@@ -23,7 +24,7 @@ export async function _addEcrecoverRecover(
 	);
 
 	const safeTxData = {
-		to: contracts.recoveryPlugin,
+		to: pluginAddr,
 		data: addK256RecoverTx,
 		value: "0",
 	};
@@ -34,6 +35,7 @@ export async function _addEcrecoverRecover(
 // costs about 1.6m gas
 export async function _addWebAuthnRecover(
 	safeSDK: Safe,
+	pluginAddr: string,
 	delay: number = 1
 ): Promise<txResult> {
 	const safeAddr = await safeSDK.getAddress();
@@ -58,7 +60,7 @@ export async function _addWebAuthnRecover(
 	]);
 
 	const safeTxData = {
-		to: contracts.recoveryPlugin,
+		to: pluginAddr,
 		data: addRecoveryData,
 		value: "0",
 	};
@@ -68,6 +70,7 @@ export async function _addWebAuthnRecover(
 
 export async function _addSecretRecover(
 	safeSDK: any,
+	pluginAddr: string,
 	delay: number = 1,
 	secret: string
 ): Promise<txResult> {
@@ -82,7 +85,7 @@ export async function _addSecretRecover(
 	]);
 
 	const safeTxData = {
-		to: contracts.recoveryPlugin,
+		to: pluginAddr,
 		data: addSecreRecoverTx,
 		value: "0",
 	};
@@ -92,6 +95,7 @@ export async function _addSecretRecover(
 
 export async function _addSocialRecover(
 	safeSDK: any,
+	pluginAddr: string,
 	delay: number = 1,
 	threshold: number,
 	guardians: string[]
@@ -106,7 +110,7 @@ export async function _addSocialRecover(
 	);
 
 	const safeTxData = {
-		to: contracts.recoveryPlugin,
+		to: pluginAddr,
 		data: addSocialRecoverTx,
 		value: "0",
 	};

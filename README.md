@@ -48,7 +48,7 @@ forge build
 forge test --match-contract RecoveryPluginNoirTest -vvv
 ```
 
-## Development
+## Deployment
 
 run forked goerli chain
 
@@ -78,21 +78,3 @@ yarn start
 - [Noir](https://noir-lang.org/)
 - [Safe {Core} Protocol](https://docs.safe.global/safe-core-protocol/safe-core-protocol)
 - [safe-core-protocol](https://github.com/5afe/safe-core-protocol)
-
-## TODO
-
-#### Milestone1: contract development
-
-- done: update deps, `safe-core-protocol` and `nargo` to the latest
-- done: implement social recovery
-- done: tests
-
-#### Milestone2: frontend development
-
-- has all the basic methods
-- activation of multiple recovery methods
-
-#### Milestone3: testnet launch (Jan, 2024)
-
-- invite users to the demo app
-- add improvements based on the feedback

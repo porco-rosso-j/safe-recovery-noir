@@ -12,7 +12,7 @@ import {
 	Flex,
 	Box,
 } from "@chakra-ui/react";
-import { shortenAddress } from "src/scripts/utils/address";
+import { shortenTxHash } from "src/scripts/utils/address";
 
 function ExecutedModal(props) {
 	const handleClose = () => {
@@ -35,9 +35,9 @@ function ExecutedModal(props) {
 							{props.functionType === 1
 								? "Successfully Executed!"
 								: props.functionType === 2
-								? "Successfully casted approve!"
+								? "Successfully Approved!"
 								: props.functionType === 3
-								? "Successfully rejected!"
+								? "Successfully Rejected!"
 								: null}
 						</ModalHeader>
 					) : (
@@ -69,7 +69,7 @@ function ExecutedModal(props) {
 										isExternal
 										textDecoration="underline"
 									>
-										{shortenAddress(props.txHash)}
+										{shortenTxHash(props.txHash)}
 									</Link>
 								</VStack>
 							</Flex>
