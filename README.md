@@ -6,6 +6,8 @@
 
 A safe plugin that allows Safe owners to recover account ownership in the case where they lose access to their Safe. All the recovery methods leverage Noir, a DSL for writing zero-knowledge proof circuits, to help owners recover their account in a secure and private manner.
 
+This product is developed as a grantee of the Safe Grant Program Wave I. Here is [the proposal on Safe Grant website](https://app.charmverse.io/safe-grants-program/page-43692424934796636).[Accouncement](https://t.co/Pdc4Pxvg3s).
+
 #### Recovery Mechanisms
 
 Available recovery methods:
@@ -43,6 +45,7 @@ noirup -v 0.19.2
 ```
 
 - Nargo commands
+
 ```shell
 cd circuits/{CIRCUIT_NAME}
 nargo compile
@@ -81,9 +84,9 @@ yarn start
 
 #### Goerli
 
-- SafeProtocolRegistry: `0x5113029053Df917bCeE92ae05e7508a9C4c2efDc`
-- SafeProtocolManager: `0xC3666058ca18deF6F6F535e34583c71D6082fF84`
-- SafeRecoverFactory: `0x1F1a1B5Da88e67e78d1bAdbd7857e3113AE56CDc`
+- SafeProtocolRegistry: `0xDF2D7534b67d5a5130F998c1368D980c82FdD99f`
+- SafeProtocolManager: `0xC5C5aeF4A4E0fB216e64BA63D5A1C3022ac4CDB8`
+- SafeRecoverFactory: `0xfA98364994203058cd994E87BE2Af9ee92A407fD`
 
 ## References
 
