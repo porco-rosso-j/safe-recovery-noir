@@ -400,9 +400,9 @@ export async function _rejectRecover(
 	console.log("data: ", _data);
 
 	const rejectionTxnTxData = {
-		// to: contracts.recoveryPlugin,
 		to: pluginAddr,
 		data: _data,
+		// data: rejectionTx,
 		value: "0",
 	};
 

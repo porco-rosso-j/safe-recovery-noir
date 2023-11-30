@@ -42,6 +42,7 @@ const ExecuteRecovery = (props) => {
 	const [result, setResult] = useState<boolean>(false);
 	const [functionType, setFunctionType] = useState<number>(0);
 	const [loadingProposals, setLoadingProposals] = useState<boolean>(true);
+
 	useEffect(() => {
 		const fetchProposals = async () => {
 			try {
@@ -53,11 +54,11 @@ const ExecuteRecovery = (props) => {
 			}
 		};
 
-		// setLoadingProposals(true);
-		// console.log("loadingProposals before: ", loadingProposals);
-		fetchProposals();
-		setLoadingProposals(true);
-		console.log("loadingProposals after: ", loadingProposals);
+		if (pluginAddress !== "") {
+			fetchProposals();
+			setLoadingProposals(true);
+			console.log("loadingProposals after: ", loadingProposals);
+		}
 	}, []);
 
 	useEffect(() => {
@@ -205,18 +206,28 @@ const ExecuteRecovery = (props) => {
 								Proposal {proposalId} Detail
 							</Text>
 							<Flex alignItems="strech">
-								<VStack spacing={1} fontSize={15} align="start" mr={15}>
-									<Text color="white">・ Method Type:</Text>
-									<Text color="white">・ New Owner:</Text>
-									<Text color="white">・ Old Owner:</Text>
-									<Text color="white">・ New Threshold:</Text>
+								<VStack
+									spacing={1}
+									fontSize={15}
+									color="white"
+									align="start"
+									mr={15}
+								>
+									<Text>・ Method Type:</Text>
+									<Text>・ New Owner:</Text>
+									<Text>・ Old Owner:</Text>
+									<Text>・ New Threshold:</Text>
 									{proposals[proposalId].type === 4 ? (
-										<Text color="white">・ Current Approval Count:</Text>
+										<Text>・ Current Approval Count:</Text>
 									) : null}
 									{proposals[proposalId].type === 4 ? (
-										<Text color="white">・ Approval Threshold:</Text>
+										<Text>・ Approval Threshold:</Text>
 									) : null}
-									<Text color="white">・ Executable:</Text>
+									<Text>・ Executable:</Text>
+									{/* {proposals[proposalId].deadline <
+									Math.floor(Date.now() / 1000) ? (
+										<Text>・ Executable After:</Text>
+									) : null} */}
 								</VStack>
 								<VStack spacing={1} fontSize={15} align="end">
 									<Text>{typeName(proposals[proposalId].type)} Recovery</Text>
@@ -253,8 +264,8 @@ const ExecuteRecovery = (props) => {
 												console.log("safeAddress: ", safeAddress);
 												const ret = await _rejectRecover(
 													safeSDK,
-													pluginAddress,
 													safeAddress,
+													pluginAddress,
 													proposalId
 												);
 												console.log("ret: ", ret);

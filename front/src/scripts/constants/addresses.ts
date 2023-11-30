@@ -1,10 +1,18 @@
 import dep from "./addresses.json";
 
+const deployedContracts = {
+	registry: "0xDF2D7534b67d5a5130F998c1368D980c82FdD99f",
+	factory: "0xC5C5aeF4A4E0fB216e64BA63D5A1C3022ac4CDB8",
+	manager: "0xfA98364994203058cd994E87BE2Af9ee92A407fD",
+};
+
+const isLOCAL: boolean = process.env.REACT_APP_ENV === "LOCAL";
+
 // deployed contract addresses
 export const contracts = {
-	safeProtocolRegistry: dep.contracts[0],
-	recoveryPluginFac: dep.contracts[1],
-	safeProotcolManager: dep.contracts[2],
+	safeProtocolRegistry: isLOCAL ? dep.contracts[0] : deployedContracts.registry,
+	recoveryPluginFac: isLOCAL ? dep.contracts[1] : deployedContracts.factory,
+	safeProotcolManager: isLOCAL ? dep.contracts[2] : deployedContracts.manager,
 };
 
 // addresses for local test

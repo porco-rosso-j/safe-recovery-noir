@@ -7,7 +7,7 @@ const useUserData = () => {
 	const [safeSDK, setSafeSDK] = useState<Safe | null>(null);
 	const [signer, setSigner] = useState<Signer | null>(null);
 	const [pluginAddress, setPluginAddress] = useState<string | null>("");
-	const [isPluinEnabled, setIsPluginEnabled] = useState<boolean>(false);
+	const [isPluginEnabled, setIsPluginEnabled] = useState<boolean>(false);
 	const [currentOwner, setCurrentOwner] = useState<string>("");
 
 	const saveSafeAddress = (
@@ -56,7 +56,7 @@ const useUserData = () => {
 		safeSDK,
 		signer,
 		pluginAddress,
-		isPluinEnabled,
+		isPluginEnabled,
 		currentOwner,
 		saveSafeAddress,
 		saveSafeSDK,

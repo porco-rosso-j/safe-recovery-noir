@@ -24,7 +24,7 @@ import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
 
 const EnableBackupAddress = () => {
-	const { safeSDK, isPluinEnabled, pluginAddress } =
+	const { safeSDK, isPluginEnabled, pluginAddress } =
 		useContext(UserDataContext);
 	const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
 	const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false);
@@ -39,7 +39,7 @@ const EnableBackupAddress = () => {
 
 	useEffect(() => {
 		(async () => {
-			if (isPluinEnabled) {
+			if (isPluginEnabled) {
 				const isMethodEnabled = await _isMethodEnabled(1, pluginAddress);
 				console.log("isMethodEnabled: ", isMethodEnabled);
 				if (isMethodEnabled) {

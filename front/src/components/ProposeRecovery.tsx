@@ -21,10 +21,9 @@ import { addresses } from "src/scripts/constants/addresses";
 import ProposedModal from "./Modals/ProposedModal";
 
 const ProposeRecovery = (props) => {
-	const { safeAddress, signer, currentOwner, pluginAddress } =
+	const { safeAddress, signer, currentOwner, pluginAddress, isPluginEnabled } =
 		useContext(UserDataContext);
 	const [ownerReplaced, setOwnerReplaced] = useState<string>(currentOwner);
-	// const [pendingNewOwner, setPendingNewOwner] = useState<string>(addresses[0]);
 	const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
 	const [threshold, setThreshold] = useState<number>(0);
 	const [secret, setSecret] = useState<string>("");
@@ -39,9 +38,15 @@ const ProposeRecovery = (props) => {
 
 	useEffect(() => {
 		(async () => {
-			const isEnabled = await _isMethodEnabled(props.method, pluginAddress);
-			console.log("isEnabled: ", isEnabled);
-			setIsMethodEnabled(isEnabled);
+			if (isPluginEnabled) {
+				try {
+					const isEnabled = await _isMethodEnabled(props.method, pluginAddress);
+					console.log("isEnabled: ", isEnabled);
+					setIsMethodEnabled(isEnabled);
+				} catch (e) {
+					console.log("e: ", e);
+				}
+			}
 		})();
 	});
 
@@ -62,7 +67,7 @@ const ProposeRecovery = (props) => {
 			{/* {closeSuccess ? ( */}
 			<Box>
 				<Text mb={8} fontSize={15}>
-					Propose recovery. The old owner will be replaced with the new owner.
+					The old owner will be replaced with the new owner.
 				</Text>
 				<Flex
 					mt="20px"
@@ -107,7 +112,7 @@ const ProposeRecovery = (props) => {
 								textAlign="center"
 								size="xl"
 								placeholder="satoshi123"
-								onChange={(e) => setThreshold(Number(e.target.value))}
+								onChange={(e) => setSecret(e.target.value)}
 							/>
 						) : null}
 					</VStack>

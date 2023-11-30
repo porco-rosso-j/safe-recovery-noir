@@ -15,7 +15,7 @@ import {
 import { useContext, useEffect, useState } from "react";
 import UserDataContext from "src/contexts/userData";
 import {
-	isPluginEnabled,
+	getIsPluginEnabled,
 	getIsPluginDeployed,
 	enableModuleOnSafe,
 	enablePluginOnProtocolManager,
@@ -28,7 +28,7 @@ const Onboard = () => {
 	const {
 		safeAddress,
 		safeSDK,
-		isPluinEnabled,
+		isPluginEnabled,
 		saveIsPluginEnabled,
 		pluginAddress,
 		savePluginAdddress,
@@ -59,7 +59,7 @@ const Onboard = () => {
 	useEffect(() => {
 		(async () => {
 			if (isPluginDeployed) {
-				const _isPluginEnabled = await isPluginEnabled(
+				const _isPluginEnabled = await getIsPluginEnabled(
 					safeAddress,
 					pluginAddress
 				);
@@ -112,7 +112,7 @@ const Onboard = () => {
 				</TabList>
 				<TabPanels>
 					<TabPanel>
-						{!isPluinEnabled && safeSDK !== null ? (
+						{!isPluginEnabled && safeSDK !== null ? (
 							<Box>
 								<Text mt={5} mb={5}>
 									Proceed the following steps to setup the recovery plugin.
@@ -140,8 +140,8 @@ const Onboard = () => {
 										onClick={async () => {
 											setLoading(true);
 											setErrorMessage("");
-											console.log("isPluinEnabled: ", isPluinEnabled);
-											// if (isPluinEnabled) {
+											console.log("isPluginEnabled: ", isPluginEnabled);
+											// if (isPluginEnabled) {
 											setSetupStatus(
 												"1. SafeRecover plugin is being deployed & Safe is adding the module..."
 											);
@@ -201,7 +201,7 @@ const Onboard = () => {
 									</Text>
 								</Box>
 							</Box>
-						) : isPluinEnabled && safeSDK !== null ? (
+						) : isPluginEnabled && safeSDK !== null ? (
 							<MethodHeader
 								updateMethod={updateMethod}
 								method={method}

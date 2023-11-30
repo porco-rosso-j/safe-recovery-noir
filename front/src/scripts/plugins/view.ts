@@ -42,7 +42,6 @@ export async function getNewOwnerForPoposal(
 }
 
 export async function _getIsRecoveryExecutable(
-	//signer: Signer,
 	pluginAddr: string,
 	proposalId: number
 ): Promise<boolean> {
@@ -50,6 +49,7 @@ export async function _getIsRecoveryExecutable(
 		const ret = await recoveryPluginContract(
 			pluginAddr
 		).getIsRecoveryExecutable(proposalId);
+		console.log("_getIsRecoveryExecutable: ", ret);
 		return ret;
 	} catch (e) {
 		return false;

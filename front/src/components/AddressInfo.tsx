@@ -5,7 +5,7 @@ import * as ethers from "ethers";
 import UserDataContext from "src/contexts/userData";
 import {
 	getSafePluginAddress,
-	isPluginEnabled,
+	getIsPluginEnabled,
 	getSafeOwners,
 } from "../scripts/utils/safe";
 import { getSigner } from "src/scripts/utils/login";
@@ -15,7 +15,7 @@ const AddressInfo = () => {
 		signer,
 		safeAddress,
 		pluginAddress,
-		isPluinEnabled,
+		isPluginEnabled,
 		currentOwner,
 		savePluginAdddress,
 		saveIsPluginEnabled,
@@ -29,7 +29,7 @@ const AddressInfo = () => {
 
 	useEffect(() => {
 		(async () => {
-			if (safeAddress !== "" && pluginAddress === "" && isPluinEnabled) {
+			if (safeAddress !== "" && pluginAddress === "" && isPluginEnabled) {
 				try {
 					const PluginAddr = await getSafePluginAddress(safeAddress);
 					if (PluginAddr !== ethers.constants.AddressZero) {
@@ -44,8 +44,8 @@ const AddressInfo = () => {
 
 	useEffect(() => {
 		(async () => {
-			if (pluginAddress === "" && isPluinEnabled) {
-				const _isPluginEnabled = await isPluginEnabled(
+			if (pluginAddress === "" && isPluginEnabled) {
+				const _isPluginEnabled = await getIsPluginEnabled(
 					safeAddress,
 					pluginAddress
 				);
@@ -62,9 +62,7 @@ const AddressInfo = () => {
 			if (safeAddress !== "") {
 				try {
 					const owners = await getSafeOwners(safeAddress);
-					console.log("owners; ", owners);
 					const owner = owners[0];
-					console.log("owner; ", owner);
 					saveCurrentOwner(owner);
 				} catch (e) {
 					console.log(e);
