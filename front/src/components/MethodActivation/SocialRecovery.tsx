@@ -6,13 +6,10 @@ import {
 	Text,
 	VStack,
 	Tooltip,
-	FormControl,
-	Select,
 	IconButton,
 	CloseButton,
 	Spinner,
 	useDisclosure,
-	Icon,
 } from "@chakra-ui/react";
 import { InfoIcon, AddIcon } from "@chakra-ui/icons";
 import { inputStyle } from "src/theme";
@@ -24,13 +21,13 @@ import {
 } from "../../scripts/plugins/index";
 import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
+import { DelayPeriod, DelayInputForm } from "./Common";
 
 const SocialRecovery = () => {
 	const { safeSDK, pluginAddress } = useContext(UserDataContext);
 	const [threshold, setThreshold] = useState<number>(0);
 	const [guardians, setGuardians] = useState<string[]>([""]);
 	const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false);
-	const [unit, setUnit] = useState<number>(1);
 	const [delayValue, setDelayValue] = useState(0);
 	const [loading, setLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string>("");
@@ -88,7 +85,7 @@ const SocialRecovery = () => {
 				<Box>
 					<Tooltip
 						placement="right"
-						label="They won't be publicly revealed as only the
+						label="These addresses won't be publicly revealed as only the
 						merkle root of the addresses is stored on smart contract. 
                         It's recommended to set, at least, more than three guardians"
 					>
@@ -160,20 +157,11 @@ const SocialRecovery = () => {
 										placement="bottom-start"
 										label="Guardian threshold is the minimum approval count that is necessary to execute social recovery proposal."
 									>
-										<InfoIcon mr={2} mt={0.5} boxSize={3} />
+										<InfoIcon mr={2} mt={0.5} boxSize={3} color="blue.500" />
 									</Tooltip>
 									<Text>2. Guardian threshold :</Text>
 								</Flex>
-								<Flex justifyContent="space-between" alignItems="center">
-									<Tooltip
-										placement="bottom-start"
-										label="`Delay Period` refers to the period of time until a recovery proposal becomes executable after the proposal is made.
-                  *Recommendation: >30 days in prod. <10 seconds in test."
-									>
-										<InfoIcon mr={2} mt={0.5} boxSize={3} />
-									</Tooltip>
-									<Text>3. Delay period :</Text>
-								</Flex>
+								<DelayPeriod index={2} />
 							</VStack>
 							<VStack spacing={3.5} fontSize={14} align="end" w="300px" ml={2}>
 								<Input
@@ -183,6 +171,7 @@ const SocialRecovery = () => {
 									type="address"
 									placeholder="2"
 									onChange={(e) => {
+										setErrorMessage("");
 										const threshold = Number(e.target.value);
 										if (threshold <= guardians.length) {
 											setThreshold(threshold);
@@ -193,37 +182,7 @@ const SocialRecovery = () => {
 										}
 									}}
 								/>
-								<FormControl>
-									<Box display="flex" alignItems="center">
-										<Input
-											sx={inputStyle}
-											textAlign="center"
-											size="xl"
-											mr="10px"
-											type="number"
-											placeholder="10"
-											onChange={(e) =>
-												setDelayValue(Number(e.target.value) * unit)
-											}
-										/>
-										<Select
-											w={"30%"}
-											size="xl"
-											borderRadius={"2px"}
-											sx={{
-												textAlign: "center", // Center the text horizontally
-												pr: "15px", // Add padding on the left side
-												pb: "4px",
-											}}
-											onChange={(e) => setUnit(Number(e.target.value))}
-										>
-											<option value="1">sec</option>
-											<option value="60">min</option>
-											<option value="3600">hour</option>
-											<option value="86400">day</option>
-										</Select>
-									</Box>
-								</FormControl>
+								<DelayInputForm setDelayValue={setDelayValue} />
 							</VStack>
 						</Flex>
 					</Box>

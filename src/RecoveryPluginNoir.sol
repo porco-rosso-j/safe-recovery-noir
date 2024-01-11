@@ -268,17 +268,8 @@ contract RecoveryPluginNoir is
     }
 
     function execRecovery(uint _proposalId) public returns (bool) {
-        require(_proposalId != 0 && _proposalId <= recoveryCount, "INVALID_ID");
-        // should check if its not called for the second time
-
+        getIsRecoveryExecutable(_proposalId);
         Recovery storage recovery = recoveries[_proposalId];
-        require(!recovery.rejected, "PROPOSAL_REJECTED");
-        require(block.timestamp >= recovery.deadline, "DELAY_NOT_EXPIRED");
-
-        if (
-            recovery.recoveryType == RECOVERY_TYPE_SOCIAL &&
-            recovery.approvalCount < threshold
-        ) revert("INSUFFICIENT_APPROVAL");
 
         bool isNewThreshold = IGnosisSafe(safe).getThreshold() !=
             recovery.newThreshold;
@@ -324,18 +315,37 @@ contract RecoveryPluginNoir is
             revert RECOVER_FAILED(reason);
         }
 
+        lastExecutionTimestamp = block.timestamp;
         return true;
     }
 
-    // TODO
-    // 0: return false instead of reverting
-    // 1: return false if the method type of the proposal has been disabled
-    // 2: return false if epoc is not the latest
     function getIsRecoveryExecutable(
         uint _proposalId
     ) public view returns (bool) {
         require(_proposalId != 0 && _proposalId <= recoveryCount, "INVALID_ID");
         Recovery storage recovery = recoveries[_proposalId];
+
+        if (
+            recovery.recoveryType == RECOVERY_TYPE_K256 &&
+            !isEcrecoverRecoverEnabled
+        ) {
+            revert("K256_RECOVERY_NOT_ENABLED");
+        } else if (
+            recovery.recoveryType == RECOVERY_TYPE_P256 &&
+            !isWebAuthnRecoverEnabled
+        ) {
+            revert("P256_RECOVERY_NOT_ENABLED");
+        } else if (
+            recovery.recoveryType == RECOVERY_TYPE_SECRET &&
+            !isSecretRecoverEnabled
+        ) {
+            revert("SECRET_RECOVERY_NOT_ENABLED");
+        } else if (
+            recovery.recoveryType == RECOVERY_TYPE_SOCIAL &&
+            !isSocialRecoverEnabled
+        ) {
+            revert("SOCIAL_RECOVERY_NOT_ENABLED");
+        }
 
         _validateAddressesAndThreshold(
             recovery.ownersReplaced,
@@ -345,6 +355,11 @@ contract RecoveryPluginNoir is
 
         require(!recovery.rejected, "PROPOSAL_REJECTED");
         require(block.timestamp >= recovery.deadline, "DELAY_NOT_EXPIRED");
+
+        require(
+            recovery.proposedTimestamp >= lastExecutionTimestamp,
+            "PROPOSAL_EXPIRED"
+        );
 
         if (
             recovery.recoveryType == RECOVERY_TYPE_SOCIAL &&

@@ -23,6 +23,7 @@ import {
 } from "../scripts/plugins/index";
 import { Proposal } from "../scripts/plugins/types";
 import ExecutedModal from "./Modals/ExecuteModal";
+import { calcTimeDiff } from "src/scripts/utils/helper";
 
 const ExecuteRecovery = (props) => {
 	const { safeSDK, safeAddress, signer, saveCurrentOwner, pluginAddress } =
@@ -31,6 +32,7 @@ const ExecuteRecovery = (props) => {
 	const [proposalId, setProposalId] = useState<number>(0);
 	const [isRecoveryExecutable, setIsRecoveryExecutable] =
 		useState<boolean>(false);
+	const [nonExecutableReason, setNonExecutableReason] = useState<string>("");
 	const [proposals, setProposals] = useState<Proposal[]>([]);
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const [socialRecoveryThreshold, setSocialRecoveryThreshold] =
@@ -59,7 +61,7 @@ const ExecuteRecovery = (props) => {
 			setLoadingProposals(true);
 			console.log("loadingProposals after: ", loadingProposals);
 		}
-	}, []);
+	}, [pluginAddress, loadingProposals]);
 
 	useEffect(() => {
 		(async () => {
@@ -93,7 +95,10 @@ const ExecuteRecovery = (props) => {
 				);
 				// const IsRecoveryExecutable = await _getIsRecoveryExecutable(signer, proposalId);
 				console.log("IsRecoveryExecutable: ", IsRecoveryExecutable);
-				setIsRecoveryExecutable(IsRecoveryExecutable);
+				setIsRecoveryExecutable(IsRecoveryExecutable.result);
+				if (!IsRecoveryExecutable.result) {
+					setNonExecutableReason(IsRecoveryExecutable.reason);
+				}
 			}
 		})();
 	});
@@ -216,7 +221,7 @@ const ExecuteRecovery = (props) => {
 									<Text>・ Method Type:</Text>
 									<Text>・ New Owner:</Text>
 									<Text>・ Old Owner:</Text>
-									<Text>・ New Threshold:</Text>
+									<Text>・ New Multi-sig Threshold:</Text>
 									{proposals[proposalId].type === 4 ? (
 										<Text>・ Current Approval Count:</Text>
 									) : null}
@@ -224,10 +229,15 @@ const ExecuteRecovery = (props) => {
 										<Text>・ Approval Threshold:</Text>
 									) : null}
 									<Text>・ Executable:</Text>
-									{/* {proposals[proposalId].deadline <
-									Math.floor(Date.now() / 1000) ? (
+									{!isRecoveryExecutable ? (
+										<Text ml={4} color="red.500">
+											*Reason:
+										</Text>
+									) : null}
+									{!isRecoveryExecutable &&
+									nonExecutableReason === "DELAY_NOT_EXPIRED" ? (
 										<Text>・ Executable After:</Text>
-									) : null} */}
+									) : null}
 								</VStack>
 								<VStack spacing={1} fontSize={15} align="end">
 									<Text>{typeName(proposals[proposalId].type)} Recovery</Text>
@@ -239,12 +249,20 @@ const ExecuteRecovery = (props) => {
 									</Text>
 									<Text>{proposals[proposalId].threshold}</Text>
 									{proposals[proposalId].type === 4 ? (
-										<Box>
-											<Text>{proposals[proposalId].approvals}</Text>
-											<Text>{socialRecoveryThreshold}</Text>
-										</Box>
+										<Text>{proposals[proposalId].approvals}</Text>
+									) : null}
+									{proposals[proposalId].type === 4 ? (
+										<Text>{proposals[proposalId].threshold}</Text>
 									) : null}
 									<Text>{isRecoveryExecutable ? "Yes" : "No"}</Text>
+
+									{!isRecoveryExecutable ? (
+										<Text color="red.500">{nonExecutableReason}</Text>
+									) : null}
+									{!isRecoveryExecutable &&
+									nonExecutableReason === "DELAY_NOT_EXPIRED" ? (
+										<Text>{calcTimeDiff(proposals[proposalId].deadline)}</Text>
+									) : null}
 								</VStack>
 							</Flex>
 							<HStack>
@@ -295,7 +313,7 @@ const ExecuteRecovery = (props) => {
 								proposals[proposalId].approvals < socialRecoveryThreshold ? (
 									<Button
 										sx={{ mt: "35px" }}
-										colorScheme="teal"
+										colorScheme="blue"
 										onClick={async () => {
 											// double-approve should fail.
 											setErrorMessage("");

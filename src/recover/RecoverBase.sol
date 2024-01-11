@@ -7,8 +7,10 @@ contract RecoverBase {
         address[] pendingNewOwners;
         address[] ownersReplaced;
         uint newThreshold;
+        uint proposedTimestamp;
         uint deadline;
         bool rejected;
+        // following two variables are for social recovery
         uint approvalCount;
         mapping(bytes32 => bool) nullifierHash;
     }
@@ -19,6 +21,8 @@ contract RecoverBase {
     // set to 0 for testing
     uint256 public constant MIN_TIMELOCK = 0;
     uint256 public recoveryTimeLock;
+
+    uint public lastExecutionTimestamp;
 
     uint public recoveryCount;
     mapping(uint => Recovery) public recoveries;
@@ -50,6 +54,7 @@ contract RecoverBase {
         recovery.pendingNewOwners = _newAddresses;
         recovery.newThreshold = _newThreshold;
         recovery.deadline = block.timestamp + recoveryTimeLock;
+        recovery.proposedTimestamp = block.timestamp;
 
         // should emit an event to notify owner
         return (newRecoveryCount, recovery.deadline);
@@ -68,6 +73,7 @@ contract RecoverBase {
             address[] memory,
             uint,
             uint,
+            uint,
             bool,
             uint
         )
@@ -80,6 +86,7 @@ contract RecoverBase {
             recovery.ownersReplaced,
             recovery.newThreshold,
             recovery.deadline,
+            recovery.proposedTimestamp,
             recovery.rejected,
             recovery.approvalCount
         );

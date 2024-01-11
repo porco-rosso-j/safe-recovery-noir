@@ -8,11 +8,8 @@ import {
 	getIsPluginEnabled,
 	getSafeOwners,
 } from "../scripts/utils/safe";
-import { getSigner } from "src/scripts/utils/login";
-
 const AddressInfo = () => {
 	const {
-		signer,
 		safeAddress,
 		pluginAddress,
 		isPluginEnabled,
@@ -99,7 +96,7 @@ const AddressInfo = () => {
 					<VStack spacing={1} fontSize={14} align="start">
 						<Text>・ Safe :</Text>
 						{currentOwner !== "" && <Text>・ Safe Owner :</Text>}
-						{pluginAddress !== "" && <Text>・ SafeRecover :</Text>}
+						{pluginAddress !== "" && <Text>・ Recovery Module :</Text>}
 					</VStack>
 					<VStack spacing={1} fontSize={14} color="white" align="end" ml={3}>
 						<Text>{safeAddress}</Text>

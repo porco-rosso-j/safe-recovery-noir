@@ -1,6 +1,7 @@
 import { Box, Divider, Select } from "@chakra-ui/react";
 import ProposeRecovery from "./ProposeRecovery";
-import ExecuteRecovery from "./ExecuteRecovery";
+// import ExecuteRecovery from "./ExecuteRecovery";
+import ProposalList from "./ProposalList";
 import {
 	BackupAddress,
 	FingerPrint,
@@ -47,7 +48,7 @@ const MethodHeader = (props) => {
 			) : props.index === 1 ? (
 				<ProposeRecovery method={props.method} />
 			) : props.index === 2 ? (
-				<ExecuteRecovery method={props.method} />
+				<ProposalList method={props.method} />
 			) : null}
 			<Divider mt="30px" borderColor={"white.400"}></Divider>
 		</Box>

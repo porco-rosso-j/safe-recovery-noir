@@ -4,15 +4,12 @@ import {
 	Button,
 	Text,
 	VStack,
-	Select,
 	Tooltip,
-	FormControl,
 	Flex,
 	Spinner,
 	useDisclosure,
-	Icon,
 } from "@chakra-ui/react";
-import { InfoIcon, InfoOutlineIcon } from "@chakra-ui/icons";
+import { InfoIcon } from "@chakra-ui/icons";
 import { inputStyle } from "src/theme";
 import { useContext, useState, useEffect } from "react";
 import UserDataContext from "src/contexts/userData";
@@ -22,13 +19,13 @@ import {
 } from "../../scripts/plugins/index";
 import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
+import { DelayPeriod, DelayInputForm } from "./Common";
 
 const EnableBackupAddress = () => {
 	const { safeSDK, isPluginEnabled, pluginAddress } =
 		useContext(UserDataContext);
 	const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
 	const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false);
-	const [unit, setUnit] = useState<number>(1);
 	const [delayValue, setDelayValue] = useState(0);
 	const [loading, setLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string>("");
@@ -82,20 +79,11 @@ const EnableBackupAddress = () => {
 									placement="bottom-start"
 									label="`Backup adddress` should not be one of the Safe owners "
 								>
-									<InfoIcon mr={2} mt={0.5} boxSize={3} />
+									<InfoIcon mr={2} mt={0.5} boxSize={3} color="blue.500" />
 								</Tooltip>
 								<Text>1. Backup address :</Text>
 							</Flex>
-							<Flex justifyContent="space-between" alignItems="center">
-								<Tooltip
-									placement="bottom-start"
-									label="`Delay Period` refers to the period of time until a recovery proposal becomes executable after the proposal is made.
-                  *Recommendation: >30 days in prod. <10 seconds in test."
-								>
-									<InfoIcon mr={2} mt={0.5} boxSize={3} />
-								</Tooltip>
-								<Text>2. Delay period :</Text>
-							</Flex>
+							<DelayPeriod index={2} />
 						</VStack>
 						<VStack spacing={3.5} fontSize={14} align="end" w="345px" ml={2}>
 							<Input
@@ -106,37 +94,7 @@ const EnableBackupAddress = () => {
 								placeholder="0xAbCd..."
 								onChange={(e) => setPendingNewOwner(e.target.value)}
 							/>
-							<FormControl>
-								<Box display="flex" alignItems="center">
-									<Input
-										sx={inputStyle}
-										textAlign="center"
-										size="xl"
-										mr="10px"
-										type="number"
-										placeholder="10"
-										onChange={(e) =>
-											setDelayValue(Number(e.target.value) * unit)
-										}
-									/>
-									<Select
-										w={"30%"}
-										size="xl"
-										borderRadius={"2px"}
-										sx={{
-											textAlign: "center", // Center the text horizontally
-											pr: "15px", // Add padding on the left side
-											pb: "4px",
-										}}
-										onChange={(e) => setUnit(Number(e.target.value))}
-									>
-										<option value="1">sec</option>
-										<option value="60">min</option>
-										<option value="3600">hour</option>
-										<option value="86400">day</option>
-									</Select>
-								</Box>
-							</FormControl>
+							<DelayInputForm setDelayValue={setDelayValue} />
 						</VStack>
 					</Flex>
 					<Box
@@ -150,6 +108,7 @@ const EnableBackupAddress = () => {
 							w="35%"
 							onClick={async () => {
 								if (pendingNewOwner !== "") {
+									setErrorMessage("");
 									setLoading(true);
 									const ret = await _addEcrecoverRecover(
 										safeSDK,
