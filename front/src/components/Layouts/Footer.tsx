@@ -7,9 +7,7 @@ export default function Footer() {
 				href="https://github.com/porco-rosso-j/safe-recovery-noir"
 				isExternal
 			>
-				<Text mt={10} mb={10} fontSize="md">
-					github
-				</Text>
+				<Text fontSize="md">github</Text>
 			</Link>
 		</Box>
 	);
