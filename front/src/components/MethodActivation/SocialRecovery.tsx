@@ -13,39 +13,24 @@ import {
 } from "@chakra-ui/react";
 import { InfoIcon, AddIcon } from "@chakra-ui/icons";
 import { inputStyle } from "src/theme";
-import { useContext, useState, useEffect } from "react";
-import UserDataContext from "src/contexts/userData";
-import {
-	_isMethodEnabled,
-	_addSocialRecover,
-} from "../../scripts/plugins/index";
+import { useState } from "react";
 import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
 import { DelayPeriod, DelayInputForm } from "./Common";
+import useIsMethodEnabled from "src/hooks/useIsMethodEnabled";
+import useAddRecover from "src/hooks/useAddRecover";
 
-const SocialRecovery = () => {
-	const { safeSDK, pluginAddress } = useContext(UserDataContext);
+const SocialRecovery = (props: { methodIndex: number }) => {
+	const { isOpen, onOpen, onClose } = useDisclosure();
+	const { isMethodEnabled } = useIsMethodEnabled(props.methodIndex);
+	const { loading, errorMessage, txHash, result, setErrorMessage, addRecover } =
+		useAddRecover(onOpen);
+
+	const [errorMessage2, setErrorMessage2] = useState<string>("");
+
+	const [delayValue, setDelayValue] = useState(0);
 	const [threshold, setThreshold] = useState<number>(0);
 	const [guardians, setGuardians] = useState<string[]>([""]);
-	const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false);
-	const [delayValue, setDelayValue] = useState(0);
-	const [loading, setLoading] = useState(false);
-	const [errorMessage, setErrorMessage] = useState<string>("");
-	const [errorMessage2, setErrorMessage2] = useState<string>("");
-	const [txHash, setTxHash] = useState<string>("");
-	const { isOpen, onOpen, onClose } = useDisclosure();
-	const [openProposedModal, setOpenProposedModal] = useState(false);
-	const [result, setResult] = useState<boolean>(false);
-
-	useEffect(() => {
-		(async () => {
-			const isMethodEnabled = await _isMethodEnabled(4, pluginAddress);
-			console.log("isMethodEnabled: ", isMethodEnabled);
-			if (isMethodEnabled) {
-				setIsMethodEnabled(isMethodEnabled);
-			}
-		})();
-	});
 
 	const addGuardian = (newValue, index) => {
 		const updatedGuardians = [...guardians];
@@ -65,18 +50,6 @@ const SocialRecovery = () => {
 	};
 	const handleAddGuardian = () => {
 		setGuardians([...guardians, ""]);
-	};
-
-	// Function to open the modal from the parent
-	const openModal = () => {
-		setOpenProposedModal(true);
-		onOpen();
-	};
-
-	// Function to close the modal from the parent
-	const closeModal = () => {
-		setOpenProposedModal(false);
-		onClose();
 	};
 
 	return (
@@ -195,44 +168,19 @@ const SocialRecovery = () => {
 							sx={{ mt: "35px" }}
 							colorScheme="teal"
 							w="35%"
+							isLoading={loading}
+							loadingText="Enabling"
 							onClick={async () => {
-								setErrorMessage("");
-								if (threshold === 0 || threshold > guardians.length) {
-									setErrorMessage("Invalid threshold");
-									return;
-								}
-								console.log("guardians.length: ", guardians.length);
-								console.log("threshold: ", threshold);
-
-								setLoading(true);
-								const ret = await _addSocialRecover(
-									safeSDK,
-									pluginAddress,
+								await addRecover({
+									methodIndex: props.methodIndex,
 									delayValue,
 									threshold,
-									guardians
-								);
-								console.log("ret: ", ret);
-								if (ret.result) {
-									setResult(true);
-								} else if (!ret.result && ret.txHash === "") {
-									console.log("ret.result: ", ret.result);
-									setErrorMessage("Something went wrong");
-									setLoading(false);
-									return;
-								}
-								setTxHash(ret.txHash);
-								openModal();
-								setLoading(false);
+									guardians,
+								});
 							}}
 						>
 							Enable method
 						</Button>
-						{loading && (
-							<Flex justifyContent="center" alignItems="center">
-								<Spinner mt={10} color="gray.300" />
-							</Flex>
-						)}
 						<Text mt={4} color="red.500" mb={4}>
 							{errorMessage}
 						</Text>
@@ -245,9 +193,9 @@ const SocialRecovery = () => {
 				</Box>
 			)}
 			<EnabledModal
-				isOpen={isOpen || openProposedModal}
+				isOpen={isOpen}
 				onOpen={onOpen}
-				onClose={closeModal}
+				onClose={onClose}
 				result={result}
 				txHash={txHash}
 				enable={true}

@@ -1,6 +1,5 @@
 import Safe from "@safe-global/protocol-kit";
 import { sendSafeTx } from "../utils/safe";
-import { contracts } from "../constants/addresses";
 import { pluginIface } from "../utils/contracts";
 import { txResult } from "./types";
 

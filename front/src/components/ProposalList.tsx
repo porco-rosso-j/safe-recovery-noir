@@ -10,8 +10,8 @@ import {
 import { useContext, useState, useEffect, useCallback } from "react";
 import UserDataContext from "src/contexts/userData";
 import { getProposals, getRecoveryCount } from "../scripts/plugins/index";
-import { Proposal as ProposalType } from "../scripts/plugins/types";
-import Proposal from "./Proposal";
+import { ProposalType } from "../scripts/plugins/types";
+import ProposalDetail from "./ProposalDetail";
 import { typeName } from "src/scripts/utils/helper";
 
 const ProposalList = (props) => {
@@ -46,7 +46,7 @@ const ProposalList = (props) => {
 		}
 
 		const interval = setInterval(() => {
-			if (pluginAddress !== "") {
+			if (proposalId === 0) {
 				fetchProposals();
 			}
 		}, 60000); // Update every 60 seconds
@@ -58,6 +58,7 @@ const ProposalList = (props) => {
 		loadingProposals,
 		proposalLength,
 		fetchProposals,
+		proposalId,
 	]);
 
 	const handleSetProposalId = (id: number) => {
@@ -75,23 +76,29 @@ const ProposalList = (props) => {
 			<Text mb={5} fontSize={15} mx="75px">
 				Choose proposal and execute ⚡️
 			</Text>
-			<Box mb={5}>
-				<label>Proposal ID:</label>
-				<Input
-					ml={3}
-					sx={{ w: "50px" }}
-					size="sm"
-					placeholder="2"
-					onChange={(e) => {
-						handleSetProposalId(Number(e.target.value));
-					}}
-				/>
-			</Box>
-			<Box>
-				{proposalId === 0 ? (
+			{proposalId === 0 ? (
+				<Box>
+					<Box mb={5}>
+						<label>Proposal ID:</label>
+						<Input
+							ml={3}
+							sx={{ w: "50px" }}
+							size="sm"
+							placeholder="2"
+							onChange={(e) => {
+								handleSetProposalId(Number(e.target.value));
+							}}
+						/>
+					</Box>
+
 					<Box>
 						{!loadingProposals ? (
-							<VStack spacing={4} align="stretch">
+							<VStack
+								spacing={4}
+								align="stretch"
+								height="300px"
+								overflowY="auto"
+							>
 								{proposals.map((proposal) => (
 									<Box
 										key={proposal.id}
@@ -103,7 +110,7 @@ const ProposalList = (props) => {
 											handleSetProposalId(proposal.id);
 										}}
 									>
-										<HStack spacing={4}>
+										<HStack spacing={4} py={1}>
 											<Text ml={3}>ID: {proposal.id}</Text>
 											<Text flex={1}>{typeName(proposal.type)} Recovery</Text>
 											{proposal.isExecutable ? (
@@ -130,14 +137,15 @@ const ProposalList = (props) => {
 							</Box>
 						)}
 					</Box>
-				) : (
-					<Proposal
-						proposal={proposals[proposalId]}
-						proposalId={proposalId}
-						setProposalId={setProposalId}
-					/>
-				)}
-			</Box>
+				</Box>
+			) : (
+				<ProposalDetail
+					proposal={proposals[proposalId]}
+					proposalId={proposalId}
+					setProposalId={setProposalId}
+					fromProposeTab={false}
+				/>
+			)}
 		</Box>
 	);
 };

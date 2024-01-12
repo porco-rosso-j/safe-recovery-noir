@@ -1,6 +1,5 @@
 import { Box, Divider, Select } from "@chakra-ui/react";
 import ProposeRecovery from "./ProposeRecovery";
-// import ExecuteRecovery from "./ExecuteRecovery";
 import ProposalList from "./ProposalList";
 import {
 	BackupAddress,
@@ -9,7 +8,14 @@ import {
 	SocialRecovery,
 } from "./MethodActivation/index";
 
-const MethodHeader = (props) => {
+type MethodHeaderType = {
+	updateMethod: (index: number) => void;
+	setTabIndex?: (index: number) => void;
+	method: number;
+	index: number;
+};
+
+const MethodHeader = (props: MethodHeaderType) => {
 	return (
 		<Box pt={3}>
 			{props.index === 0 || props.index === 1 ? (
@@ -29,26 +35,29 @@ const MethodHeader = (props) => {
 				<Box>
 					{props.method === 1 ? (
 						<Box>
-							<BackupAddress />
+							<BackupAddress methodIndex={props.method} />
 						</Box>
 					) : props.method === 2 ? (
 						<Box>
-							<FingerPrint />
+							<FingerPrint methodIndex={props.method} />
 						</Box>
 					) : props.method === 3 ? (
 						<Box>
-							<SecretWord />
+							<SecretWord methodIndex={props.method} />
 						</Box>
 					) : props.method === 4 ? (
 						<Box>
-							<SocialRecovery />
+							<SocialRecovery methodIndex={props.method} />
 						</Box>
 					) : null}
 				</Box>
 			) : props.index === 1 ? (
-				<ProposeRecovery method={props.method} />
+				<ProposeRecovery
+					methodIndex={props.method}
+					setTabIndex={props.setTabIndex}
+				/>
 			) : props.index === 2 ? (
-				<ProposalList method={props.method} />
+				<ProposalList />
 			) : null}
 			<Divider mt="30px" borderColor={"white.400"}></Divider>
 		</Box>

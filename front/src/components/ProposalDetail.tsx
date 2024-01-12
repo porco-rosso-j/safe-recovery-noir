@@ -20,12 +20,14 @@ import {
 } from "../scripts/plugins/index";
 import ExecutedModal from "./Modals/ExecuteModal";
 import { calcTimeDiff, typeName } from "src/scripts/utils/helper";
-import { Proposal as ProposalType, txResult } from "../scripts/plugins/types";
+import { ProposalType, txResult } from "../scripts/plugins/types";
 
-const Proposal = (props: {
+const ProposalDetail = (props: {
 	proposal: ProposalType;
 	proposalId: number;
-	setProposalId: (id: number) => void;
+	setProposalId?: (id: number) => void;
+	fromProposeTab: boolean;
+	setOpenProposal?: (value: boolean) => void;
 }) => {
 	const { safeSDK, safeAddress, signer, saveCurrentOwner, pluginAddress } =
 		useContext(UserDataContext);
@@ -45,6 +47,7 @@ const Proposal = (props: {
 	const [fucntionResult, setFunctionResult] = useState<boolean>(false);
 	const [openProposedModal, setOpenProposedModal] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [loadingIndex, setLoadingIndex] = useState(0);
 
 	useEffect(() => {
 		(async () => {
@@ -70,7 +73,7 @@ const Proposal = (props: {
 
 	const handleFunction = async (funcType: number) => {
 		setErrorMessage("");
-		setLoading(true);
+		handleLoading(funcType, true);
 
 		let ret: txResult = { result: false, txHash: "" };
 
@@ -104,8 +107,21 @@ const Proposal = (props: {
 		}
 		setTxHash(ret.txHash);
 		setFunctionType(funcType);
-		setLoading(false);
+		handleLoading(funcType, false);
 		openModal();
+	};
+
+	const handleLoading = (index: number, loading: boolean) => {
+		if (index === 1 && loading) {
+			setLoadingIndex(index);
+			setLoading(loading);
+		} else if (index === 2 && loading) {
+			setLoadingIndex(index);
+			setLoading(loading);
+		} else if (index === 3 && loading) {
+			setLoadingIndex(index);
+			setLoading(loading);
+		}
 	};
 
 	// Function to open the modal from the parent
@@ -121,11 +137,10 @@ const Proposal = (props: {
 	};
 
 	return (
-		<Box>
+		<Box mt={10}>
 			<Flex
 				p={5}
 				mx="auto"
-				mt="3"
 				mb="5"
 				borderRadius="lg"
 				borderColor={"white"}
@@ -188,6 +203,8 @@ const Proposal = (props: {
 							sx={{ mt: "35px", mr: "30px" }}
 							bg="#C53030"
 							color="white"
+							isLoading={loading && loadingIndex === 3}
+							loadingText="Rejecting"
 							_hover={{
 								bg: "#9B2C2C",
 							}}
@@ -208,6 +225,8 @@ const Proposal = (props: {
 						<Button
 							sx={{ mt: "35px" }}
 							colorScheme="blue"
+							isLoading={loading && loadingIndex === 2}
+							loadingText="Approving"
 							onClick={() => {
 								handleFunction(2);
 							}}
@@ -218,6 +237,8 @@ const Proposal = (props: {
 						<Button
 							sx={{ mt: "35px" }}
 							colorScheme="teal"
+							isLoading={loading && loadingIndex === 1}
+							loadingText="Executing"
 							onClick={() => {
 								handleFunction(1);
 							}}
@@ -227,11 +248,6 @@ const Proposal = (props: {
 						</Button>
 					)}
 				</HStack>
-				{loading && (
-					<Flex justifyContent="center" alignItems="center">
-						<Spinner mt={10} mb={5} color="gray.300" />
-					</Flex>
-				)}
 				{errorMessage !== "" ? (
 					<Text mt={4} color="red.500" mb={4}>
 						{errorMessage}
@@ -239,12 +255,16 @@ const Proposal = (props: {
 				) : null}
 				<Button
 					fontSize={15}
-					mt="20px"
+					mt="30px"
 					h="25px"
 					color="white"
 					bgColor="gray.600"
 					onClick={async () => {
-						props.setProposalId(0);
+						if (props.fromProposeTab) {
+							props.setOpenProposal(false);
+						} else {
+							props.setProposalId(0);
+						}
 					}}
 				>
 					back
@@ -264,4 +284,4 @@ const Proposal = (props: {
 	);
 };
 
-export default Proposal;
+export default ProposalDetail;

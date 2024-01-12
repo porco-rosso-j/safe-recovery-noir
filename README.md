@@ -6,7 +6,7 @@
 
 A safe plugin that allows Safe owners to recover account ownership in the case where they lose access to their Safe. All the recovery methods leverage Noir, a DSL for writing zero-knowledge proof circuits, to help owners recover their account in a secure and private manner.
 
-This product is developed as a grantee of the Safe Grant Program Wave I. Here is [the proposal on Safe Grant website](https://app.charmverse.io/safe-grants-program/page-43692424934796636) and [Accouncement](https://t.co/Pdc4Pxvg3s).
+This product is developed as a grantee of the Safe Grant Program Wave I. Here is [the proposal on Safe Grant website](https://app.charmverse.io/safe-grants-program/page-43692424934796636) and [Announcement](https://t.co/Pdc4Pxvg3s).
 
 #### Recovery Mechanisms
 

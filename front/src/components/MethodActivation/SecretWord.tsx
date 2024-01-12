@@ -11,49 +11,21 @@ import {
 } from "@chakra-ui/react";
 import { InfoIcon } from "@chakra-ui/icons";
 import { inputStyle } from "src/theme";
-import { useContext, useState, useEffect } from "react";
-import UserDataContext from "src/contexts/userData";
-import {
-	_isMethodEnabled,
-	_addSecretRecover,
-} from "../../scripts/plugins/index";
+import { useState } from "react";
 import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
 import { DelayPeriod, DelayInputForm } from "./Common";
+import useIsMethodEnabled from "src/hooks/useIsMethodEnabled";
+import useAddRecover from "src/hooks/useAddRecover";
 
-const SecretWord = () => {
-	const { safeSDK, pluginAddress } = useContext(UserDataContext);
-	const [secretWord, setSecretWord] = useState<string>("");
-	const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false);
-	const [delayValue, setDelayValue] = useState(0);
-	const [loading, setLoading] = useState(false);
-	const [errorMessage, setErrorMessage] = useState<string>("");
-	const [txHash, setTxHash] = useState<string>("");
+const SecretWord = (props) => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const [openProposedModal, setOpenProposedModal] = useState(false);
-	const [result, setResult] = useState<boolean>(false);
+	const { isMethodEnabled } = useIsMethodEnabled(props.methodIndex);
+	const { loading, errorMessage, txHash, result, setErrorMessage, addRecover } =
+		useAddRecover(onOpen);
 
-	useEffect(() => {
-		(async () => {
-			const _isPluginEnabled = await _isMethodEnabled(3, pluginAddress);
-			console.log("isPluginEnabled: ", _isPluginEnabled);
-			if (_isPluginEnabled) {
-				setIsMethodEnabled(_isPluginEnabled);
-			}
-		})();
-	});
-
-	// Function to open the modal from the parent
-	const openModal = () => {
-		setOpenProposedModal(true);
-		onOpen();
-	};
-
-	// Function to close the modal from the parent
-	const closeModal = () => {
-		setOpenProposedModal(false);
-		onClose();
-	};
+	const [secretWord, setSecretWord] = useState("");
+	const [delayValue, setDelayValue] = useState(0);
 
 	return (
 		<Box pt="10px">
@@ -89,8 +61,6 @@ const SecretWord = () => {
 								placeholder="satoshi123"
 								onChange={(e) => {
 									setErrorMessage("");
-									console.log("e: ", e.target.value);
-									console.log("length: ", e.target.value.length);
 									if (e.target.value.length > 10) {
 										setErrorMessage(
 											"secret word's length shoule be less than 10"
@@ -112,28 +82,16 @@ const SecretWord = () => {
 							sx={{ mt: "35px" }}
 							colorScheme="teal"
 							w="35%"
+							isLoading={loading}
+							loadingText="Enabling"
 							onClick={async () => {
 								setErrorMessage("");
 								if (secretWord !== "") {
-									setLoading(true);
-									const ret = await _addSecretRecover(
-										safeSDK,
-										pluginAddress,
+									await addRecover({
+										methodIndex: props.methodIndex,
 										delayValue,
-										secretWord
-									);
-									console.log("ret: ", ret);
-									if (ret.result) {
-										setResult(true);
-									} else if (!ret.result && ret.txHash === "") {
-										console.log("ret.result: ", ret.result);
-										setErrorMessage("Something went wrong");
-										setLoading(false);
-										return;
-									}
-									setTxHash(ret.txHash);
-									openModal();
-									setLoading(false);
+										secretWord,
+									});
 								} else {
 									setErrorMessage("new owner address not set");
 								}
@@ -141,11 +99,6 @@ const SecretWord = () => {
 						>
 							Enable method
 						</Button>
-						{loading && (
-							<Flex justifyContent="center" alignItems="center">
-								<Spinner mt={10} color="gray.300" />
-							</Flex>
-						)}
 						<Text mt={4} color="red.500" mb={4}>
 							{errorMessage}
 						</Text>
@@ -158,9 +111,9 @@ const SecretWord = () => {
 				</Box>
 			)}
 			<EnabledModal
-				isOpen={isOpen || openProposedModal}
+				isOpen={isOpen}
 				onOpen={onOpen}
-				onClose={closeModal}
+				onClose={onClose}
 				result={result}
 				txHash={txHash}
 				enable={true}

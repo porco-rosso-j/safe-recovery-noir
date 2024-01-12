@@ -12,33 +12,16 @@ import {
 	Flex,
 	Box,
 } from "@chakra-ui/react";
-import { useContext, useState } from "react";
-// import { useNavigate } from "react-router-dom";
-import UserDataContext from "src/contexts/userData";
 import { shortenTxHash } from "src/scripts/utils/address";
-import {
-	Proposal as ProposalType,
-	emptyProposal,
-} from "../../scripts/plugins/types";
-import { getProposal } from "src/scripts/plugins/view";
 
 function ProposedModal(props) {
-	const { pluginAddress } = useContext(UserDataContext);
-	// const navigate = useNavigate();
-	const [proposals, setProposals] = useState<ProposalType>(null);
-
 	const handleCheckProposal = async () => {
-		console.log("handleCheckProposal");
+		console.log("handleCheckProposal in Modal");
 
-		const proposal = await getProposal(props.recoveryCount, pluginAddress);
-		setProposals(proposals);
-
-		// navigate("/proposal/" + props.recoveryCount.toString(), {
-		// 	state: proposal,
-		// });
-		// navigate("/proposal/", {
-		// 	state: proposal,
-		// });
+		await props.handleCheckProposal();
+		console.log("props.handleCheckProposal done");
+		props.onClose();
+		console.log("onClose");
 	};
 	return (
 		<>

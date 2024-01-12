@@ -1,24 +1,25 @@
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import UserDataContext from "src/contexts/userData";
 import logo from "../../assets/logo.png";
 
-import {
-	Box,
-	Button,
-	Flex,
-	Text,
-	HStack,
-	useColorModeValue,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, Text, HStack, VStack } from "@chakra-ui/react";
+import { shortenAddress } from "src/scripts/utils/address";
 export default function Header() {
 	const { signer, logout } = useContext(UserDataContext);
+	const [signerAddress, setSignerAddress] = useState<string>("");
+
+	useEffect(() => {
+		const setSignerAddr = async () => {
+			const addr = await signer.getAddress();
+			setSignerAddress(shortenAddress(addr));
+		};
+		if (signer !== null && signerAddress === "") {
+			setSignerAddr();
+		}
+	}, [signer, signerAddress, setSignerAddress]);
 	return (
 		<Box>
-			{/* <Box bg={useColorModeValue('#01796F', 'gray.700')}> */}
 			<Flex justify="space-between" p={4}>
-				{/* <Text fontSize="1.5rem" fontWeight="bold">
-      SafeRecover
-    </Text> */}
 				<HStack spacing={3}>
 					<img
 						src={logo}
@@ -29,7 +30,10 @@ export default function Header() {
 						SafeRecover
 					</Text>
 				</HStack>
-				{signer != null ? <Button onClick={logout}>Disconnect</Button> : null}
+				<VStack>
+					{signer != null ? <Button onClick={logout}>Disconnect</Button> : null}
+					{/* <Text>{signerAddress !== "" ? signerAddress : null}</Text> */}
+				</VStack>
 			</Flex>
 		</Box>
 	);

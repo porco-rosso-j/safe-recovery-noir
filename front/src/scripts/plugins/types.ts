@@ -1,4 +1,4 @@
-export type Proposal = {
+export type ProposalType = {
 	id: number;
 	type: number;
 	newOwners: string[];
@@ -11,7 +11,7 @@ export type Proposal = {
 	isExecutable: boolean;
 };
 
-export const emptyProposal = {
+export const emptyProposal: ProposalType = {
 	id: 0,
 	type: 0,
 	newOwners: [""],
@@ -27,6 +27,11 @@ export const emptyProposal = {
 export type txResult = {
 	result: boolean;
 	txHash: string;
+};
+
+export const empTxResult = {
+	result: false,
+	txHash: "",
 };
 
 export const error: txResult = { result: false, txHash: "" };

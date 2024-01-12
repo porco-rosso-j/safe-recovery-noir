@@ -8,47 +8,21 @@ import {
 	useDisclosure,
 	Link,
 } from "@chakra-ui/react";
-import { useContext, useState, useEffect } from "react";
-import UserDataContext from "src/contexts/userData";
-import {
-	_isMethodEnabled,
-	_addWebAuthnRecover,
-} from "../../scripts/plugins/index";
+import { useState } from "react";
 import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
 import { DelayPeriod, DelayInputForm } from "./Common";
+import useIsMethodEnabled from "src/hooks/useIsMethodEnabled";
+import useAddRecover from "src/hooks/useAddRecover";
 
-const EnableFingerPrint = () => {
-	const { safeSDK, pluginAddress } = useContext(UserDataContext);
-	const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false);
-	const [delayValue, setDelayValue] = useState(0);
-	const [loading, setLoading] = useState(false);
-	const [errorMessage, setErrorMessage] = useState<string>("");
-	const [txHash, setTxHash] = useState<string>("");
+const EnableFingerPrint = (props) => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const [openProposedModal, setOpenProposedModal] = useState(false);
-	const [result, setResult] = useState<boolean>(false);
+	const { isMethodEnabled } = useIsMethodEnabled(props.methodIndex);
 
-	useEffect(() => {
-		(async () => {
-			const isEnabled = await _isMethodEnabled(2, pluginAddress);
-			console.log("isEnabled: ", isEnabled);
-			if (isEnabled) {
-				setIsMethodEnabled(isEnabled);
-			}
-		})();
-	});
-	// Function to open the modal from the parent
-	const openModal = () => {
-		setOpenProposedModal(true);
-		onOpen();
-	};
+	const { loading, errorMessage, txHash, result, addRecover } =
+		useAddRecover(onOpen);
 
-	// Function to close the modal from the parent
-	const closeModal = () => {
-		setOpenProposedModal(false);
-		onClose();
-	};
+	const [delayValue, setDelayValue] = useState(0);
 
 	return (
 		<Box pt="10px">
@@ -87,37 +61,18 @@ const EnableFingerPrint = () => {
 						<Button
 							sx={{ mt: "35px" }}
 							colorScheme="teal"
+							isLoading={loading}
+							loadingText="Enabling"
 							w="35%"
 							onClick={async () => {
-								setErrorMessage("");
-								setLoading(true);
-
-								const ret = await _addWebAuthnRecover(
-									safeSDK,
-									pluginAddress,
-									delayValue
-								);
-								console.log("ret: ", ret);
-								if (ret.result) {
-									setResult(true);
-								} else if (!ret.result && ret.txHash === "") {
-									console.log("ret.result: ", ret.result);
-									setErrorMessage("Something went wrong");
-									setLoading(false);
-									return;
-								}
-								setTxHash(ret.txHash);
-								openModal();
-								setLoading(false);
+								await addRecover({
+									methodIndex: props.methodIndex,
+									delayValue,
+								});
 							}}
 						>
 							Enable method
 						</Button>
-						{loading && (
-							<Flex justifyContent="center" alignItems="center">
-								<Spinner mt={10} color="gray.300" />
-							</Flex>
-						)}
 						<Text mt={4} color="red.500" mb={4}>
 							{errorMessage}
 						</Text>
@@ -130,9 +85,9 @@ const EnableFingerPrint = () => {
 				</Box>
 			)}
 			<EnabledModal
-				isOpen={isOpen || openProposedModal}
+				isOpen={isOpen}
 				onOpen={onOpen}
-				onClose={closeModal}
+				onClose={onClose}
 				result={result}
 				txHash={txHash}
 				enable={true}

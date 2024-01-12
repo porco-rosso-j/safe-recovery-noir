@@ -1,6 +1,6 @@
 import Safe from "@safe-global/protocol-kit";
 import { recoveryPluginContract } from "../utils/contracts";
-import { Proposal } from "./types";
+import { ProposalType } from "./types";
 import { ethers } from "ethers";
 
 export async function _isSafeModuleEnabled(
@@ -80,10 +80,12 @@ export async function _getIsRecoveryExecutable(
 	// previous swap execution may invalidates this one
 }
 
-export async function getProposals(pluginAddr: string): Promise<Proposal[]> {
+export async function getProposals(
+	pluginAddr: string
+): Promise<ProposalType[]> {
 	const count = await getRecoveryCount(pluginAddr);
 	console.log("count: ", count);
-	let proposals: Proposal[] = [];
+	let proposals: ProposalType[] = [];
 	for (let i = 0; i < count; i++) {
 		console.log("i: ", i);
 		const res = await recoveryPluginContract(
@@ -95,7 +97,7 @@ export async function getProposals(pluginAddr: string): Promise<Proposal[]> {
 		const _isExecutable = await _getIsRecoveryExecutable(pluginAddr, i + 1);
 		console.log("_isExecutable: ", _isExecutable);
 
-		const proposal: Proposal = {
+		const proposal: ProposalType = {
 			id: i + 1,
 			type: Number(res[0] + 1),
 			newOwners: res[1],
@@ -119,7 +121,7 @@ export async function getProposals(pluginAddr: string): Promise<Proposal[]> {
 export async function getProposal(
 	proposalId: number,
 	pluginAddr: string
-): Promise<Proposal> {
+): Promise<ProposalType> {
 	const res = await recoveryPluginContract(pluginAddr).getRecoveryByProposalId(
 		proposalId
 	);
@@ -128,7 +130,7 @@ export async function getProposal(
 	const _isExecutable = await _getIsRecoveryExecutable(pluginAddr, proposalId);
 	console.log("_isExecutable: ", _isExecutable);
 
-	const proposal: Proposal = {
+	const proposal: ProposalType = {
 		id: proposalId,
 		type: Number(res[0] + 1),
 		newOwners: res[1],
