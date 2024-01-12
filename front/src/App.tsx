@@ -1,7 +1,7 @@
 import Header from "src/components/Layouts/Header";
 import Footer from "src/components/Layouts/Footer";
 import WalletLogin from "src/components/WalletLogin";
-import { ChakraProvider, Box, Container } from "@chakra-ui/react";
+import { ChakraProvider, Box, Container, Flex } from "@chakra-ui/react";
 import useUserData from "src/hooks/useUserData";
 import UserDataContext from "src/contexts/userData";
 
@@ -52,19 +52,20 @@ function App() {
 					logout,
 				}}
 			>
-				<Header />
-				<Container>
+				<Flex flexDirection="column" minHeight="100vh">
+					<Header />
 					<Box
-						mt="10"
+						mb={10}
 						display="flex"
 						flexDirection="column"
 						justifyContent="center"
 						alignItems="center"
+						flex="1"
 					>
 						{getShowLoginPage() ? <WalletLogin /> : <MenuTabs />}
 					</Box>
-				</Container>
-				<Footer />
+					<Footer />
+				</Flex>
 			</UserDataContext.Provider>
 		</ChakraProvider>
 	);
