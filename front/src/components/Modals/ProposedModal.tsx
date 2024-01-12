@@ -15,6 +15,14 @@ import {
 import { shortenTxHash } from "src/scripts/utils/address";
 
 function ProposedModal(props) {
+	const handleCheckProposal = async () => {
+		console.log("handleCheckProposal in Modal");
+
+		await props.handleCheckProposal();
+		console.log("props.handleCheckProposal done");
+		props.onClose();
+		console.log("onClose");
+	};
 	return (
 		<>
 			<Modal
@@ -61,6 +69,15 @@ function ProposedModal(props) {
 											</Link>
 										</VStack>
 									</Flex>
+									<Text
+										onClick={handleCheckProposal}
+										cursor="pointer"
+										textDecoration="underline"
+										_hover={{ color: "cyan" }}
+										mt={7}
+									>
+										See the proposal details 👀
+									</Text>
 								</Flex>
 							</ModalBody>
 						</Box>

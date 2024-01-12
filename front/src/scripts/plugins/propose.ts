@@ -13,7 +13,7 @@ import {
 	nonce,
 	pluginIface,
 } from "../utils/contracts";
-import { parseUint8ArrayToBytes32 } from "../utils/parser";
+import { parseUint8ArrayToBytes32 } from "../utils/helper";
 import { txResult, error } from "./types";
 import {
 	computeMessage,

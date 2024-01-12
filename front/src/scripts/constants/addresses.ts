@@ -6,7 +6,8 @@ const deployedContracts = {
 	manager: "0xfA98364994203058cd994E87BE2Af9ee92A407fD",
 };
 
-const isLOCAL: boolean = process.env.REACT_APP_ENV === "LOCAL";
+//const isLOCAL: boolean = process.env.REACT_APP_ENV === "LOCAL";
+const isLOCAL: boolean = true;
 
 // deployed contract addresses
 export const contracts = {

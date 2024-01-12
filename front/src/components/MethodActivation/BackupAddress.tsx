@@ -4,62 +4,28 @@ import {
 	Button,
 	Text,
 	VStack,
-	Select,
 	Tooltip,
-	FormControl,
 	Flex,
 	Spinner,
 	useDisclosure,
-	Icon,
 } from "@chakra-ui/react";
-import { InfoIcon, InfoOutlineIcon } from "@chakra-ui/icons";
+import { InfoIcon } from "@chakra-ui/icons";
 import { inputStyle } from "src/theme";
-import { useContext, useState, useEffect } from "react";
-import UserDataContext from "src/contexts/userData";
-import {
-	_isMethodEnabled,
-	_addEcrecoverRecover,
-} from "../../scripts/plugins/index";
+import { useState } from "react";
 import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
+import { DelayPeriod, DelayInputForm } from "./Common";
+import useIsMethodEnabled from "src/hooks/useIsMethodEnabled";
+import useAddRecover from "src/hooks/useAddRecover";
 
-const EnableBackupAddress = () => {
-	const { safeSDK, isPluginEnabled, pluginAddress } =
-		useContext(UserDataContext);
-	const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
-	const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false);
-	const [unit, setUnit] = useState<number>(1);
-	const [delayValue, setDelayValue] = useState(0);
-	const [loading, setLoading] = useState(false);
-	const [errorMessage, setErrorMessage] = useState<string>("");
-	const [txHash, setTxHash] = useState<string>("");
+const EnableBackupAddress = (props) => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const [openProposedModal, setOpenProposedModal] = useState(false);
-	const [result, setResult] = useState<boolean>(false);
+	const { isMethodEnabled } = useIsMethodEnabled(props.methodIndex);
+	const { loading, errorMessage, txHash, result, setErrorMessage, addRecover } =
+		useAddRecover(onOpen);
 
-	useEffect(() => {
-		(async () => {
-			if (isPluginEnabled) {
-				const isMethodEnabled = await _isMethodEnabled(1, pluginAddress);
-				console.log("isMethodEnabled: ", isMethodEnabled);
-				if (isMethodEnabled) {
-					setIsMethodEnabled(isMethodEnabled);
-				}
-			}
-		})();
-	});
-
-	// Function to open the modal from the parent
-	const openModal = () => {
-		setOpenProposedModal(true);
-		onOpen();
-	};
-
-	// Function to close the modal from the parent
-	const closeModal = () => {
-		setOpenProposedModal(false);
-		onClose();
-	};
+	const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
+	const [delayValue, setDelayValue] = useState(0);
 
 	return (
 		<Box pt="10px">
@@ -82,20 +48,11 @@ const EnableBackupAddress = () => {
 									placement="bottom-start"
 									label="`Backup adddress` should not be one of the Safe owners "
 								>
-									<InfoIcon mr={2} mt={0.5} boxSize={3} />
+									<InfoIcon mr={2} mt={0.5} boxSize={3} color="blue.500" />
 								</Tooltip>
 								<Text>1. Backup address :</Text>
 							</Flex>
-							<Flex justifyContent="space-between" alignItems="center">
-								<Tooltip
-									placement="bottom-start"
-									label="`Delay Period` refers to the period of time until a recovery proposal becomes executable after the proposal is made.
-                  *Recommendation: >30 days in prod. <10 seconds in test."
-								>
-									<InfoIcon mr={2} mt={0.5} boxSize={3} />
-								</Tooltip>
-								<Text>2. Delay period :</Text>
-							</Flex>
+							<DelayPeriod index={2} />
 						</VStack>
 						<VStack spacing={3.5} fontSize={14} align="end" w="345px" ml={2}>
 							<Input
@@ -106,37 +63,7 @@ const EnableBackupAddress = () => {
 								placeholder="0xAbCd..."
 								onChange={(e) => setPendingNewOwner(e.target.value)}
 							/>
-							<FormControl>
-								<Box display="flex" alignItems="center">
-									<Input
-										sx={inputStyle}
-										textAlign="center"
-										size="xl"
-										mr="10px"
-										type="number"
-										placeholder="10"
-										onChange={(e) =>
-											setDelayValue(Number(e.target.value) * unit)
-										}
-									/>
-									<Select
-										w={"30%"}
-										size="xl"
-										borderRadius={"2px"}
-										sx={{
-											textAlign: "center", // Center the text horizontally
-											pr: "15px", // Add padding on the left side
-											pb: "4px",
-										}}
-										onChange={(e) => setUnit(Number(e.target.value))}
-									>
-										<option value="1">sec</option>
-										<option value="60">min</option>
-										<option value="3600">hour</option>
-										<option value="86400">day</option>
-									</Select>
-								</Box>
-							</FormControl>
+							<DelayInputForm setDelayValue={setDelayValue} />
 						</VStack>
 					</Flex>
 					<Box
@@ -147,28 +74,17 @@ const EnableBackupAddress = () => {
 						<Button
 							sx={{ mt: "35px" }}
 							colorScheme="teal"
+							isLoading={loading}
+							loadingText="Enabling"
 							w="35%"
 							onClick={async () => {
 								if (pendingNewOwner !== "") {
-									setLoading(true);
-									const ret = await _addEcrecoverRecover(
-										safeSDK,
-										pluginAddress,
+									setErrorMessage("");
+									await addRecover({
+										methodIndex: props.methodIndex,
 										pendingNewOwner,
-										delayValue
-									);
-									console.log("ret: ", ret);
-									if (ret.result) {
-										setResult(true);
-									} else if (!ret.result && ret.txHash === "") {
-										console.log("ret.result: ", ret.result);
-										setErrorMessage("Something went wrong");
-										setLoading(false);
-										return;
-									}
-									setTxHash(ret.txHash);
-									openModal();
-									setLoading(false);
+										delayValue,
+									});
 								} else {
 									setErrorMessage("New owner address not set");
 								}
@@ -176,11 +92,6 @@ const EnableBackupAddress = () => {
 						>
 							Enable method
 						</Button>
-						{loading && (
-							<Flex justifyContent="center" alignItems="center">
-								<Spinner mt={10} color="gray.300" />
-							</Flex>
-						)}
 						<Text mt={4} color="red.500" mb={4}>
 							{errorMessage}
 						</Text>
@@ -193,9 +104,9 @@ const EnableBackupAddress = () => {
 				</Box>
 			)}
 			<EnabledModal
-				isOpen={isOpen || openProposedModal}
+				isOpen={isOpen}
 				onOpen={onOpen}
-				onClose={closeModal}
+				onClose={onClose}
 				result={result}
 				txHash={txHash}
 				enable={true}

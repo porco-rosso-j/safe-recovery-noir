@@ -13,24 +13,12 @@ import EnabledModal from "../Modals/EnabledModal";
 
 const MethodRemoval = (props) => {
 	const { safeSDK, pluginAddress } = useContext(UserDataContext);
+	const { isOpen, onOpen, onClose } = useDisclosure();
+
 	const [loading, setLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const [txHash, setTxHash] = useState<string>("");
-	const { isOpen, onOpen, onClose } = useDisclosure();
-	const [openProposedModal, setOpenProposedModal] = useState(false);
 	const [result, setResult] = useState<boolean>(false);
-
-	// Function to open the modal from the parent
-	const openModal = () => {
-		setOpenProposedModal(true);
-		onOpen();
-	};
-
-	// Function to close the modal from the parent
-	const closeModal = () => {
-		setOpenProposedModal(false);
-		onClose();
-	};
 
 	return (
 		<Box textAlign="center" alignItems="center">
@@ -38,6 +26,8 @@ const MethodRemoval = (props) => {
 				sx={{ mt: "35px" }}
 				bg="#C53030"
 				color="white"
+				isLoading={loading}
+				loadingText="Removing"
 				_hover={{
 					bg: "#9B2C2C",
 				}}
@@ -46,7 +36,7 @@ const MethodRemoval = (props) => {
 					setErrorMessage("");
 
 					setLoading(true);
-					const ret = await await _removeRecover(
+					const ret = await _removeRecover(
 						safeSDK,
 						pluginAddress,
 						props.method
@@ -61,24 +51,19 @@ const MethodRemoval = (props) => {
 						return;
 					}
 					setTxHash(ret.txHash);
-					openModal();
+					onOpen();
 					setLoading(false);
 				}}
 			>
 				Disable this method
 			</Button>
-			{loading && (
-				<Flex justifyContent="center" alignItems="center">
-					<Spinner mt={10} color="gray.300" />
-				</Flex>
-			)}
 			<Text mt={4} color="red.500" mb={4}>
 				{errorMessage}
 			</Text>
 			<EnabledModal
-				isOpen={isOpen || openProposedModal}
+				isOpen={isOpen}
 				onOpen={onOpen}
-				onClose={closeModal}
+				onClose={onClose}
 				result={result}
 				txHash={txHash}
 				enable={false}

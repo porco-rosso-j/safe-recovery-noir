@@ -5,7 +5,7 @@ import { ChakraProvider, Box, Container } from "@chakra-ui/react";
 import useUserData from "src/hooks/useUserData";
 import UserDataContext from "src/contexts/userData";
 
-import Onboard from "src/components/Onboard";
+import MenuTabs from "src/components/MenuTabs";
 import chakraDefaultTheme from "src/theme";
 
 function App() {
@@ -53,7 +53,7 @@ function App() {
 				}}
 			>
 				<Header />
-				<Container height={1000}>
+				<Container>
 					<Box
 						mt="10"
 						display="flex"
@@ -61,7 +61,7 @@ function App() {
 						justifyContent="center"
 						alignItems="center"
 					>
-						{getShowLoginPage() ? <WalletLogin /> : <Onboard />}
+						{getShowLoginPage() ? <WalletLogin /> : <MenuTabs />}
 					</Box>
 				</Container>
 				<Footer />

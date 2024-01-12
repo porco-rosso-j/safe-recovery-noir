@@ -1,4 +1,4 @@
-import { parseUint8ArrayToBytes32 } from "./parser";
+import { parseUint8ArrayToBytes32 } from "./helper";
 import { pedersenHash } from "./pedersen";
 
 export async function getHashFromSecret(_secret: string): Promise<string> {
