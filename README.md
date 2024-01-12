@@ -84,9 +84,9 @@ yarn start
 
 #### Goerli
 
-- SafeProtocolRegistry: `0xDF2D7534b67d5a5130F998c1368D980c82FdD99f`
-- SafeProtocolManager: `0xC5C5aeF4A4E0fB216e64BA63D5A1C3022ac4CDB8`
-- SafeRecoverFactory: `0xfA98364994203058cd994E87BE2Af9ee92A407fD`
+- SafeProtocolRegistry: `0x5013b288578Bb821E6b3785Dc0B62393bBE59c8D`
+- SafeProtocolManager: `0x2ffF293deD0D9d00DFFEcAa5FaC7d5F85387655E`
+- SafeRecoverFactory: `0x7A3C7e5f5bD7C200E522E360C475524032453D53`
 
 ## References
 
