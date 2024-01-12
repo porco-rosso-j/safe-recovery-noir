@@ -1,9 +1,9 @@
 import dep from "./addresses.json";
 
 const deployedContracts = {
-	registry: "0xDF2D7534b67d5a5130F998c1368D980c82FdD99f",
-	factory: "0xC5C5aeF4A4E0fB216e64BA63D5A1C3022ac4CDB8",
-	manager: "0xfA98364994203058cd994E87BE2Af9ee92A407fD",
+	registry: "0x5013b288578Bb821E6b3785Dc0B62393bBE59c8D",
+	factory: "0x2ffF293deD0D9d00DFFEcAa5FaC7d5F85387655E",
+	manager: "0x7A3C7e5f5bD7C200E522E360C475524032453D53",
 };
 
 //const isLOCAL: boolean = process.env.REACT_APP_ENV === "LOCAL";
