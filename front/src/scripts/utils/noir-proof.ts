@@ -33,13 +33,8 @@ export async function generateProofK256(
 
 	console.log("input: ", input);
 
-	// const proof: ProofData = await noir.generateFinalProof(input);
-	// console.log("proof: ", proof);
-	const proof = dummyProof();
-	console.log("new Date().valueOf(): ", new Date().valueOf());
-	// /
-	// // const { witness } = await noir.execute(input);
-	// // const proof = await backend.generateFinalProof(witness);
+	const proof: ProofData = await noir.generateFinalProof(input);
+	console.log("proof: ", proof);
 
 	// const result = await noir.verifyFinalProof(proof);
 	// console.log("result: ", result);
@@ -48,7 +43,6 @@ export async function generateProofK256(
 }
 
 export async function generateProofP256(
-	// webauthnInputs: any, // string
 	signature: Uint8Array, // BigNumber
 	pubkey_x: Uint8Array, // bytes32[]
 	pubkey_y: Uint8Array, // bytes32[],
@@ -79,15 +73,9 @@ export async function generateProofP256(
 
 	console.log("input: ", input);
 
-	console.log("Math.random(): ", Math.random());
-
-	// const proof: ProofData = await noir.generateFinalProof(input);
-	// console.log("proof: ", proof);
-	// console.log("proof: ", proof.publicInputs);
-	const proof = dummyProof();
+	const proof: ProofData = await noir.generateFinalProof(input);
 	console.log("proof: ", proof);
-	// // const { witness } = await noir.execute(input);
-	// // const proof = await backend.generateFinalProof(witness);
+	console.log("proof: ", proof.publicInputs);
 
 	// const result = await noir.verifyFinalProof(proof);
 	// console.log("result: ", result);
@@ -150,10 +138,10 @@ export async function generateProofSocial(
 
 	console.log("input: ", input);
 
-	// const proof: ProofData = await noir.generateFinalProof(input);
-	// console.log("proof: ", proof);
-	const proof = dummyProof();
+	const proof: ProofData = await noir.generateFinalProof(input);
 	console.log("proof: ", proof);
+	// const proof = dummyProof();
+	// console.log("proof: ", proof);
 
 	// // const { witness } = await noir.execute(input);
 	// // const proof = await backend.generateFinalProof(witness);
@@ -164,10 +152,10 @@ export async function generateProofSocial(
 	return proof;
 }
 
-const dummyProof = (): ProofData => {
-	const dummy: ProofData = {
-		proof: new Uint8Array(new Date().valueOf() % 1000),
-		publicInputs: [new Uint8Array(0)],
-	};
-	return dummy;
-};
+// const dummyProof = (): ProofData => {
+// 	const dummy: ProofData = {
+// 		proof: new Uint8Array(new Date().valueOf() % 1000),
+// 		publicInputs: [new Uint8Array(0)],
+// 	};
+// 	return dummy;
+// };

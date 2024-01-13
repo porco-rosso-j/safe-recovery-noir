@@ -13,7 +13,6 @@ contract WebAuthnRecover is RecoverBase {
 
     function addWebAuthnRecover(
         uint _recoveryTimeLock,
-        // bytes32[] memory _pubkeyForVerifier,
         bytes32 _pubkey_x,
         bytes32 _pubkey_y,
         string memory _credentialId

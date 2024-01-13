@@ -1,6 +1,7 @@
 import { Fr } from "@aztec/bb.js";
 import { MerkleTree } from "./merkle";
 import { pedersenHash } from "../pedersen";
+import { ethers } from "ethers";
 
 export async function getMerkleRootFromAddresses(
 	addresses: string[]
@@ -85,6 +86,10 @@ export async function getNullifierHashAndHashPath(
 		hash_path.push(pathElements[i].toString());
 	}
 	console.log("hash_path: ", hash_path);
+
+	console.log("nodes[index]: ", nodes[index]);
+	console.log("proposal_id: ", proposal_id);
+	console.log("address: ", address);
 
 	const nullifierHash = await pedersenHash([
 		nodes[index],

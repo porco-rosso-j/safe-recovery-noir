@@ -5,7 +5,7 @@ libs = ["lib"]
 test = "test"
 ffi = true
 auto_detect_solc = false
-solc_version = '0.8.18'
+solc_version = '0.8.20'
 optimizer_runs = 5_000
 optimizer = true
 

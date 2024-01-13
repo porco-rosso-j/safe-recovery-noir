@@ -1,8 +1,31 @@
-pragma solidity 0.8.18;
+pragma solidity 0.8.20;
 
 import "forge-std/console.sol";
 
 contract Inputs {
+    bytes32 public secret_test =
+        0x15a52a0d6f0eedd4f63d72cb8275ae6826dcd005eafee769658486a2d3c09e1d;
+
+    bytes32 public hashedAddr =
+        0x01e32ef55c3585d88ccf0201b61bd7dea1f69b13f251ba9082cf0cb190d47071;
+
+    bytes32 public publickey_x =
+        0x0873dcbc0494eccea0a842a731ac7f2804edff2786502dc64b78e2e119baa7a6;
+    bytes32 public publickey_y =
+        0x30f46d04b51fc3fc97446d3ee8df91a0c0f4d64ce969fa416176b5ee95bc61e3;
+
+    bytes32 public guardiansRoot =
+        0x11d01c0067d1e894a83c6ac6f935a31e250f9f723f71a4e53b24ae29f47213d2;
+
+    bytes32 public guardiansRoot2 =
+        0x159203bdb93e44c9069d2dea34abdc548c58f22de8a0aaf57f320576a7debb21;
+
+    bytes32 public nullifierHash =
+        0x2b8caa407eb3bc33aa3b46a6d20ec396dbece04566c10a5acdfdf91da95bc525;
+
+    bytes32 public nullifierHash2 =
+        0x2c859828f7a8f32a26583cbbbecc0b4ff84c1ce7ce336ae88ed68ff59cc13cca;
+
     uint8[] public pubkey_x = [
         8,
         115,
@@ -200,9 +223,6 @@ contract Inputs {
         return array;
     }
 
-    bytes32 public hashedAddr =
-        0x11afe536a3d158d626aabefad9dc7a70ef5f23280d262cd7db5da5bd8d5f87e6;
-
     // for ecrecover-k256
     uint8[] public pubkey = [
         131,
@@ -340,7 +360,4 @@ contract Inputs {
         106,
         33
     ];
-
-    bytes32 public guardiansRoot =
-        0x2449e58ea6122681cf6b4041d8b17e88979ec0a467000c7230c2cfebf8742944;
 }

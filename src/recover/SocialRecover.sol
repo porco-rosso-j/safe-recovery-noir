@@ -49,7 +49,6 @@ contract SocialRecover is RecoverBase {
     ) internal view returns (bytes32[] memory) {
         _publicInputs[0] = guardiansRoot;
         _publicInputs[1] = bytes32(_proposalId);
-        //_publicInputs[1] = bytes32(0);
         _publicInputs[2] = _nullifierHash;
 
         for (uint i = 0; i < 32; i++) {

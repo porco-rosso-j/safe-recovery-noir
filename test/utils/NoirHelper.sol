@@ -1,4 +1,4 @@
-pragma solidity 0.8.18;
+pragma solidity 0.8.20;
 
 // import {TestBase} from "forge-std/Base.sol";
 import "./Inputs.sol";
@@ -61,13 +61,7 @@ contract NoirHelper is Inputs, Test {
         string memory fileName
     ) public view returns (bytes memory) {
         string memory file = vm.readFile(
-            string.concat(
-                "circuits/recoveries/",
-                path,
-                "/proofs/",
-                fileName,
-                ".proof"
-            )
+            string.concat("circuits/", path, "/proofs/", fileName, ".proof")
         );
         return vm.parseBytes(file);
     }

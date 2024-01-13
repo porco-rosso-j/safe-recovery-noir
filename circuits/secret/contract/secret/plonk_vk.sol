@@ -1,11 +1,11 @@
-// Verification Key Hash: c14bcc48cb2e57c8a95dc518f00354e5fa9c80e3768466b8089922963b0fd35d
+// Verification Key Hash: 8afebcc7bea9acd848d9a7e1196d3297e6c799d655b90b1f36c4cbc41a17a863
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2022 Aztec
 pragma solidity >=0.8.4;
 
 library UltraVerificationKey {
     function verificationKeyHash() internal pure returns(bytes32) {
-        return 0xc14bcc48cb2e57c8a95dc518f00354e5fa9c80e3768466b8089922963b0fd35d;
+        return 0x8afebcc7bea9acd848d9a7e1196d3297e6c799d655b90b1f36c4cbc41a17a863;
     }
 
     function loadVerificationKey(uint256 _vk, uint256 _omegaInverseLoc) internal pure {
@@ -18,10 +18,10 @@ library UltraVerificationKey {
             mstore(add(_vk, 0xa0), 0x12ab5d2c3168a79bbab983be33fa1fc666c3841fce55148d894b6ef5da3a0f33) // vk.Q1.y
             mstore(add(_vk, 0xc0), 0x271da36b7a253f7054f85902d012fa2377e043ef502c346561a78e9fdd42a92d) // vk.Q2.x
             mstore(add(_vk, 0xe0), 0x27c6c2ca38ab5180ffb29170e02dae8eeee5832e494491d541db3aa82e91e72e) // vk.Q2.y
-            mstore(add(_vk, 0x100), 0x137bb6b4c621c5f28ac29efde82892e9859e9f188fbf312dec5a9aff0a905483) // vk.Q3.x
-            mstore(add(_vk, 0x120), 0x1de3f229f6858f360db885ca0601228ebeb3826d6c071ac63b4a159719db4ca4) // vk.Q3.y
-            mstore(add(_vk, 0x140), 0x2e453baec6b92af957582dd34b874cb311e4e291dd7295d0a6c9db47a2221501) // vk.Q4.x
-            mstore(add(_vk, 0x160), 0x1307282bddd36e601ef85738e1411faa7c1a03df2ab0704ddb3d1118dcbcf066) // vk.Q4.y
+            mstore(add(_vk, 0x100), 0x12d038de8b36820d357de5209d6c20bcadff2a88a2c7949595a97e16504c011a) // vk.Q3.x
+            mstore(add(_vk, 0x120), 0x1b84f37cec35034a9ffaef8b66c45277b2ac7c54005170ccafc07e7699a49bf0) // vk.Q3.y
+            mstore(add(_vk, 0x140), 0x22888a6f6ead08ec50d06a562010951a3e89aa6a5a494c5a194654946bdc7e34) // vk.Q4.x
+            mstore(add(_vk, 0x160), 0x0f134a04d795641aecb16f19609438c36b8f3967381b92d42c991ede9a73ea6e) // vk.Q4.y
             mstore(add(_vk, 0x180), 0x1a07c6a36765980d58687d87f5f705ca8b20a3fa65530f9e505e5bcb507a5363) // vk.Q_M.x
             mstore(add(_vk, 0x1a0), 0x045549fdafd698f186b49b3b1e4c9200ac2843b1107b7ead4435d40a98db9022) // vk.Q_M.y
             mstore(add(_vk, 0x1c0), 0x03c6c2d16a48e04a9980d86fea0a3f4f016bc369a0ea412be1e836e1c2869df6) // vk.Q_C.x

@@ -1,6 +1,6 @@
 {
-    "noir_version": "0.19.2+47f0130c0d154f1b70eb23f376783beb3f23ad72",
-    "hash": 338952826011822498,
+    "noir_version": "0.19.4+4d133c50a50f21ca23861a9d1987207bd8783d36",
+    "hash": 661739274933186597,
     "backend": "acvm-backend-barretenberg",
     "abi": {
         "parameters": [

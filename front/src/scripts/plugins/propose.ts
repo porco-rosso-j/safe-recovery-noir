@@ -250,20 +250,26 @@ export async function _proposeSocialRecover(
 			utils.arrayify(signature)
 		);
 
-		const proposalId = Number(await getRecoveryCount(pluginAddr)) + 1;
+		const proposalId = ethers.utils.hexlify(
+			Number(await getRecoveryCount(pluginAddr)) + 1
+		);
+		console.log("proposalId: ", proposalId);
 		const root = await getGuardiansRoot(pluginAddr);
+		console.log("root _proposeSocialRecover: ", root);
 
 		const response: NullifierHashAndHashPath =
 			await getNullifierHashAndHashPath(
 				root,
 				await signer.getAddress(),
-				proposalId.toString()
+				proposalId
 			);
+
+		console.log("response NullifierHashAndHashPath: ", response);
 
 		const ret = await generateProofSocial(
 			root,
 			response.nullHash,
-			proposalId.toString(),
+			proposalId,
 			utils.arrayify(pubkey).slice(1, 65),
 			utils.arrayify(signature).slice(0, -1),
 			utils.arrayify(msgHash),
@@ -322,13 +328,13 @@ export async function _approveSocialRecovery(
 	const { index, nullHash, hashPath } = await getNullifierHashAndHashPath(
 		root,
 		await signer.getAddress(),
-		proposalId.toString()
+		utils.hexlify(proposalId)
 	);
 
 	const ret = await generateProofSocial(
 		root,
 		nullHash,
-		proposalId.toString(),
+		utils.hexlify(proposalId),
 		utils.arrayify(pubkey).slice(1, 65),
 		utils.arrayify(signature).slice(0, -1),
 		utils.arrayify(msgHash),

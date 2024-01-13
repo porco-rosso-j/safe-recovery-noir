@@ -40,15 +40,6 @@ contract Deploy is Script {
             socialVerifier
         );
 
-        // recoveryPlugin = RecoveryPluginNoir(
-        //     factory.createRecoveryPluginNoir(
-        //         safeAddr,
-        //         0 // salt
-        //     )
-        // );
-
-        // registry.addModule(address(recoveryPlugin), 1);
-
         console.logString("registry");
         console.logAddress(address(registry));
         console.logString("factory");

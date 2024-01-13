@@ -33,7 +33,7 @@ export class MerkleTree implements IMerkleTree {
 
 	async initialize(defaultLeaves: Fr[]) {
 		// this.bb = await Barretenberg.new(cpus().length);
-		this.bb = await Barretenberg.new(8);
+		this.bb = await Barretenberg.new();
 		// build zeros depends on tree levels
 		let currentZero = this.zeroValue;
 		this.zeros.push(currentZero);
@@ -51,7 +51,7 @@ export class MerkleTree implements IMerkleTree {
 	// func to reinitialzie MerkleTree class with hashed nodes
 	async initializeFromRootAndLeaves(root: Fr, hashedLeaves: Fr[]) {
 		// this.bb = await Barretenberg.new(cpus().length);
-		this.bb = await Barretenberg.new(8);
+		this.bb = await Barretenberg.new();
 
 		// Set the provided root
 		this.storage.set(MerkleTree.indexToKey(this.levels, 0), root);

@@ -34,20 +34,20 @@
     jsonpointer "^5.0.0"
     leven "^3.1.0"
 
-"@aztec/bb.js@0.12.0":
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/@aztec/bb.js/-/bb.js-0.12.0.tgz#c24ff586438b19ca49dbc5b06676f646969533b5"
-  integrity sha512-KBV1WHLvLo2foum3mzPkDtiLtedNSLAx4i3Oroex6X9OaP5ZF/KYKwCYo4vn4CJJgISoD4feC6D29D+CY1PY6w==
+"@aztec/bb.js@0.14.2":
+  version "0.14.2"
+  resolved "https://registry.yarnpkg.com/@aztec/bb.js/-/bb.js-0.14.2.tgz#f77e5b4769436df7e50e5ae56c9b034afbbc6e6a"
+  integrity sha512-XvXC75MPF3wGykstMX6cDNb0lWjT2zKkxn7tqfVnt9ibHXmiMivwwnN1iUlVRHtJaADVDntHi7/OuBBKkHAoMg==
   dependencies:
     comlink "^4.4.1"
     commander "^10.0.1"
     debug "^4.3.4"
     tslib "^2.4.0"
 
-"@aztec/bb.js@0.14.2":
-  version "0.14.2"
-  resolved "https://registry.yarnpkg.com/@aztec/bb.js/-/bb.js-0.14.2.tgz#f77e5b4769436df7e50e5ae56c9b034afbbc6e6a"
-  integrity sha512-XvXC75MPF3wGykstMX6cDNb0lWjT2zKkxn7tqfVnt9ibHXmiMivwwnN1iUlVRHtJaADVDntHi7/OuBBKkHAoMg==
+"@aztec/bb.js@0.16.0":
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/@aztec/bb.js/-/bb.js-0.16.0.tgz#b99632ee378f4154111a865195ea88817f5e79d3"
+  integrity sha512-RWx0Oiml+bgOA+cqdh+/jynLIUOFHKFsPpk7L9gWz8Di0UZg9AoTSSOG+pR3il5EGWA4cJp5Wp3ikOSq62gC7g==
   dependencies:
     comlink "^4.4.1"
     commander "^10.0.1"
@@ -3115,40 +3115,40 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@noir-lang/acvm_js@0.33.0":
-  version "0.33.0"
-  resolved "https://registry.yarnpkg.com/@noir-lang/acvm_js/-/acvm_js-0.33.0.tgz#556655584ecb55e231ca73eaacc493cad0b2242b"
-  integrity sha512-4e53SFUB7t05Q3n/0pLZ38LKDdvm7nhfmt2dFSnFgj9dgjRgzgDVSSWIoFWkAWC9oYlYVNJvHpeFyaDHVRFl0w==
+"@noir-lang/acvm_js@0.35.0":
+  version "0.35.0"
+  resolved "https://registry.yarnpkg.com/@noir-lang/acvm_js/-/acvm_js-0.35.0.tgz#81130d0236c259b2fb47b0d8efc577bbb5ee18f9"
+  integrity sha512-LiQUSF3P4/1VGfMZc0hSivLs4oiPsRt+ADFBMF7sOg4oaImeQ4L6tu0Og2Wh1Pc0k2y1EXdv1EKxN2N1WRDdKg==
 
-"@noir-lang/backend_barretenberg@0.19.2":
-  version "0.19.2"
-  resolved "https://registry.yarnpkg.com/@noir-lang/backend_barretenberg/-/backend_barretenberg-0.19.2.tgz#c4862662cdcbbfba2723ad05c8443b8aa3abeeec"
-  integrity sha512-rsD7tGuAzOYsXQBlQrjc9HHO/l3TwH/0RPohhWmuba5MW9+j1rvttJk4Ve75ku/fkP6oLyBudwC4XWCvjZbGeQ==
+"@noir-lang/backend_barretenberg@0.19.4":
+  version "0.19.4"
+  resolved "https://registry.yarnpkg.com/@noir-lang/backend_barretenberg/-/backend_barretenberg-0.19.4.tgz#77deb7fc365466437b3ddd7fc97a74f01870f1dd"
+  integrity sha512-gk8uyx3qJAXp7hNgzBpAyyoK5BV/8zoB+kQqVStuue6D9ByMTxvqL3juJ0Ivm+NYN/IqBIIkuFNTgiaD/2gHsA==
   dependencies:
-    "@aztec/bb.js" "0.12.0"
-    "@noir-lang/types" "0.19.2"
+    "@aztec/bb.js" "0.16.0"
+    "@noir-lang/types" "0.19.4"
     fflate "^0.8.0"
 
-"@noir-lang/noir_js@0.19.2":
-  version "0.19.2"
-  resolved "https://registry.yarnpkg.com/@noir-lang/noir_js/-/noir_js-0.19.2.tgz#6234503d1a3f31fdabd978367803c8a80a5470ee"
-  integrity sha512-Zp1dL4O43Q4sNMp13Ofu1a+oAL28d7ZG/Xy4LKnaWypHFu/abRgdk4VYrppEkGmmwWJSCkLBevDb9hXk3+TSwg==
+"@noir-lang/noir_js@0.19.4":
+  version "0.19.4"
+  resolved "https://registry.yarnpkg.com/@noir-lang/noir_js/-/noir_js-0.19.4.tgz#e71fc27e28a17cd03b21e498aaaf0f901b2bb75e"
+  integrity sha512-V/3jLoor3dMuYuv0ad154M0Ko1xZWxx0qoRDLC/Y/xMH5Wbe5yH4yOvBjCXzQ0dLG5JX1IWGOCC7xxzpStk+hA==
   dependencies:
-    "@noir-lang/acvm_js" "0.33.0"
-    "@noir-lang/noirc_abi" "0.19.2"
-    "@noir-lang/types" "0.19.2"
+    "@noir-lang/acvm_js" "0.35.0"
+    "@noir-lang/noirc_abi" "0.19.4"
+    "@noir-lang/types" "0.19.4"
 
-"@noir-lang/noirc_abi@0.19.2":
-  version "0.19.2"
-  resolved "https://registry.yarnpkg.com/@noir-lang/noirc_abi/-/noirc_abi-0.19.2.tgz#ebbda039179f760570e86c98f9e327b73d318f34"
-  integrity sha512-G2Gl2TMhpkKmvJdcb6cqVMD0a/DkEETP7MkrV+WICU46GpwJqx32f4l0J/j185q20BABSssCc9ztfDtg1pwPWw==
+"@noir-lang/noirc_abi@0.19.4":
+  version "0.19.4"
+  resolved "https://registry.yarnpkg.com/@noir-lang/noirc_abi/-/noirc_abi-0.19.4.tgz#a51e76efabf70d49de92ca0a114ef5721ab857a4"
+  integrity sha512-g3fa3rVGyvnqu1BQdXytCPzIFQDvK1kH9uMjNrEz5UG/LKl+EPvIl1Te8FcOsSi5/eVSbMWveyz3HJu+SwMjDQ==
 
-"@noir-lang/types@0.19.2":
-  version "0.19.2"
-  resolved "https://registry.yarnpkg.com/@noir-lang/types/-/types-0.19.2.tgz#882c396f20d7639072dde47498699ae6771b3cf4"
-  integrity sha512-I0seLib7v60BiTFuCRvztzmKy4TKEvCGx+m8pd1xHtnxAkm+9ISpHn/OoTZK8T4/kTsLhChP3ZiNEdtEvhrNlA==
+"@noir-lang/types@0.19.4":
+  version "0.19.4"
+  resolved "https://registry.yarnpkg.com/@noir-lang/types/-/types-0.19.4.tgz#bef8fc4d4023b78cfb77c66272418a1c5ea55327"
+  integrity sha512-NInyF1IQ1qNidhqyu1dxIYMatehnLI7eZz+9DaWH9t8TDA1RjIiUZ3wF2j/ukeTrk3RrhS+wj4t2cCVwv/aEiA==
   dependencies:
-    "@noir-lang/noirc_abi" "0.19.2"
+    "@noir-lang/noirc_abi" "0.19.4"
 
 "@pmmmwh/react-refresh-webpack-plugin@^0.5.3":
   version "0.5.11"

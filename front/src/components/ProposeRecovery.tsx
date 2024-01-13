@@ -196,7 +196,7 @@ const ProposeRecovery = (props: {
 						) : loading && props.methodIndex === 2 ? (
 							<Text mt={5}>
 								{" "}
-								*you need to provide fingerprint or Yubikey PIN <br />
+								*you need to provide TouchID fingerprint or Yubikey PIN <br />
 								for WebAuthn to generate zk-proof{" "}
 							</Text>
 						) : null}

@@ -87,8 +87,8 @@ contract RecoveryPluginNoir is
 
         publicInputs = _getPublicInputEcrecover(publicInputs, _message);
 
-        // if (!IUltraVerifier(ecrecoverVerifier).verify(_proof, publicInputs))
-        //     revert PROOF_VERIFICATION_FAILED();
+        if (!IUltraVerifier(ecrecoverVerifier).verify(_proof, publicInputs))
+            revert PROOF_VERIFICATION_FAILED();
 
         recoveryNullifiers[RECOVERY_TYPE_K256][proofNullifier] = true;
 
@@ -127,8 +127,8 @@ contract RecoveryPluginNoir is
         bytes32[] memory publicInputs = new bytes32[](32);
         publicInputs = _getPublicInputWebAuthn(message);
 
-        // if (!IUltraVerifier(webAuthnVerifier).verify(_proof, publicInputs))
-        //     revert PROOF_VERIFICATION_FAILED();
+        if (!IUltraVerifier(webAuthnVerifier).verify(_proof, publicInputs))
+            revert PROOF_VERIFICATION_FAILED();
 
         recoveryNullifiers[RECOVERY_TYPE_P256][proofNullifier] = true;
 
@@ -202,16 +202,17 @@ contract RecoveryPluginNoir is
         );
 
         bytes32[] memory publicInputs = new bytes32[](35);
+        uint _proposalId = recoveryCount + 1;
 
         publicInputs = _getPublicInputSocial(
-            recoveryCount + 1,
+            _proposalId,
             publicInputs,
             _message,
             _nullifierHash
         );
 
-        // if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
-        //     revert PROOF_VERIFICATION_FAILED();
+        if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
+            revert PROOF_VERIFICATION_FAILED();
 
         recoveryNullifiers[RECOVERY_TYPE_SOCIAL][proofNullifier] = true;
 
@@ -248,8 +249,8 @@ contract RecoveryPluginNoir is
             nullifierHash
         );
 
-        // if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
-        //     revert PROOF_VERIFICATION_FAILED();
+        if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
+            revert PROOF_VERIFICATION_FAILED();
 
         recoveryNullifiers[RECOVERY_TYPE_SOCIAL][proofNullifier] = true;
 

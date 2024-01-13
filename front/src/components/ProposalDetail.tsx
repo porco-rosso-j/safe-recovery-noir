@@ -184,7 +184,7 @@ const ProposalDetail = (props: {
 							<Text>{props.proposal.approvals}</Text>
 						) : null}
 						{props.proposal.type === 4 ? (
-							<Text>{props.proposal.threshold}</Text>
+							<Text>{socialRecoveryThreshold}</Text>
 						) : null}
 						<Text>{isRecoveryExecutable ? "Yes" : "No"}</Text>
 

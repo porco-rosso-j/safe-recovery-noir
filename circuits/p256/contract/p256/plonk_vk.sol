@@ -1,11 +1,11 @@
-// Verification Key Hash: e1f107d72c9001bdab618b0e1fb07925d5b61dd53f070d804566237e8dc4b38f
+// Verification Key Hash: a416ea10510ffeb305ac1f6006bc016d40f2add63f0996a631f5831180f692f1
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2022 Aztec
 pragma solidity >=0.8.4;
 
 library UltraVerificationKey {
     function verificationKeyHash() internal pure returns(bytes32) {
-        return 0xe1f107d72c9001bdab618b0e1fb07925d5b61dd53f070d804566237e8dc4b38f;
+        return 0xa416ea10510ffeb305ac1f6006bc016d40f2add63f0996a631f5831180f692f1;
     }
 
     function loadVerificationKey(uint256 _vk, uint256 _omegaInverseLoc) internal pure {
@@ -34,10 +34,10 @@ library UltraVerificationKey {
             mstore(add(_vk, 0x2a0), 0x16e1bbb0a7728dcb7696fdf3361b39510c6a4f83cc2159f5fc65ceb2be0599f9) // vk.Q_ELLIPTIC.y
             mstore(add(_vk, 0x2c0), 0x05c2f9d9a59a719a83b90645f84d73b5d1ef86eb84a3ef62fbff5de32decfdb4) // vk.Q_AUX.x
             mstore(add(_vk, 0x2e0), 0x1220b6d89cde624bd8234f31eab7e669da854a1b34bf4ff71e4f7a3933e0bad9) // vk.Q_AUX.y
-            mstore(add(_vk, 0x300), 0x1e7839e799ccc79178567da3a05cc103eef15d9161e7b824d3650a51e6cffb84) // vk.SIGMA1.x
-            mstore(add(_vk, 0x320), 0x278f6e0c845e621fde1f94113993a602be1febb71ff0508d2afb3a16e942554a) // vk.SIGMA1.y
-            mstore(add(_vk, 0x340), 0x03566674da5fb333add3192717e1308bb636d28d7379432688ea20302ffec66a) // vk.SIGMA2.x
-            mstore(add(_vk, 0x360), 0x01a1b7c057a90cc1c75e1b362a3ab762443b561aaaf24cc6d86f09fc8cd424c8) // vk.SIGMA2.y
+            mstore(add(_vk, 0x300), 0x09f46ac9d4d5c768fd338d0dc629740b96f893c802513835fee4e689b860d2dd) // vk.SIGMA1.x
+            mstore(add(_vk, 0x320), 0x20ee20d2f13fde9aacd5661c6ab6a8907b286e1da4f22d2bdc162f716c5386d4) // vk.SIGMA1.y
+            mstore(add(_vk, 0x340), 0x2b181c361a212c2b387f1517a35038ff2334e7bf888bd65f0ab32120db1b445e) // vk.SIGMA2.x
+            mstore(add(_vk, 0x360), 0x05d5e8b4269eafbfd6bed04ad54eea394360442a89dfc80d384841c3ca610fcc) // vk.SIGMA2.y
             mstore(add(_vk, 0x380), 0x2834af258d1b9d0a7894134fe25040cb558016eba94342ed5d77cf730651d64b) // vk.SIGMA3.x
             mstore(add(_vk, 0x3a0), 0x2ac45c5ca2daa3b43444797e7f9ce36067787f24573fe985d8d32721a70ef7bc) // vk.SIGMA3.y
             mstore(add(_vk, 0x3c0), 0x165e9d66b110eb0d2b8e6d19f89aacf06adab63cdaf65cfcb1ac822a11a44968) // vk.SIGMA4.x

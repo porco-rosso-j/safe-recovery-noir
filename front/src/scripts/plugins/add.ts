@@ -15,6 +15,8 @@ export async function _addEcrecoverRecover(
 	delay: number = 1
 ): Promise<txResult> {
 	// hash in circuit should also be pedersen
+	console.log("address: ", address);
+	console.log("address buffer: ", Buffer.from(address));
 	const hashedAddr = await pedersenHash([address]);
 	console.log("hashedAddr: ", hashedAddr);
 
