@@ -113,7 +113,7 @@ const ProposalList = (props) => {
 										<HStack spacing={4} py={1}>
 											<Text ml={3}>ID: {proposal.id}</Text>
 											<Text flex={1}>{typeName(proposal.type)} Recovery</Text>
-											{proposal.isExecutable ? (
+											{proposal.isExecutable.result ? (
 												<Text mr={3} color={"green"}>
 													{" "}
 													Executable

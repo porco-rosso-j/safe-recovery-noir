@@ -10,7 +10,7 @@ import { empTxResult, txResult } from "src/scripts/plugins/types";
 
 type UseAddRecoverType = {
 	methodIndex: number;
-	delayValue: number;
+	timeLock: number;
 	pendingNewOwner?: string;
 	secretWord?: string;
 	threshold?: number;
@@ -27,7 +27,7 @@ const useAddRecover = (onOpen: () => void) => {
 
 	async function addRecover(params: UseAddRecoverType) {
 		const methodIndex = params.methodIndex;
-		const delayValue = params.delayValue;
+		const timeLock = params.timeLock;
 
 		setErrorMessage("");
 		setLoading(true);
@@ -38,26 +38,22 @@ const useAddRecover = (onOpen: () => void) => {
 				safeSDK,
 				pluginAddress,
 				params.pendingNewOwner,
-				params.delayValue
+				params.timeLock
 			);
 		} else if (methodIndex === 2) {
-			ret = await _addWebAuthnRecover(
-				safeSDK,
-				pluginAddress,
-				params.delayValue
-			);
+			ret = await _addWebAuthnRecover(safeSDK, pluginAddress, params.timeLock);
 		} else if (methodIndex === 3) {
 			ret = await _addSecretRecover(
 				safeSDK,
 				pluginAddress,
-				delayValue,
+				timeLock,
 				params.secretWord
 			);
 		} else if (methodIndex === 4) {
 			ret = await _addSocialRecover(
 				safeSDK,
 				pluginAddress,
-				delayValue,
+				timeLock,
 				params.threshold,
 				params.guardians
 			);

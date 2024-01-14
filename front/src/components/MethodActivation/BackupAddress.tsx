@@ -6,7 +6,6 @@ import {
 	VStack,
 	Tooltip,
 	Flex,
-	Spinner,
 	useDisclosure,
 } from "@chakra-ui/react";
 import { InfoIcon } from "@chakra-ui/icons";
@@ -14,9 +13,8 @@ import { inputStyle } from "src/theme";
 import { useState } from "react";
 import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
-import { DelayPeriod, DelayInputForm } from "./Common";
-import useIsMethodEnabled from "src/hooks/useIsMethodEnabled";
-import useAddRecover from "src/hooks/useAddRecover";
+import { Timelock, TimelockInput } from "./Common";
+import { useIsMethodEnabled, useAddRecover } from "src/hooks";
 
 const EnableBackupAddress = (props) => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -25,15 +23,20 @@ const EnableBackupAddress = (props) => {
 		useAddRecover(onOpen);
 
 	const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
-	const [delayValue, setDelayValue] = useState(0);
+	const [timeLock, setTimelock] = useState<number>(0);
 
 	return (
 		<Box pt="10px">
-			{!isMethodEnabled ? (
+			{isMethodEnabled ? (
+				<Box>
+					This method has already been enabled
+					<MethodRemoval method={1} />
+				</Box>
+			) : (
 				<Box>
 					<Text mb={8} fontSize={15} mx="25px">
-						Register backup address. It is hashed and stored on the plugin
-						contract and can be used to recover your Safe.
+						Register private backup address. Only its hash is stored on the
+						plugin contract and can be used to recover your Safe.
 					</Text>
 					<Flex
 						mt="20px"
@@ -52,7 +55,7 @@ const EnableBackupAddress = (props) => {
 								</Tooltip>
 								<Text>1. Backup address :</Text>
 							</Flex>
-							<DelayPeriod index={2} />
+							<Timelock index={2} />
 						</VStack>
 						<VStack spacing={3.5} fontSize={14} align="end" w="345px" ml={2}>
 							<Input
@@ -63,7 +66,7 @@ const EnableBackupAddress = (props) => {
 								placeholder="0xAbCd..."
 								onChange={(e) => setPendingNewOwner(e.target.value)}
 							/>
-							<DelayInputForm setDelayValue={setDelayValue} />
+							<TimelockInput setTimelock={setTimelock} />
 						</VStack>
 					</Flex>
 					<Box
@@ -83,7 +86,7 @@ const EnableBackupAddress = (props) => {
 									await addRecover({
 										methodIndex: props.methodIndex,
 										pendingNewOwner,
-										delayValue,
+										timeLock,
 									});
 								} else {
 									setErrorMessage("New owner address not set");
@@ -92,15 +95,10 @@ const EnableBackupAddress = (props) => {
 						>
 							Enable method
 						</Button>
-						<Text mt={4} color="red.500" mb={4}>
+						<Text mt={4} color="red.400" mb={4}>
 							{errorMessage}
 						</Text>
 					</Box>
-				</Box>
-			) : (
-				<Box>
-					This method has already been enabled
-					<MethodRemoval method={1} />
 				</Box>
 			)}
 			<EnabledModal

@@ -10,7 +10,6 @@ import {
 	Text,
 	Link,
 	Flex,
-	Box,
 } from "@chakra-ui/react";
 import { shortenTxHash } from "src/scripts/utils/address";
 

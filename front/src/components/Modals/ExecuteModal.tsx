@@ -38,8 +38,8 @@ function ExecutedModal(props) {
 					textAlign="center"
 					alignItems="center"
 				>
-					{props.result ? (
-						<ModalHeader mt={4}>
+					{props.fucntionResult ? (
+						<ModalHeader color="green.400" mt={4}>
 							{props.functionType === 1
 								? "Successfully Executed!"
 								: props.functionType === 2
@@ -49,7 +49,7 @@ function ExecutedModal(props) {
 								: null}
 						</ModalHeader>
 					) : (
-						<ModalHeader color="red" mt={4}>
+						<ModalHeader color="red.400" mt={4}>
 							{props.functionType === 1
 								? "Execution Failed"
 								: props.functionType === 2

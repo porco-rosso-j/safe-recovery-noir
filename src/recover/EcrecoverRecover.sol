@@ -6,13 +6,10 @@ import "./RecoverBase.sol";
 contract EcrecoverRecover is RecoverBase {
     address public ecrecoverVerifier;
     bool public isEcrecoverRecoverEnabled;
-    // bytes32[] public hashed_address;
     bytes32 public hashed_address;
 
-    // should call basic recovery setup func that determines pending period, etc...
     function addEcrecoverRecover(
         uint _recoveryTimeLock,
-        // bytes32[] memory _hashed_address
         bytes32 _hashed_address
     ) public onlySafe {
         require(_hashed_address != bytes32(0), "INVALID_HASH");
@@ -21,7 +18,6 @@ contract EcrecoverRecover is RecoverBase {
         isEcrecoverRecoverEnabled = true;
     }
 
-    // should all the proposals invalidated if this is disabled?
     function removeEcrecoverRecover() public onlySafe {
         require(isEcrecoverRecoverEnabled, "NOT_ENABLED");
         isEcrecoverRecoverEnabled = false;

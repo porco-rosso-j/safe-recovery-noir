@@ -23,7 +23,7 @@ export async function parseUint8ArrayToBytes32(
 export function calcTimeDiff(solidityTimestamp: number) {
 	let timeDiffInSeconds = solidityTimestamp - Math.floor(Date.now() / 1000);
 	if (timeDiffInSeconds < 0) {
-		return "Timestamp is in the past";
+		return "*Reload the page, already executable";
 	}
 
 	const secondsInAMinute = 60;

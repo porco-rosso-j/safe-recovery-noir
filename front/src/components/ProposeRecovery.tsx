@@ -200,7 +200,7 @@ const ProposeRecovery = (props: {
 								for WebAuthn to generate zk-proof{" "}
 							</Text>
 						) : null}
-						<Text mt={4} color="red.500" mb={4}>
+						<Text mt={4} color="red.400" mb={4}>
 							{errorMessage}
 						</Text>
 						<ProposedModal

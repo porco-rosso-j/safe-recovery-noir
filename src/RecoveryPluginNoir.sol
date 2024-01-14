@@ -216,7 +216,7 @@ contract RecoveryPluginNoir is
 
         recoveryNullifiers[RECOVERY_TYPE_SOCIAL][proofNullifier] = true;
 
-        (uint proposalId, uint deadline) = _proposeRecovery(
+        (uint proposalId, uint timeLockEnd) = _proposeRecovery(
             RECOVERY_TYPE_SOCIAL,
             _oldAddresses,
             _newAddresses,
@@ -225,7 +225,7 @@ contract RecoveryPluginNoir is
 
         _incrementApprovalCount(proposalId, _nullifierHash);
 
-        return (proposalId, deadline);
+        return (proposalId, timeLockEnd);
     }
 
     function approveSocialRecovery(
@@ -355,7 +355,7 @@ contract RecoveryPluginNoir is
         );
 
         require(!recovery.rejected, "PROPOSAL_REJECTED");
-        require(block.timestamp >= recovery.deadline, "DELAY_NOT_EXPIRED");
+        require(block.timestamp >= recovery.timeLockEnd, "TIMELOCK_NOT_ENDED");
 
         require(
             recovery.proposedTimestamp >= lastExecutionTimestamp,
@@ -364,8 +364,8 @@ contract RecoveryPluginNoir is
 
         if (
             recovery.recoveryType == RECOVERY_TYPE_SOCIAL &&
-            recovery.approvalCount < threshold
-        ) revert("INSUFFICIENT_APPROVAL");
+            recovery.approvalCount < approvalThreshold
+        ) revert("INSUFFICIENT_APPROVAL_COUNT");
 
         return true;
     }
@@ -393,9 +393,6 @@ contract RecoveryPluginNoir is
                     _newAddresses[i] != SENTINEL_DELEGATES,
                 "INVALID_ADDRESS"
             );
-
-            // would ensure no duplication in new addresses here if possible
-            // but as its hard to implement, just igore it and let have contract check it
         }
 
         uint currenThreshold = IGnosisSafe(safe).getThreshold();
@@ -438,11 +435,9 @@ contract RecoveryPluginNoir is
         address newImplementation
     ) internal view override {
         (newImplementation);
-        //_onlySelf();
     }
 
     function requiresPermissions() external view returns (uint8 permissions) {
         return PLUGIN_PERMISSION_CALL_TO_SELF;
-        //return 1;
     }
 }

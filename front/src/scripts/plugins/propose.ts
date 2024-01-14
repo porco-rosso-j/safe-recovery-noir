@@ -1,4 +1,4 @@
-import { ethers, Signer, utils } from "ethers";
+import { Signer, utils } from "ethers";
 import { authenticateWebAuthn } from "../utils/webauthn/webauthn";
 import { getNullifierHashAndHashPath } from "../utils/merkle/merkle-helper";
 import {
@@ -7,12 +7,7 @@ import {
 	generateProofSecret,
 	generateProofSocial,
 } from "../utils/noir-proof";
-import {
-	recoveryPluginSigner,
-	dummyWallet,
-	nonce,
-	pluginIface,
-} from "../utils/contracts";
+import { recoveryPluginSigner, nonce, pluginIface } from "../utils/contracts";
 import { parseUint8ArrayToBytes32 } from "../utils/helper";
 import { txResult, error } from "./types";
 import {
@@ -23,7 +18,6 @@ import {
 	getRecoveryCount,
 	getWebAuthnPubkey,
 } from "./view";
-import { contracts } from "../constants/addresses";
 import Safe from "@safe-global/protocol-kit";
 import { sendSafeTx } from "../utils/safe";
 import { NullifierHashAndHashPath } from "../utils/merkle/merkle-helper";
@@ -104,7 +98,7 @@ export async function _proposeEcrecoverRecover(
 	);
 	if (msg === "" || signature === "") return error;
 
-	const msgHash: string = ethers.utils.hashMessage(msg);
+	const msgHash: string = utils.hashMessage(msg);
 	const pubkey: string = utils.recoverPublicKey(
 		msgHash,
 		utils.arrayify(signature)
@@ -236,35 +230,26 @@ export async function _proposeSocialRecover(
 	oldOwner: string,
 	newOwner: string
 ): Promise<txResult> {
-	const [msg, signature] = await getMsgAndSig(
-		signer,
-		4,
-		await signer.getAddress()
-	);
+	const signerAddr = await signer.getAddress();
+	const [msg, signature] = await getMsgAndSig(signer, 4, signerAddr);
 	if (msg === "" || signature === "") return error;
 
 	try {
-		const msgHash: string = ethers.utils.hashMessage(msg);
+		const msgHash: string = utils.hashMessage(msg);
 		const pubkey: string = utils.recoverPublicKey(
 			msgHash,
 			utils.arrayify(signature)
 		);
 
-		const proposalId = ethers.utils.hexlify(
+		const proposalId = utils.hexlify(
 			Number(await getRecoveryCount(pluginAddr)) + 1
 		);
-		console.log("proposalId: ", proposalId);
+
 		const root = await getGuardiansRoot(pluginAddr);
-		console.log("root _proposeSocialRecover: ", root);
+		console.log("root: ", root);
 
 		const response: NullifierHashAndHashPath =
-			await getNullifierHashAndHashPath(
-				root,
-				await signer.getAddress(),
-				proposalId
-			);
-
-		console.log("response NullifierHashAndHashPath: ", response);
+			await getNullifierHashAndHashPath(root, signerAddr, proposalId);
 
 		const ret = await generateProofSocial(
 			root,
@@ -282,10 +267,6 @@ export async function _proposeSocialRecover(
 		);
 		console.log("pubInputMsgHash: ", pubInputMsgHash);
 
-		console.log("here?");
-		console.log("oldOwner: ", oldOwner);
-		console.log("newOwner: ", newOwner);
-		console.log("ret.proof: ", ret.proof);
 		const tx = await recoveryPluginSigner(
 			signer,
 			pluginAddr
@@ -317,7 +298,7 @@ export async function _approveSocialRecovery(
 		await signer.getAddress()
 	);
 	if (msg === "" || signature === "") return error;
-	const msgHash: string = ethers.utils.hashMessage(msg);
+	const msgHash: string = utils.hashMessage(msg);
 	const pubkey: string = utils.recoverPublicKey(
 		msgHash,
 		utils.arrayify(signature)
@@ -334,7 +315,7 @@ export async function _approveSocialRecovery(
 	const ret = await generateProofSocial(
 		root,
 		nullHash,
-		utils.hexlify(proposalId),
+		proposalId.toString(),
 		utils.arrayify(pubkey).slice(1, 65),
 		utils.arrayify(signature).slice(0, -1),
 		utils.arrayify(msgHash),
@@ -371,9 +352,6 @@ export async function _executeRecover(
 	pluginAddr: string,
 	proposalId: number
 ): Promise<txResult> {
-	// dummy tx to move blocks in local test
-	// await dummyWallet.sendTransaction({ to: await dummyWallet.getAddress() });
-
 	try {
 		const tx = await recoveryPluginSigner(signer, pluginAddr).execRecovery(
 			proposalId,
@@ -399,7 +377,7 @@ export async function _rejectRecover(
 		proposalId,
 	]);
 
-	const _data = ethers.utils.solidityPack(
+	const _data = utils.solidityPack(
 		["bytes", "address"],
 		[rejectionTx, safeAddr]
 	);
@@ -408,7 +386,6 @@ export async function _rejectRecover(
 	const rejectionTxnTxData = {
 		to: pluginAddr,
 		data: _data,
-		// data: rejectionTx,
 		value: "0",
 	};
 

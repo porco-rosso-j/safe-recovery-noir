@@ -1,4 +1,4 @@
-import DelayPeriod from "./DelayPeriod";
-import DelayInputForm from "./DelayInputForm";
+import Timelock from "./Timelock";
+import TimelockInput from "./TimelockInput";
 
-export { DelayPeriod, DelayInputForm };
+export { Timelock, TimelockInput };

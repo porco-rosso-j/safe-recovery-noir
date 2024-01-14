@@ -4,11 +4,12 @@ export type ProposalType = {
 	newOwners: string[];
 	oldOwners: string[];
 	threshold: number;
-	deadline: number;
+	timeLockEnd: number;
 	proposedTimestamp: number;
 	rejected: boolean;
 	approvals: number;
-	isExecutable: boolean;
+	approvealThreshold: number;
+	isExecutable: IsRecoveryExecutableType;
 };
 
 export const emptyProposal: ProposalType = {
@@ -17,11 +18,17 @@ export const emptyProposal: ProposalType = {
 	newOwners: [""],
 	oldOwners: [""],
 	threshold: 0,
-	deadline: 0,
+	timeLockEnd: 0,
 	proposedTimestamp: 0,
 	rejected: false,
 	approvals: 0,
-	isExecutable: false,
+	approvealThreshold: 0,
+	isExecutable: { result: false, reason: "" },
+};
+
+export type IsRecoveryExecutableType = {
+	result: boolean;
+	reason: string;
 };
 
 export type txResult = {

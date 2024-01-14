@@ -132,7 +132,7 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
         recoveryPlugin.addSecretRecover(45 days, bytes32(0));
 
         // only in test
-        // vm.expectRevert("DELAY_TOO_SHORT");
+        // vm.expectRevert("Timelock_TOO_SHORT");
         // recoveryPlugin.addSecretRecover(15 days, secret_test);
 
         recoveryPlugin.removeSecretRecover();
@@ -143,7 +143,7 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
         vm.stopBroadcast();
     }
 
-    function test_recovery_delay() public {
+    function test_recovery_Timelock() public {
         vm.startBroadcast(newOwners[0]);
 
         address[] memory ownersReplaced = new address[](1);
@@ -160,12 +160,12 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
         );
 
         // 0 days not enough
-        vm.expectRevert("DELAY_NOT_EXPIRED");
+        vm.expectRevert("TIMELOCK_NOT_ENDED");
         recoveryPlugin.execRecovery(1);
 
         // 30 days still not enough
         vm.warp(block.timestamp + 30 days);
-        vm.expectRevert("DELAY_NOT_EXPIRED");
+        vm.expectRevert("TIMELOCK_NOT_ENDED");
         recoveryPlugin.execRecovery(1);
 
         // 45 days + 1 seconds enough
@@ -530,14 +530,15 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
 
         bytes memory proof = readProof("social", "social1");
 
-        (uint recoveryId, uint deadline) = recoveryPlugin.proposeSocialRecover(
-            ownersReplaced,
-            newPendingOwners,
-            1, // 2 -> 1
-            proof,
-            nullifierHash,
-            convertUint8ToBytes32(hashed_message1)
-        );
+        (uint recoveryId, uint timeLockEnd) = recoveryPlugin
+            .proposeSocialRecover(
+                ownersReplaced,
+                newPendingOwners,
+                1, // 2 -> 1
+                proof,
+                nullifierHash,
+                convertUint8ToBytes32(hashed_message1)
+            );
 
         vm.warp(block.timestamp + 60 days);
         recoveryPlugin.execRecovery(recoveryId);
@@ -562,7 +563,7 @@ contract RecoveryPluginNoirTest is SafeTestTools, NoirHelper {
     //     newPendingOwners[0] = newOwners[0];
 
     //     bytes memory proof = readProof("social", "social1");
-    //     (uint recoveryId, uint deadline) = recoveryPlugin.proposeSocialRecover(
+    //     (uint recoveryId, uint timeLockEnd) = recoveryPlugin.proposeSocialRecover(
     //         ownersReplaced,
     //         newPendingOwners,
     //         1, // 2 -> 1

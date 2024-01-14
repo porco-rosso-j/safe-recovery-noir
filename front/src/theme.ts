@@ -1,17 +1,8 @@
 import { extendTheme } from "@chakra-ui/react";
-import { mode } from "@chakra-ui/theme-tools";
-import { cardAnatomy } from "@chakra-ui/anatomy";
-import { createMultiStyleConfigHelpers } from "@chakra-ui/react";
-
-const { definePartsStyle, defineMultiStyleConfig } =
-	createMultiStyleConfigHelpers(cardAnatomy.keys);
 
 const chakraDefaultTheme = extendTheme({
 	styles: {
 		global: {
-			html: {
-				height: "100%",
-			},
 			body: {
 				height: "100%",
 				margin: "0",

@@ -1,6 +1,5 @@
 import Safe from "@safe-global/protocol-kit";
 import { sendSafeTx } from "../utils/safe";
-import { contracts } from "../constants/addresses";
 import { pedersenHash } from "../utils/pedersen";
 import { getKeyPairAndID } from "../utils/webauthn/webauthn";
 import { getMerkleRootFromAddresses } from "../utils/merkle/merkle-helper";
@@ -12,17 +11,14 @@ export async function _addEcrecoverRecover(
 	safeSDK: any,
 	pluginAddr: string,
 	address: string,
-	delay: number = 1
+	timelock: number = 1
 ): Promise<txResult> {
-	// hash in circuit should also be pedersen
-	console.log("address: ", address);
-	console.log("address buffer: ", Buffer.from(address));
 	const hashedAddr = await pedersenHash([address]);
 	console.log("hashedAddr: ", hashedAddr);
 
 	const addK256RecoverTx = pluginIface.encodeFunctionData(
 		"addEcrecoverRecover",
-		[delay, hashedAddr]
+		[timelock, hashedAddr]
 	);
 
 	const safeTxData = {
@@ -38,7 +34,7 @@ export async function _addEcrecoverRecover(
 export async function _addWebAuthnRecover(
 	safeSDK: Safe,
 	pluginAddr: string,
-	delay: number = 1
+	timelock: number = 1
 ): Promise<txResult> {
 	const safeAddr = await safeSDK.getAddress();
 
@@ -54,8 +50,7 @@ export async function _addWebAuthnRecover(
 	console.log("res.pubkey: ", res.pubkeyHex);
 
 	const addRecoveryData = pluginIface.encodeFunctionData("addWebAuthnRecover", [
-		delay,
-		// res.pubkey,
+		timelock,
 		res.pubkeyHex[0],
 		res.pubkeyHex[1],
 		res.id,
@@ -73,7 +68,7 @@ export async function _addWebAuthnRecover(
 export async function _addSecretRecover(
 	safeSDK: any,
 	pluginAddr: string,
-	delay: number = 1,
+	timelock: number = 1,
 	secret: string
 ): Promise<txResult> {
 	// hash in circuit should also be pedersen
@@ -82,7 +77,7 @@ export async function _addSecretRecover(
 
 	// const pluginIface = new ethers.utils.Interface(RecoveryPlugin.abi);
 	const addSecreRecoverTx = pluginIface.encodeFunctionData("addSecretRecover", [
-		delay,
+		timelock,
 		hashedSecret,
 	]);
 
@@ -98,7 +93,7 @@ export async function _addSecretRecover(
 export async function _addSocialRecover(
 	safeSDK: any,
 	pluginAddr: string,
-	delay: number = 1,
+	timelock: number = 1,
 	threshold: number,
 	guardians: string[]
 ): Promise<txResult> {
@@ -108,7 +103,7 @@ export async function _addSocialRecover(
 	const merkleRoot = await getMerkleRootFromAddresses(guardians);
 	const addSocialRecoverTx = pluginIface.encodeFunctionData(
 		"addSocialRecover",
-		[delay, threshold, merkleRoot]
+		[timelock, threshold, merkleRoot]
 	);
 
 	const safeTxData = {

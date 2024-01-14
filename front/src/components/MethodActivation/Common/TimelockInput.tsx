@@ -2,8 +2,21 @@ import { Box, Input, FormControl, Select } from "@chakra-ui/react";
 import { inputStyle } from "src/theme";
 import { useState } from "react";
 
-const DelayInputForm = (props: { setDelayValue: (num: number) => void }) => {
+const TimelockInput = (props: { setTimelock: (num: number) => void }) => {
+	const [time, setTime] = useState<number>(0);
 	const [unit, setUnit] = useState<number>(1);
+
+	const handleTimeChange = (num: number) => {
+		const seconds = num * unit;
+		props.setTimelock(seconds);
+		setTime(num);
+	};
+
+	const handleUnitChange = (unit: number) => {
+		const seconds = time * unit;
+		props.setTimelock(seconds);
+		setUnit(unit);
+	};
 
 	return (
 		<FormControl>
@@ -15,18 +28,18 @@ const DelayInputForm = (props: { setDelayValue: (num: number) => void }) => {
 					mr="10px"
 					type="number"
 					placeholder="10"
-					onChange={(e) => props.setDelayValue(Number(e.target.value) * unit)}
+					onChange={(e) => handleTimeChange(Number(e.target.value))}
 				/>
 				<Select
 					w={"30%"}
 					size="xl"
 					borderRadius={"2px"}
 					sx={{
-						textAlign: "center", // Center the text horizontally
-						pr: "15px", // Add padding on the left side
+						textAlign: "center",
+						pr: "15px",
 						pb: "4px",
 					}}
-					onChange={(e) => setUnit(Number(e.target.value))}
+					onChange={(e) => handleUnitChange(Number(e.target.value))}
 				>
 					<option value="1">sec</option>
 					<option value="60">min</option>
@@ -38,4 +51,4 @@ const DelayInputForm = (props: { setDelayValue: (num: number) => void }) => {
 	);
 };
 
-export default DelayInputForm;
+export default TimelockInput;

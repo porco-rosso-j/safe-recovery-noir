@@ -7,7 +7,7 @@ export async function getMerkleRootFromAddresses(
 	addresses: string[]
 ): Promise<string> {
 	const isOdd = addresses.length % 2 !== 0;
-	const depth = await calculateDepth(addresses.length + 1);
+	const depth = calculateDepth(isOdd ? addresses.length + 1 : addresses.length);
 	console.log("depth: ", depth);
 	let merkleTree = new MerkleTree(depth);
 
@@ -26,6 +26,7 @@ export async function getMerkleRootFromAddresses(
 	const mappedAddrs = hashed_nodes.map((nodes) => Fr.fromString(nodes));
 	await merkleTree.initialize(mappedAddrs);
 	const root = await merkleTree.getRoot();
+	console.log("merkleTree: ", merkleTree);
 	console.log("root: ", root);
 	console.log("leaves: ", await merkleTree.getLeaves());
 

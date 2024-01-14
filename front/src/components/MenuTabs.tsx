@@ -30,7 +30,7 @@ const MenuTabs = () => {
 
 	useEffect(() => {
 		(async () => {
-			if (safeAddress !== "") {
+			if (safeAddress !== "" && !isPluginDeployed) {
 				const [_isPluginDeployed, pluginAddr] = await getIsPluginDeployed(
 					safeAddress
 				);
@@ -44,7 +44,7 @@ const MenuTabs = () => {
 
 	useEffect(() => {
 		(async () => {
-			if (isPluginDeployed) {
+			if (isPluginDeployed && !isPluginEnabled) {
 				const _isPluginEnabled = await getIsPluginEnabled(
 					safeAddress,
 					pluginAddress
@@ -62,6 +62,7 @@ const MenuTabs = () => {
 
 	const handleTabsChange = (index: number) => {
 		setTabIndex(index);
+		setMethod(method);
 	};
 
 	return (

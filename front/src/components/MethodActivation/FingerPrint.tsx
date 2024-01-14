@@ -11,9 +11,8 @@ import {
 import { useState } from "react";
 import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
-import { DelayPeriod, DelayInputForm } from "./Common";
-import useIsMethodEnabled from "src/hooks/useIsMethodEnabled";
-import useAddRecover from "src/hooks/useAddRecover";
+import { Timelock, TimelockInput } from "./Common";
+import { useIsMethodEnabled, useAddRecover } from "src/hooks";
 
 const EnableFingerPrint = (props) => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -22,7 +21,7 @@ const EnableFingerPrint = (props) => {
 	const { loading, errorMessage, txHash, result, addRecover } =
 		useAddRecover(onOpen);
 
-	const [delayValue, setDelayValue] = useState(0);
+	const [timeLock, setTimelock] = useState<number>(0);
 
 	return (
 		<Box pt="10px">
@@ -47,10 +46,10 @@ const EnableFingerPrint = (props) => {
 						w="100%"
 					>
 						<VStack spacing={4} fontSize={14} align="start">
-							<DelayPeriod index={1} />
+							<Timelock index={1} />
 						</VStack>
 						<VStack spacing={3.5} fontSize={14} align="end" w="345px" ml={2}>
-							<DelayInputForm setDelayValue={setDelayValue} />
+							<TimelockInput setTimelock={setTimelock} />
 						</VStack>
 					</Flex>
 					<Box
@@ -67,13 +66,13 @@ const EnableFingerPrint = (props) => {
 							onClick={async () => {
 								await addRecover({
 									methodIndex: props.methodIndex,
-									delayValue,
+									timeLock,
 								});
 							}}
 						>
 							Enable method
 						</Button>
-						<Text mt={4} color="red.500" mb={4}>
+						<Text mt={4} color="red.400" mb={4}>
 							{errorMessage}
 						</Text>
 					</Box>

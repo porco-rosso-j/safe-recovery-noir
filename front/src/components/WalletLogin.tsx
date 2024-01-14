@@ -96,7 +96,7 @@ const WalletLogin: React.FC = () => {
 						onChange={(e) => setSafeAddressInput(e.target.value)}
 					/>
 				</Box>
-				<Text color="red.500" mb={4}>
+				<Text color="red.400" mb={4}>
 					{errorMessage}
 				</Text>
 				<Button w="100%" onClick={onClickLogin}>

@@ -5,18 +5,15 @@ import {
 	Text,
 	VStack,
 	HStack,
-	Spinner,
 	useDisclosure,
 } from "@chakra-ui/react";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import UserDataContext from "src/contexts/userData";
 import { shortenAddress } from "../scripts/utils/address";
 import {
 	_approveSocialRecovery,
 	_executeRecover,
 	_rejectRecover,
-	_getIsRecoveryExecutable,
-	getSocialRecoveryThreshold,
 } from "../scripts/plugins/index";
 import ExecutedModal from "./Modals/ExecuteModal";
 import { calcTimeDiff, typeName } from "src/scripts/utils/helper";
@@ -33,43 +30,16 @@ const ProposalDetail = (props: {
 		useContext(UserDataContext);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
-	// const [proposalId, setProposalId] = useState<number>(0);
 	const [functionType, setFunctionType] = useState<number>(0);
-	const [socialRecoveryThreshold, setSocialRecoveryThreshold] =
-		useState<number>(0);
-
-	const [nonExecutableReason, setNonExecutableReason] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const [txHash, setTxHash] = useState<string>("");
 
-	const [isRecoveryExecutable, setIsRecoveryExecutable] =
-		useState<boolean>(true);
 	const [fucntionResult, setFunctionResult] = useState<boolean>(false);
 	const [openProposedModal, setOpenProposedModal] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [loadingIndex, setLoadingIndex] = useState(0);
 
-	useEffect(() => {
-		(async () => {
-			if (props.proposalId !== 0) {
-				const IsRecoveryExecutable = await _getIsRecoveryExecutable(
-					pluginAddress,
-					props.proposalId
-				);
-				console.log("IsRecoveryExecutable: ", IsRecoveryExecutable);
-				setIsRecoveryExecutable(IsRecoveryExecutable.result);
-				if (!IsRecoveryExecutable.result) {
-					setNonExecutableReason(IsRecoveryExecutable.reason);
-				}
-
-				if (props.proposal.type === 4) {
-					setSocialRecoveryThreshold(
-						await getSocialRecoveryThreshold(pluginAddress)
-					);
-				}
-			}
-		})();
-	});
+	// use effect to update give prposal's contents
 
 	const handleFunction = async (funcType: number) => {
 		setErrorMessage("");
@@ -109,6 +79,7 @@ const ProposalDetail = (props: {
 		setFunctionType(funcType);
 		handleLoading(funcType, false);
 		openModal();
+		setLoading(false);
 	};
 
 	const handleLoading = (index: number, loading: boolean) => {
@@ -165,13 +136,13 @@ const ProposalDetail = (props: {
 							<Text>・ Approval Threshold:</Text>
 						) : null}
 						<Text>・ Executable:</Text>
-						{!isRecoveryExecutable ? (
-							<Text ml={4} color="red.500">
+						{!props.proposal.isExecutable.result ? (
+							<Text ml={4} color="red.400">
 								*Reason:
 							</Text>
 						) : null}
-						{!isRecoveryExecutable &&
-						nonExecutableReason === "DELAY_NOT_EXPIRED" ? (
+						{!props.proposal.isExecutable.result &&
+						props.proposal.isExecutable.reason === "TIMELOCK_NOT_ENDED" ? (
 							<Text>・ Executable After:</Text>
 						) : null}
 					</VStack>
@@ -184,16 +155,19 @@ const ProposalDetail = (props: {
 							<Text>{props.proposal.approvals}</Text>
 						) : null}
 						{props.proposal.type === 4 ? (
-							<Text>{socialRecoveryThreshold}</Text>
+							<Text>{props.proposal.approvealThreshold}</Text>
 						) : null}
-						<Text>{isRecoveryExecutable ? "Yes" : "No"}</Text>
-
-						{!isRecoveryExecutable ? (
-							<Text color="red.500">{nonExecutableReason}</Text>
+						{props.proposal.isExecutable.result ? (
+							<Text color="green.400"> Yes </Text>
+						) : (
+							<Text color="red.400"> No </Text>
+						)}
+						{!props.proposal.isExecutable.result ? (
+							<Text color="red.400">{props.proposal.isExecutable.reason}</Text>
 						) : null}
-						{!isRecoveryExecutable &&
-						nonExecutableReason === "DELAY_NOT_EXPIRED" ? (
-							<Text>{calcTimeDiff(props.proposal.deadline)}</Text>
+						{!props.proposal.isExecutable.result &&
+						props.proposal.isExecutable.reason === "TIMELOCK_NOT_ENDED" ? (
+							<Text>{calcTimeDiff(props.proposal.timeLockEnd)}</Text>
 						) : null}
 					</VStack>
 				</Flex>
@@ -221,7 +195,7 @@ const ProposalDetail = (props: {
 						</Button>
 					) : null}
 					{props.proposal.type === 4 &&
-					props.proposal.approvals < socialRecoveryThreshold ? (
+					props.proposal.approvals < props.proposal.approvealThreshold ? (
 						<Button
 							sx={{ mt: "35px" }}
 							colorScheme="blue"
@@ -242,14 +216,21 @@ const ProposalDetail = (props: {
 							onClick={() => {
 								handleFunction(1);
 							}}
-							isDisabled={!isRecoveryExecutable}
+							isDisabled={!props.proposal.isExecutable.result}
 						>
 							Execute
 						</Button>
 					)}
 				</HStack>
+				{loading && loadingIndex === 2 ? (
+					<Text mt={5}>
+						{" "}
+						*you need to sign a message on connected wallet <br /> to generate
+						zk-proof{" "}
+					</Text>
+				) : null}
 				{errorMessage !== "" ? (
-					<Text mt={4} color="red.500" mb={4}>
+					<Text mt={4} color="red.400" mb={4}>
 						{errorMessage}
 					</Text>
 				) : null}

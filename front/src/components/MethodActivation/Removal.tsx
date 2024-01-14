@@ -1,11 +1,4 @@
-import {
-	Box,
-	Button,
-	Spinner,
-	useDisclosure,
-	Flex,
-	Text,
-} from "@chakra-ui/react";
+import { Box, Button, useDisclosure, Text } from "@chakra-ui/react";
 import { useState, useContext } from "react";
 import UserDataContext from "src/contexts/userData";
 import { _removeRecover } from "../../scripts/plugins/index";
@@ -57,7 +50,7 @@ const MethodRemoval = (props) => {
 			>
 				Disable this method
 			</Button>
-			<Text mt={4} color="red.500" mb={4}>
+			<Text mt={4} color="red.400" mb={4}>
 				{errorMessage}
 			</Text>
 			<EnabledModal

@@ -10,7 +10,7 @@ export async function generateProofK256(
 	pubkey: Uint8Array,
 	signature: Uint8Array,
 	msgHash: Uint8Array
-): Promise<any> {
+): Promise<ProofData> {
 	const program = k256 as CompiledCircuit;
 	const backend = new BarretenbergBackend(program);
 	const noir = new Noir(program, backend);
@@ -47,7 +47,7 @@ export async function generateProofP256(
 	pubkey_x: Uint8Array, // bytes32[]
 	pubkey_y: Uint8Array, // bytes32[],
 	message: Uint8Array // bytes32
-): Promise<any> {
+): Promise<ProofData> {
 	const program = p256 as CompiledCircuit;
 	const backend = new BarretenbergBackend(program);
 	const noir = new Noir(program, backend);
@@ -83,7 +83,7 @@ export async function generateProofP256(
 	return proof;
 }
 
-export async function generateProofSecret(_secret: string): Promise<any> {
+export async function generateProofSecret(_secret: string): Promise<ProofData> {
 	const program = secret as CompiledCircuit;
 	const backend = new BarretenbergBackend(program);
 	const noir = new Noir(program, backend);
@@ -111,7 +111,7 @@ export async function generateProofSocial(
 	msgHash: Uint8Array,
 	index: string,
 	hashPath: string[]
-): Promise<any> {
+): Promise<ProofData> {
 	const program = social as CompiledCircuit;
 	const backend = new BarretenbergBackend(program);
 	const noir = new Noir(program, backend);

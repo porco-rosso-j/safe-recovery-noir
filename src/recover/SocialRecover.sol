@@ -7,17 +7,17 @@ contract SocialRecover is RecoverBase {
     address public socialRecoverVerifier;
     bool public isSocialRecoverEnabled;
     bytes32 public guardiansRoot;
-    uint public threshold;
+    uint public approvalThreshold;
 
     // should call basic recovery setup func that determines pending period, etc...
     function addSocialRecover(
         uint _recoveryTimeLock,
-        uint _threshold,
+        uint _approvalThreshold,
         bytes32 _guardiansRoot
     ) public onlySafe {
         require(_guardiansRoot != bytes32(0), "INVALID_HASH");
         guardiansRoot = _guardiansRoot;
-        threshold = _threshold;
+        approvalThreshold = _approvalThreshold;
         _setTimeLock(_recoveryTimeLock);
         isSocialRecoverEnabled = true;
     }
@@ -25,7 +25,7 @@ contract SocialRecover is RecoverBase {
     function removeSocialRecover() public onlySafe {
         require(isSocialRecoverEnabled, "NOT_ENABLED");
         guardiansRoot = bytes32(0);
-        threshold = 0;
+        approvalThreshold = 0;
         isSocialRecoverEnabled = false;
     }
 

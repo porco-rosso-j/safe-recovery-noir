@@ -5,7 +5,6 @@ import {
 	Button,
 	Tooltip,
 	Flex,
-	Spinner,
 	useDisclosure,
 	VStack,
 } from "@chakra-ui/react";
@@ -14,9 +13,8 @@ import { inputStyle } from "src/theme";
 import { useState } from "react";
 import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
-import { DelayPeriod, DelayInputForm } from "./Common";
-import useIsMethodEnabled from "src/hooks/useIsMethodEnabled";
-import useAddRecover from "src/hooks/useAddRecover";
+import { Timelock, TimelockInput } from "./Common";
+import { useIsMethodEnabled, useAddRecover } from "src/hooks";
 
 const SecretWord = (props) => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -25,7 +23,7 @@ const SecretWord = (props) => {
 		useAddRecover(onOpen);
 
 	const [secretWord, setSecretWord] = useState("");
-	const [delayValue, setDelayValue] = useState(0);
+	const [timeLock, setTimelock] = useState(0);
 
 	return (
 		<Box pt="10px">
@@ -51,7 +49,7 @@ const SecretWord = (props) => {
 								</Tooltip>
 								<Text>1. Secret word :</Text>
 							</Flex>
-							<DelayPeriod index={2} />
+							<Timelock index={2} />
 						</VStack>
 						<VStack spacing={3.5} fontSize={14} align="end" w="345px" ml={2}>
 							<Input
@@ -70,7 +68,7 @@ const SecretWord = (props) => {
 									setSecretWord(e.target.value);
 								}}
 							/>
-							<DelayInputForm setDelayValue={setDelayValue} />
+							<TimelockInput setTimelock={setTimelock} />
 						</VStack>
 					</Flex>
 					<Box
@@ -89,7 +87,7 @@ const SecretWord = (props) => {
 								if (secretWord !== "") {
 									await addRecover({
 										methodIndex: props.methodIndex,
-										delayValue,
+										timeLock,
 										secretWord,
 									});
 								} else {
@@ -99,7 +97,7 @@ const SecretWord = (props) => {
 						>
 							Enable method
 						</Button>
-						<Text mt={4} color="red.500" mb={4}>
+						<Text mt={4} color="red.400" mb={4}>
 							{errorMessage}
 						</Text>
 					</Box>

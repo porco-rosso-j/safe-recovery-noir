@@ -8,7 +8,6 @@ import {
 	Tooltip,
 	IconButton,
 	CloseButton,
-	Spinner,
 	useDisclosure,
 } from "@chakra-ui/react";
 import { InfoIcon, AddIcon } from "@chakra-ui/icons";
@@ -16,9 +15,8 @@ import { inputStyle } from "src/theme";
 import { useState } from "react";
 import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
-import { DelayPeriod, DelayInputForm } from "./Common";
-import useIsMethodEnabled from "src/hooks/useIsMethodEnabled";
-import useAddRecover from "src/hooks/useAddRecover";
+import { Timelock, TimelockInput } from "./Common";
+import { useIsMethodEnabled, useAddRecover } from "src/hooks";
 
 const SocialRecovery = (props: { methodIndex: number }) => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -28,7 +26,7 @@ const SocialRecovery = (props: { methodIndex: number }) => {
 
 	const [errorMessage2, setErrorMessage2] = useState<string>("");
 
-	const [delayValue, setDelayValue] = useState(0);
+	const [timeLock, setTimelock] = useState(0);
 	const [threshold, setThreshold] = useState<number>(0);
 	const [guardians, setGuardians] = useState<string[]>([""]);
 
@@ -64,14 +62,14 @@ const SocialRecovery = (props: { methodIndex: number }) => {
 					>
 						<Text mb={3} fontSize={15} mx="25px">
 							1. Guardian addresses. <br></br>
-							*Should include addresses controlled by your family, friend, and
+							*Please include addresses controlled by your family, friend, and
 							people closed to you as well as your back up addresses.
 						</Text>
 					</Tooltip>
 					<Box mt="10px" textAlign="center" alignItems="center">
 						<Flex justifyContent="space-between">
 							<VStack spacing={1} flex={1} fontSize={14}>
-								<Text color="red.500" mb={2}>
+								<Text color="red.400" mb={2}>
 									{errorMessage2}
 								</Text>
 								{guardians.map((address, index) => (
@@ -134,7 +132,7 @@ const SocialRecovery = (props: { methodIndex: number }) => {
 									</Tooltip>
 									<Text>2. Guardian threshold :</Text>
 								</Flex>
-								<DelayPeriod index={2} />
+								<Timelock index={2} />
 							</VStack>
 							<VStack spacing={3.5} fontSize={14} align="end" w="300px" ml={2}>
 								<Input
@@ -155,7 +153,7 @@ const SocialRecovery = (props: { methodIndex: number }) => {
 										}
 									}}
 								/>
-								<DelayInputForm setDelayValue={setDelayValue} />
+								<TimelockInput setTimelock={setTimelock} />
 							</VStack>
 						</Flex>
 					</Box>
@@ -173,7 +171,7 @@ const SocialRecovery = (props: { methodIndex: number }) => {
 							onClick={async () => {
 								await addRecover({
 									methodIndex: props.methodIndex,
-									delayValue,
+									timeLock,
 									threshold,
 									guardians,
 								});
@@ -181,7 +179,7 @@ const SocialRecovery = (props: { methodIndex: number }) => {
 						>
 							Enable method
 						</Button>
-						<Text mt={4} color="red.500" mb={4}>
+						<Text mt={4} color="red.400" mb={4}>
 							{errorMessage}
 						</Text>
 					</Box>

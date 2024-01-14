@@ -1,4 +1,4 @@
-import { Box, Button, Text, Flex, Spinner, VStack } from "@chakra-ui/react";
+import { Box, Button, Text, VStack } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import UserDataContext from "src/contexts/userData";
 import {
@@ -23,7 +23,6 @@ const EnablePlugin = () => {
 
 	useEffect(() => {
 		(async () => {
-			console.log("safeAddress: ", safeAddress);
 			if (safeAddress !== "") {
 				const [_isPluginDeployed, pluginAddr] = await getIsPluginDeployed(
 					safeAddress
@@ -44,7 +43,6 @@ const EnablePlugin = () => {
 					safeAddress,
 					pluginAddress
 				);
-				console.log("here???");
 				console.log("_isPluginEnabled: ", _isPluginEnabled);
 				if (_isPluginEnabled) {
 					saveIsPluginEnabled(_isPluginEnabled);
@@ -112,7 +110,12 @@ const EnablePlugin = () => {
 				>
 					Enable SafeRecover Plugin
 				</Button>
-				<Text mt={4} color="red.500" mb={4}>
+				{loading ? (
+					<Text mt={5} mb={4} fontSize={13}>
+						{setupStatus}
+					</Text>
+				) : null}
+				<Text mt={4} color="red.400" mb={4}>
 					{errorMessage}
 				</Text>
 			</Box>

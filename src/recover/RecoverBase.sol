@@ -8,7 +8,7 @@ contract RecoverBase {
         address[] ownersReplaced;
         uint newThreshold;
         uint proposedTimestamp;
-        uint deadline;
+        uint timeLockEnd;
         bool rejected;
         // following two variables are for social recovery
         uint approvalCount;
@@ -34,7 +34,7 @@ contract RecoverBase {
     }
 
     function _setTimeLock(uint _recoveryTimeLock) internal {
-        require(_recoveryTimeLock >= MIN_TIMELOCK, "DELAY_TOO_SHORT");
+        require(_recoveryTimeLock >= MIN_TIMELOCK, "TIMELOCK_TOO_SHORT");
         recoveryTimeLock = _recoveryTimeLock;
     }
 
@@ -53,11 +53,11 @@ contract RecoverBase {
         recovery.ownersReplaced = _oldAddresses;
         recovery.pendingNewOwners = _newAddresses;
         recovery.newThreshold = _newThreshold;
-        recovery.deadline = block.timestamp + recoveryTimeLock;
+        recovery.timeLockEnd = block.timestamp + recoveryTimeLock;
         recovery.proposedTimestamp = block.timestamp;
 
         // should emit an event to notify owner
-        return (newRecoveryCount, recovery.deadline);
+        return (newRecoveryCount, recovery.timeLockEnd);
     }
 
     // view
@@ -85,7 +85,7 @@ contract RecoverBase {
             recovery.pendingNewOwners,
             recovery.ownersReplaced,
             recovery.newThreshold,
-            recovery.deadline,
+            recovery.timeLockEnd,
             recovery.proposedTimestamp,
             recovery.rejected,
             recovery.approvalCount
