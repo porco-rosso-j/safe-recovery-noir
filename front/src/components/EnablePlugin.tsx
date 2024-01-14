@@ -1,55 +1,18 @@
 import { Box, Button, Text, VStack } from "@chakra-ui/react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import UserDataContext from "src/contexts/userData";
 import {
-	getIsPluginEnabled,
-	getIsPluginDeployed,
 	enableModuleOnSafe,
 	enablePluginOnProtocolManager,
 } from "../scripts/utils/safe";
 
 const EnablePlugin = () => {
-	const {
-		safeAddress,
-		safeSDK,
-		saveIsPluginEnabled,
-		pluginAddress,
-		savePluginAdddress,
-	} = useContext(UserDataContext);
+	const { safeAddress, safeSDK, savePluginAddress } =
+		useContext(UserDataContext);
+
 	const [loading, setLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string>("");
-	const [isPluginDeployed, setIsPluginDeployed] = useState<boolean>(false);
 	const [setupStatus, setSetupStatus] = useState<string>("");
-
-	useEffect(() => {
-		(async () => {
-			if (safeAddress !== "") {
-				const [_isPluginDeployed, pluginAddr] = await getIsPluginDeployed(
-					safeAddress
-				);
-				console.log("_isPluginDeployed: ", _isPluginDeployed);
-				setIsPluginDeployed(_isPluginDeployed);
-				if (_isPluginDeployed) {
-					savePluginAdddress(pluginAddr);
-				}
-			}
-		})();
-	});
-
-	useEffect(() => {
-		(async () => {
-			if (isPluginDeployed) {
-				const _isPluginEnabled = await getIsPluginEnabled(
-					safeAddress,
-					pluginAddress
-				);
-				console.log("_isPluginEnabled: ", _isPluginEnabled);
-				if (_isPluginEnabled) {
-					saveIsPluginEnabled(_isPluginEnabled);
-				}
-			}
-		})();
-	});
 
 	return (
 		<Box>
@@ -91,7 +54,7 @@ const EnablePlugin = () => {
 							return;
 						}
 
-						savePluginAdddress(_pluginAddress);
+						savePluginAddress(_pluginAddress, true);
 						setSetupStatus("2. Enabling SafeRecover on SafeProtocolManager...");
 						const res2 = await enablePluginOnProtocolManager(
 							safeAddress,

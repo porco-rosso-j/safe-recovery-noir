@@ -39,6 +39,8 @@ const ProposeRecovery = (props: {
 	const [proposal, setProposal] = useState<ProposalType>(null);
 	const [openProposal, setOpenProposal] = useState<boolean>(false);
 
+	console.log("currentOwner: ", currentOwner);
+
 	const handleCheckProposal = async () => {
 		console.log("handleCheckProposal in ProposeRecovery");
 
@@ -91,7 +93,7 @@ const ProposeRecovery = (props: {
 								<Text>1. Old owner :</Text>
 								<Text>2. New owner :</Text>
 								<Text>3. New Threshold :</Text>
-								{props.methodIndex === 3 ? <Text>4. Secret :</Text> : null}
+								{props.methodIndex === 3 ? <Text>4. Secret word :</Text> : null}
 							</VStack>
 							<VStack spacing={3} fontSize={14} align="end" w="345px" ml={2}>
 								<Input

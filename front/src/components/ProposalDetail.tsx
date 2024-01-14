@@ -237,7 +237,8 @@ const ProposalDetail = (props: {
 				<Button
 					fontSize={15}
 					mt="30px"
-					h="25px"
+					h="30px"
+					pb="2px"
 					color="white"
 					bgColor="gray.600"
 					onClick={async () => {

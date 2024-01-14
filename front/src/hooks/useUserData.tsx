@@ -1,14 +1,78 @@
-import { useState } from "react";
-import { Signer } from "ethers";
+import { useEffect, useState } from "react";
+import { Signer, constants } from "ethers";
 import Safe from "@safe-global/protocol-kit";
+import {
+	getIsPluginEnabled,
+	getSafeOwners,
+	getSafePluginAddress,
+} from "src/scripts/utils/safe";
 
 const useUserData = () => {
 	const [safeAddress, setSafeAddress] = useState<string | null>("");
+	const [pluginAddress, setPluginAddress] = useState<string | null>("");
+	const [currentOwner, setCurrentOwner] = useState<string>("");
+
 	const [safeSDK, setSafeSDK] = useState<Safe | null>(null);
 	const [signer, setSigner] = useState<Signer | null>(null);
-	const [pluginAddress, setPluginAddress] = useState<string | null>("");
 	const [isPluginEnabled, setIsPluginEnabled] = useState<boolean>(false);
-	const [currentOwner, setCurrentOwner] = useState<string>("");
+
+	// in case browser storage is still present
+	useEffect(() => {
+		(async () => {
+			const safe_address = localStorage.getItem(`safe_address`);
+			setSafeAddress(safe_address ? JSON.parse(safe_address) : "");
+
+			const plugin_address = localStorage.getItem(`plugin_address`);
+			setPluginAddress(plugin_address ? JSON.parse(plugin_address) : "");
+
+			const current_owner = localStorage.getItem(`current_owner`);
+			setCurrentOwner(current_owner ? JSON.parse(current_owner) : "");
+		})();
+	});
+
+	// in case not
+	useEffect(() => {
+		(async () => {
+			if (safeAddress !== "" && pluginAddress === "") {
+				try {
+					const PluginAddr = await getSafePluginAddress(safeAddress);
+					if (PluginAddr !== constants.AddressZero) {
+						savePluginAddress(PluginAddr, true);
+					}
+				} catch (e) {
+					console.log(e);
+				}
+			}
+		})();
+	});
+
+	useEffect(() => {
+		(async () => {
+			if (safeAddress !== "" && currentOwner === "") {
+				try {
+					const owners = await getSafeOwners(safeAddress);
+					const owner = owners[0];
+					saveCurrentOwner(owner, true);
+				} catch (e) {
+					console.log(e);
+				}
+			}
+		})();
+	});
+
+	useEffect(() => {
+		(async () => {
+			if (safeAddress !== "" && pluginAddress !== "" && !isPluginEnabled) {
+				const _isPluginEnabled = await getIsPluginEnabled(
+					safeAddress,
+					pluginAddress
+				);
+				if (_isPluginEnabled) {
+					setIsPluginEnabled(_isPluginEnabled);
+				}
+			}
+		})();
+	});
 
 	const saveSafeAddress = (
 		_safeAddress: string,
@@ -20,9 +84,39 @@ const useUserData = () => {
 		}
 	};
 
+	const savePluginAddress = (
+		_pluginAddress: string,
+		storeLocalStorage?: boolean
+	) => {
+		setPluginAddress(_pluginAddress);
+		if (storeLocalStorage) {
+			localStorage.setItem(`plugin_address`, JSON.stringify(_pluginAddress));
+		}
+	};
+
+	const saveCurrentOwner = (
+		_currentOwner: string,
+		storeLocalStorage?: boolean
+	) => {
+		setCurrentOwner(_currentOwner);
+		if (storeLocalStorage) {
+			localStorage.setItem(`current_owner`, JSON.stringify(_currentOwner));
+		}
+	};
+
 	const removeSafeAddress = () => {
 		localStorage.removeItem(`safe_address`);
 		setSafeAddress("");
+	};
+
+	const removePluginAddress = () => {
+		localStorage.removeItem(`plugin_address`);
+		setPluginAddress("");
+	};
+
+	const removeCurrentOwner = () => {
+		localStorage.removeItem(`current_owner`);
+		setCurrentOwner("");
 	};
 
 	const saveSafeSDK = (_safeSDK: any) => {
@@ -33,22 +127,13 @@ const useUserData = () => {
 		setSigner(_signer);
 	};
 
-	const savePluginAdddress = (_plugin: string) => {
-		setPluginAddress(_plugin);
-	};
-
-	const saveIsPluginEnabled = (_isEnabled: boolean) => {
-		setIsPluginEnabled(_isEnabled);
-	};
-
-	const saveCurrentOwner = (_currentOwner: string) => {
-		setCurrentOwner(_currentOwner);
-	};
-
 	const logout = () => {
 		removeSafeAddress();
+		removePluginAddress();
+		removeCurrentOwner();
 		saveSafeSDK(null);
 		saveSigner(null);
+		setIsPluginEnabled(false);
 	};
 
 	return {
@@ -61,8 +146,7 @@ const useUserData = () => {
 		saveSafeAddress,
 		saveSafeSDK,
 		saveSigner,
-		savePluginAdddress,
-		saveIsPluginEnabled,
+		savePluginAddress,
 		saveCurrentOwner,
 		logout,
 	};

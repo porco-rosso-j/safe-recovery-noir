@@ -8,47 +8,100 @@ import {
 } from "@chakra-ui/react";
 import React, { useState, useContext, useEffect } from "react";
 import UserDataContext from "src/contexts/userData";
-import { getSafeSDK, getSigner, switchNetwork } from "../scripts/utils/login";
+import {
+	getSafeSDK,
+	supportedChainID,
+	switchNetwork,
+} from "../scripts/utils/login";
+import {
+	useWeb3Modal,
+	useWeb3ModalProvider,
+	useWeb3ModalState,
+	useWeb3ModalAccount,
+} from "@web3modal/ethers5/react";
+import { providers, Signer } from "ethers";
 
 const WalletLogin: React.FC = () => {
-	const { saveSafeAddress, saveSafeSDK, saveSigner } =
+	const { safeAddress, saveSafeAddress, saveSafeSDK, saveSigner } =
 		useContext(UserDataContext);
+	const { walletProvider } = useWeb3ModalProvider();
+	const modal = useWeb3Modal();
+	const { chainId } = useWeb3ModalAccount();
+	const { open, selectedNetworkId } = useWeb3ModalState();
+
 	const [safeAddressInput, setSafeAddressInput] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
 
 	useEffect(() => {
+		const timer = setTimeout(async () => {
+			if (!walletProvider) {
+				modal.open();
+			}
+		}, 10000);
+
+		return () => clearTimeout(timer);
+	}, [walletProvider, modal]);
+
+	useEffect(() => {
 		(async () => {
-			await switchNetwork();
+			console.log("walletProvider uf: ", walletProvider);
+			if (walletProvider && chainId !== supportedChainID) {
+				await switchNetwork(walletProvider);
+			}
 		})();
 	});
 
 	useEffect(() => {
 		(async () => {
-			try {
-				const signer = await getSigner();
-				if (signer) saveSigner(signer);
+			if (walletProvider && safeAddress !== "") {
+				try {
+					// signer
+					const signer = await getSigner();
+					console.log("signer uf: ", signer);
+					if (signer) saveSigner(signer);
 
-				const storedData = localStorage.getItem(`safe_address`);
-				const _safeAddress = storedData ? JSON.parse(storedData) : undefined;
-				console.log("_safeAddress: ", _safeAddress);
-				if (_safeAddress) {
-					saveSafeAddress(_safeAddress);
-					const safeSDK = await getSafeSDK(_safeAddress, signer);
+					// safe sdk
+					const safeSDK = await getSafeSDK(safeAddress, signer);
 					if (safeSDK) {
 						saveSafeSDK(safeSDK);
 					}
+				} catch (e) {
+					console.log("e:", e);
 				}
-			} catch (e) {
-				console.log("e:", e);
 			}
 		})();
 	});
 
+	const getSigner = async (): Promise<Signer> => {
+		console.log("getSigner walletProvider: ", walletProvider);
+		const provider = new providers.Web3Provider(walletProvider);
+		const signer: Signer = provider.getSigner(0);
+		return signer;
+	};
+
 	const onClickLogin = async () => {
 		setErrorMessage("");
-		await switchNetwork();
+
+		console.log("selectedNetworkId: ", selectedNetworkId);
+		console.log("open: ", open);
+
+		if (!walletProvider) {
+			setErrorMessage("Please connect your wallet");
+			return;
+		}
+
+		console.log("chainId: ", chainId);
+		console.log("selectedChainid: ", selectedNetworkId);
+		if (chainId !== supportedChainID) {
+			await switchNetwork(walletProvider);
+		}
+
 		const signer = await getSigner();
-		if (signer) saveSigner(signer);
+		console.log("signer: ", signer);
+		if (!signer) {
+			setErrorMessage("Please connect wallet first");
+			return;
+		}
 
 		if (safeAddressInput !== "") {
 			saveSafeAddress(safeAddressInput, true);
@@ -81,7 +134,6 @@ const WalletLogin: React.FC = () => {
 				mt={20}
 				borderRadius="lg"
 				boxShadow="lg"
-				// backgroundColor={"gray.800"}
 				backgroundColor={"#2e2e2e"}
 			>
 				<Text fontSize="xl" fontWeight="bold" mb={6}>
@@ -96,7 +148,7 @@ const WalletLogin: React.FC = () => {
 						onChange={(e) => setSafeAddressInput(e.target.value)}
 					/>
 				</Box>
-				<Text color="red.400" mb={4}>
+				<Text color="red.400" mb={10}>
 					{errorMessage}
 				</Text>
 				<Button w="100%" onClick={onClickLogin}>

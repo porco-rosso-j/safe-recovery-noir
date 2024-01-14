@@ -141,16 +141,16 @@ export async function getSafePluginAddress(safeAddr: string): Promise<string> {
 	// return await pluginFac.getPluginAddr(safeAddr);
 }
 
-export async function getIsPluginDeployed(
-	safeAddr: string
-): Promise<[boolean, string]> {
-	const pluginAddr = await getSafePluginAddress(safeAddr);
-	if (pluginAddr === ethers.constants.AddressZero) {
-		return [false, ""];
-	} else {
-		return [true, pluginAddr];
-	}
-}
+// export async function getIsPluginDeployed(
+// 	safeAddr: string
+// ): Promise<[boolean, string]> {
+// 	const pluginAddr = await getSafePluginAddress(safeAddr);
+// 	if (pluginAddr === ethers.constants.AddressZero) {
+// 		return [false, ""];
+// 	} else {
+// 		return [true, pluginAddr];
+// 	}
+// }
 
 export async function getIsPluginEnabled(
 	safe: string,

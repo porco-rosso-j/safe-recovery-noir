@@ -4,6 +4,12 @@ export function shortenAddress(address: string) {
 	);
 }
 
+export function shortenAddressS(address: string) {
+	return (
+		address.substring(0, 5) + "..." + address.substring(address.length - 4)
+	);
+}
+
 export function shortenTxHash(address: string) {
 	return (
 		address.substring(0, 8) + "..." + address.substring(address.length - 8)

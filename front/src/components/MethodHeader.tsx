@@ -23,7 +23,7 @@ const MethodHeader = (props: MethodHeaderType) => {
 					mt={2}
 					mb={4}
 					onChange={(e) => props.updateMethod(Number(e.target.value))}
-					defaultValue={"1"}
+					// defaultValue={"1"}
 					value={props.method}
 				>
 					<option value="1">1. Backup Address Recovery</option>
