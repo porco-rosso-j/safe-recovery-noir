@@ -14,15 +14,26 @@ import {
 } from "@chakra-ui/react";
 import { shortenTxHash } from "src/scripts/utils/address";
 
-function ProposedModal(props) {
-	const handleCheckProposal = async () => {
+type ProposeResultModalType = {
+	isOpen: boolean;
+	onOpen: () => void;
+	onClose: () => void;
+	fucntionResult: boolean;
+	txHash: string;
+	recoveryCount: number;
+	handleCheckProposal: () => void;
+};
+
+function ProposedModal(props: ProposeResultModalType) {
+	const handleCheckProposal = () => {
 		console.log("handleCheckProposal in Modal");
 
-		await props.handleCheckProposal();
+		props.handleCheckProposal();
 		console.log("props.handleCheckProposal done");
 		props.onClose();
 		console.log("onClose");
 	};
+
 	return (
 		<>
 			<Modal
@@ -42,7 +53,7 @@ function ProposedModal(props) {
 					textAlign="center"
 					alignItems="center"
 				>
-					{props.result ? (
+					{props.fucntionResult ? (
 						<Box>
 							<ModalHeader mt={4}>Successfully proposed!</ModalHeader>
 							<ModalBody pb={6}>

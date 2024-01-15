@@ -8,7 +8,7 @@ import {
 	useDisclosure,
 } from "@chakra-ui/react";
 import { inputStyle } from "src/theme";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import UserDataContext from "src/contexts/userData";
 import { getRecoveryCount, _proposeRecovery } from "../scripts/plugins/index";
 import { getProposal } from "src/scripts/plugins/view";
@@ -39,12 +39,14 @@ const ProposeRecovery = (props: {
 	const [proposal, setProposal] = useState<ProposalType>(null);
 	const [openProposal, setOpenProposal] = useState<boolean>(false);
 
+	const [currentMethod, setCurrentMethod] = useState<number>(0);
+
 	console.log("currentOwner: ", currentOwner);
 
 	const handleCheckProposal = async () => {
 		console.log("handleCheckProposal in ProposeRecovery");
 
-		const proposal = await getProposal(BigInt(recoveryCount), pluginAddress);
+		const proposal = await getProposal(recoveryCount, pluginAddress);
 		console.log("proposal");
 		setProposal(proposal);
 		console.log("proposal set: ", proposal);
@@ -57,13 +59,25 @@ const ProposeRecovery = (props: {
 		props.setTabIndex(2);
 	};
 
+	useEffect(() => {
+		console.log("currentMethod ;", currentMethod);
+		console.log("props.methodIndex ;", props.methodIndex);
+		if (currentMethod !== props.methodIndex) {
+			setCurrentMethod(props.methodIndex);
+			if (loading) {
+				setLoading(false);
+			}
+		}
+	}, [currentMethod, props.methodIndex, loading]);
+	console.log("currentMethod ;", currentMethod);
+
 	return (
 		<Box pt="3px">
 			{openProposal ? (
 				<Box>
 					<ProposalDetail
 						proposal={proposal}
-						proposalId={BigInt(recoveryCount)}
+						proposalId={recoveryCount}
 						fromProposeTab={true}
 						setOpenProposal={setOpenProposal}
 					/>
@@ -155,10 +169,10 @@ const ProposeRecovery = (props: {
 										console.log("method: ", props.methodIndex);
 										console.log("secret: ", secret);
 										const ret = await _proposeRecovery(
-											BigInt(props.methodIndex),
+											props.methodIndex,
 											signer,
 											pluginAddress,
-											BigInt(threshold),
+											threshold,
 											ownerReplaced,
 											pendingNewOwner,
 											secret
@@ -168,7 +182,7 @@ const ProposeRecovery = (props: {
 											const _recoveryCount = await getRecoveryCount(
 												pluginAddress
 											);
-											setRecoveryCount(Number(_recoveryCount));
+											setRecoveryCount(_recoveryCount);
 											setResult(true);
 										} else if (!ret.result && ret.txHash === "") {
 											console.log("ret.result: ", ret.result);
@@ -209,9 +223,9 @@ const ProposeRecovery = (props: {
 							isOpen={isOpen}
 							onOpen={onOpen}
 							onClose={onClose}
-							result={result}
+							fucntionResult={result}
 							txHash={txHash}
-							recoveryCount={recoveryCount}
+							recoveryCount={Number(recoveryCount)}
 							handleCheckProposal={handleCheckProposal}
 						/>
 					</Box>

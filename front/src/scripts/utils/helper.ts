@@ -13,10 +13,13 @@ export async function parseUint8ArrayToBytes32(
 	value: Uint8Array
 ): Promise<string[]> {
 	let array: string[] = [];
-	let i = 0;
-	for (i; i < value.length; i++) {
-		array[i] = ethers.zeroPadValue(`0x${value[i].toString(16)}`, 32);
+
+	console.log("value: ", value);
+	for (let i = 0; i < value.length; i++) {
+		let element = `0x${value[i].toString(16).padStart(2, "0")}`;
+		array[i] = ethers.zeroPadValue(element, 32);
 	}
+	console.log("array: ", array);
 	return array;
 }
 

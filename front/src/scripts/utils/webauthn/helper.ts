@@ -132,7 +132,7 @@ export async function getCordinates(pubkey: string): Promise<any> {
 	let i = 0;
 	for (i; i < uint8ArrayPubkey.length; i++) {
 		pubkeyBytes32Array[i] = ethers.zeroPadValue(
-			`0x${uint8ArrayPubkey[i].toString(16)}`,
+			`0x${uint8ArrayPubkey[i].toString(16).padStart(2, "0")}`,
 			32
 		);
 	}

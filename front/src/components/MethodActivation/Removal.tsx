@@ -57,7 +57,7 @@ const MethodRemoval = (props) => {
 				isOpen={isOpen}
 				onOpen={onOpen}
 				onClose={onClose}
-				result={result}
+				fucntionResult={result}
 				txHash={txHash}
 				enable={false}
 			/>

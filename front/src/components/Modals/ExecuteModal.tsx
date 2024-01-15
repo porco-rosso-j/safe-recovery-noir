@@ -10,11 +10,20 @@ import {
 	Text,
 	Link,
 	Flex,
-	Box,
 } from "@chakra-ui/react";
 import { shortenTxHash } from "src/scripts/utils/address";
 
-function ExecutedModal(props) {
+type ExecuteResultModalType = {
+	isOpen: boolean;
+	onOpen: () => void;
+	onClose: () => void;
+	fucntionResult: boolean;
+	txHash: string;
+	functionType: number;
+	setFunctionType: (num: number) => void;
+};
+
+function ExecutedModal(props: ExecuteResultModalType) {
 	const handleClose = () => {
 		props.setFunctionType(0);
 		props.onClose();

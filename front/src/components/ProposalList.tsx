@@ -16,15 +16,15 @@ import { typeName } from "src/scripts/utils/helper";
 
 const ProposalList = () => {
 	const { pluginAddress } = useContext(UserDataContext);
-	const [proposalId, setProposalId] = useState<bigint>(0n);
-	const [proposalLength, setProposalLength] = useState<bigint>(0n);
+	const [proposalId, setProposalId] = useState<number>(0);
+	const [proposalLength, setProposalLength] = useState<number>(0);
 	const [proposals, setProposals] = useState<ProposalType[]>([]);
 	const [loadingProposals, setLoadingProposals] = useState<boolean>(true);
 	const [initialLoad, setInitialLoad] = useState<boolean>(true);
 
 	const fetchProposals = useCallback(async () => {
 		console.log("fetchProposals");
-		const proposalLen = await getRecoveryCount(pluginAddress);
+		const proposalLen = Number(await getRecoveryCount(pluginAddress));
 		if (proposalLength !== proposalLen) {
 			try {
 				const proposalsFetched = await getProposals(pluginAddress);
@@ -46,7 +46,7 @@ const ProposalList = () => {
 		}
 
 		const interval = setInterval(() => {
-			if (proposalId === 0n) {
+			if (proposalId === 0) {
 				fetchProposals();
 			}
 		}, 60000); // Update every 60 seconds
@@ -61,7 +61,7 @@ const ProposalList = () => {
 		proposalId,
 	]);
 
-	const handleSetProposalId = (id: bigint) => {
+	const handleSetProposalId = (id: number) => {
 		console.log("id: ", id);
 		console.log("proposals.length: ", proposals.length);
 		if (id < proposals.length) {
@@ -73,11 +73,11 @@ const ProposalList = () => {
 
 	return (
 		<Box pt="3px">
-			<Text mb={5} fontSize={15} mx="75px">
-				Choose proposal and execute ⚡️
-			</Text>
-			{proposalId === 0n ? (
+			{proposalId === 0 ? (
 				<Box>
+					<Text mb={5} fontSize={15} mx="75px">
+						Choose proposal and execute ⚡️
+					</Text>
 					<Box mb={5}>
 						<label>Proposal ID:</label>
 						<Input
@@ -86,7 +86,7 @@ const ProposalList = () => {
 							size="sm"
 							placeholder="2"
 							onChange={(e) => {
-								handleSetProposalId(BigInt(e.target.value));
+								handleSetProposalId(Number(e.target.value));
 							}}
 						/>
 					</Box>

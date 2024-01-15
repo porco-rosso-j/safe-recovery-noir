@@ -6,7 +6,9 @@ import {
 	VStack,
 	HStack,
 	useDisclosure,
+	Spinner,
 } from "@chakra-ui/react";
+import { RepeatIcon } from "@chakra-ui/icons";
 import { useContext, useState } from "react";
 import UserDataContext from "src/contexts/userData";
 import { shortenAddress } from "../scripts/utils/address";
@@ -18,11 +20,12 @@ import {
 import ExecutedModal from "./Modals/ExecuteModal";
 import { calcTimeDiff, typeName } from "src/scripts/utils/helper";
 import { ProposalType, txResult } from "../scripts/plugins/types";
+import { getProposal } from "src/scripts/plugins/view";
 
 const ProposalDetail = (props: {
 	proposal: ProposalType;
-	proposalId: bigint;
-	setProposalId?: (id: bigint) => void;
+	proposalId: number;
+	setProposalId?: (id: number) => void;
 	fromProposeTab: boolean;
 	setOpenProposal?: (value: boolean) => void;
 }) => {
@@ -30,26 +33,27 @@ const ProposalDetail = (props: {
 		useContext(UserDataContext);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
-	const [functionType, setFunctionType] = useState<bigint>(0n);
+	const [functionType, setFunctionType] = useState<number>(0);
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const [txHash, setTxHash] = useState<string>("");
 
 	const [fucntionResult, setFunctionResult] = useState<boolean>(false);
 	const [openProposedModal, setOpenProposedModal] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [loadingIndex, setLoadingIndex] = useState<bigint>(0n);
+	const [loadingIndex, setLoadingIndex] = useState<number>(0);
 
-	// use effect to update give prposal's contents
+	const [proposal, setProposal] = useState<ProposalType>(props.proposal);
+	const [refreshing, setRefreshing] = useState(false);
 
-	const handleFunction = async (funcType: bigint) => {
+	const handleFunction = async (funcType: number) => {
 		setErrorMessage("");
 		handleLoading(funcType, true);
 
 		let ret: txResult = { result: false, txHash: "" };
 
-		if (funcType === 1n) {
+		if (funcType === 1) {
 			ret = await _executeRecover(signer, pluginAddress, props.proposalId);
-		} else if (funcType === 2n) {
+		} else if (funcType === 2) {
 			ret = await _approveSocialRecovery(
 				signer,
 				pluginAddress,
@@ -66,8 +70,10 @@ const ProposalDetail = (props: {
 
 		if (ret.result) {
 			setFunctionResult(true);
-			if (funcType === 1n || funcType === 2n) {
-				saveCurrentOwner(props.proposal.newOwners[0]);
+			if (funcType === 1) {
+				console.log("saveCurrentOwner called?: ");
+				saveCurrentOwner(proposal.newOwners[0], true);
+				console.log("saveCurrentOwner called 2?: ");
 			}
 		} else if (!ret.result && ret.txHash === "") {
 			console.log("ret.result: ", ret.result);
@@ -80,16 +86,32 @@ const ProposalDetail = (props: {
 		handleLoading(funcType, false);
 		openModal();
 		setLoading(false);
+		handleRefreshProposal();
 	};
 
-	const handleLoading = (index: bigint, loading: boolean) => {
-		if (index === 1n && loading) {
+	const handleRefreshProposal = async () => {
+		setRefreshing(true);
+		try {
+			const refreshedProposal = await getProposal(
+				props.proposalId,
+				pluginAddress
+			);
+			setProposal(refreshedProposal);
+		} catch (e) {
+			console.log("e: ", e);
+		}
+
+		setRefreshing(false);
+	};
+
+	const handleLoading = (index: number, loading: boolean) => {
+		if (index === 1 && loading) {
 			setLoadingIndex(index);
 			setLoading(loading);
-		} else if (index === 2n && loading) {
+		} else if (index === 2 && loading) {
 			setLoadingIndex(index);
 			setLoading(loading);
-		} else if (index === 3n && loading) {
+		} else if (index === 3 && loading) {
 			setLoadingIndex(index);
 			setLoading(loading);
 		}
@@ -108,7 +130,7 @@ const ProposalDetail = (props: {
 	};
 
 	return (
-		<Box mt={10}>
+		<Box mt={3}>
 			<Flex
 				p={5}
 				mx="auto"
@@ -120,54 +142,66 @@ const ProposalDetail = (props: {
 				alignItems="center" // Vertically center the button
 				flexDirection="column"
 			>
-				<Text as="b" mb={3} fontSize={16} justifyContent="center">
-					Proposal {Number(props.proposalId)} Detail
-				</Text>
+				<Flex alignItems="center" width="100%" mb={3}>
+					<Flex flex="1" justifyContent="center" ml={14}>
+						<Text as="b" fontSize={16}>
+							Proposal {Number(props.proposalId)} Detail
+						</Text>
+					</Flex>
+
+					<Button
+						onClick={handleRefreshProposal}
+						leftIcon={
+							<RepeatIcon color={"white"} _hover={{ color: "green" }} />
+						}
+						backgroundColor={"transparent"}
+						_hover={{ bg: "transparent" }}
+					></Button>
+					{refreshing ? <Spinner size={"xs"} /> : null}
+				</Flex>
 				<Flex alignItems="strech">
 					<VStack spacing={1} fontSize={15} color="white" align="start" mr={15}>
 						<Text>・ Method Type:</Text>
 						<Text>・ New Owner:</Text>
 						<Text>・ Old Owner:</Text>
 						<Text>・ New Multi-sig Threshold:</Text>
-						{props.proposal.type === 4n ? (
+						{proposal.type === 4 ? (
 							<Text>・ Current Approval Count:</Text>
 						) : null}
-						{props.proposal.type === 4n ? (
-							<Text>・ Approval Threshold:</Text>
-						) : null}
+						{proposal.type === 4 ? <Text>・ Approval Threshold:</Text> : null}
 						<Text>・ Executable:</Text>
-						{!props.proposal.isExecutable.result ? (
+						{!proposal.isExecutable.result ? (
 							<Text ml={4} color="red.400">
 								*Reason:
 							</Text>
 						) : null}
-						{!props.proposal.isExecutable.result &&
-						props.proposal.isExecutable.reason === "TIMELOCK_NOT_ENDED" ? (
+						{!proposal.isExecutable.result &&
+						proposal.isExecutable.reason === "TIMELOCK_NOT_ENDED" ? (
 							<Text>・ Executable After:</Text>
 						) : null}
 					</VStack>
 					<VStack spacing={1} fontSize={15} align="end">
-						<Text>{typeName(Number(props.proposal.type))} Recovery</Text>
-						<Text>{shortenAddress(props.proposal.newOwners[0])}</Text>
-						<Text>{shortenAddress(props.proposal.oldOwners[0])}</Text>
-						<Text>{Number(props.proposal.threshold)}</Text>
-						{props.proposal.type === 4n ? (
-							<Text>{Number(props.proposal.approvals)}</Text>
+						<Text>{typeName(Number(proposal.type))} Recovery</Text>
+						<Text>{shortenAddress(proposal.newOwners[0])}</Text>
+						<Text>{shortenAddress(proposal.oldOwners[0])}</Text>
+						<Text>{Number(proposal.threshold)}</Text>
+						{proposal.type === 4 ? (
+							<Text>{Number(proposal.approvals)}</Text>
 						) : null}
-						{props.proposal.type === 4n ? (
-							<Text>{Number(props.proposal.approvealThreshold)}</Text>
+						{proposal.type === 4 ? (
+							<Text>{Number(proposal.approvealThreshold)}</Text>
 						) : null}
-						{props.proposal.isExecutable.result ? (
+						{proposal.isExecutable.result ? (
 							<Text color="green.400"> Yes </Text>
 						) : (
 							<Text color="red.400"> No </Text>
 						)}
-						{!props.proposal.isExecutable.result ? (
-							<Text color="red.400">{props.proposal.isExecutable.reason}</Text>
+						{!proposal.isExecutable.result ? (
+							<Text color="red.400">{proposal.isExecutable.reason}</Text>
 						) : null}
-						{!props.proposal.isExecutable.result &&
-						props.proposal.isExecutable.reason === "TIMELOCK_NOT_ENDED" ? (
-							<Text>{calcTimeDiff(Number(props.proposal.timeLockEnd))}</Text>
+						{!proposal.isExecutable.result &&
+						proposal.isExecutable.reason === "TIMELOCK_NOT_ENDED" ? (
+							<Text>{calcTimeDiff(Number(proposal.timeLockEnd))}</Text>
 						) : null}
 					</VStack>
 				</Flex>
@@ -177,32 +211,32 @@ const ProposalDetail = (props: {
 							sx={{ mt: "35px", mr: "30px" }}
 							bg="#C53030"
 							color="white"
-							isLoading={loading && loadingIndex === 3n}
+							isLoading={loading && loadingIndex === 3}
 							loadingText="Rejecting"
 							_hover={{
 								bg: "#9B2C2C",
 							}}
 							onClick={async () => {
-								if (!props.proposal.rejected) {
-									await handleFunction(3n);
+								if (!proposal.rejected) {
+									await handleFunction(3);
 								} else {
 									setErrorMessage("This proposal has already been rejected");
 								}
 							}}
-							isDisabled={props.proposal.rejected}
+							isDisabled={proposal.rejected}
 						>
 							Reject
 						</Button>
 					) : null}
-					{props.proposal.type === 4n &&
-					props.proposal.approvals < props.proposal.approvealThreshold ? (
+					{proposal.type === 4 &&
+					proposal.approvals < proposal.approvealThreshold ? (
 						<Button
 							sx={{ mt: "35px" }}
 							colorScheme="blue"
-							isLoading={loading && loadingIndex === 2n}
+							isLoading={loading && loadingIndex === 2}
 							loadingText="Approving"
 							onClick={() => {
-								handleFunction(2n);
+								handleFunction(2);
 							}}
 						>
 							Approve
@@ -211,18 +245,18 @@ const ProposalDetail = (props: {
 						<Button
 							sx={{ mt: "35px" }}
 							colorScheme="teal"
-							isLoading={loading && loadingIndex === 1n}
+							isLoading={loading && loadingIndex === 1}
 							loadingText="Executing"
 							onClick={() => {
-								handleFunction(1n);
+								handleFunction(1);
 							}}
-							isDisabled={!props.proposal.isExecutable.result}
+							isDisabled={!proposal.isExecutable.result}
 						>
 							Execute
 						</Button>
 					)}
 				</HStack>
-				{loading && loadingIndex === 2n ? (
+				{loading && loadingIndex === 2 ? (
 					<Text mt={5}>
 						{" "}
 						*you need to sign a message on connected wallet <br /> to generate
@@ -245,7 +279,7 @@ const ProposalDetail = (props: {
 						if (props.fromProposeTab) {
 							props.setOpenProposal(false);
 						} else {
-							props.setProposalId(0n);
+							props.setProposalId(0);
 						}
 					}}
 				>

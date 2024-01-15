@@ -66,7 +66,6 @@ export default function Header() {
 						alignItems="center"
 						gap={4}
 						mt={2}
-						mr={250}
 					>
 						<Link to="/">
 							<Button

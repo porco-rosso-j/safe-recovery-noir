@@ -1,4 +1,9 @@
-import { Signer, ethers, SigningKey } from "ethers";
+import {
+	Signer,
+	ethers,
+	SigningKey,
+	ContractTransactionResponse,
+} from "ethers";
 import { authenticateWebAuthn } from "../utils/webauthn/webauthn";
 import { getNullifierHashAndHashPath } from "../utils/merkle/merkle-helper";
 import {
@@ -23,17 +28,17 @@ import { sendSafeTx } from "../utils/safe";
 import { NullifierHashAndHashPath } from "../utils/merkle/merkle-helper";
 
 export async function _proposeRecovery(
-	method: bigint,
+	method: number,
 	signer: Signer,
 	pluginAddr: string,
-	newThreshold: bigint,
+	newThreshold: number,
 	oldOwner: string,
 	newOwner: string,
 	secret?: string
 ): Promise<txResult> {
 	let result: txResult;
 
-	if (method === 1n) {
+	if (method === 1) {
 		result = await _proposeEcrecoverRecover(
 			signer,
 			pluginAddr,
@@ -41,7 +46,7 @@ export async function _proposeRecovery(
 			oldOwner,
 			newOwner
 		);
-	} else if (method === 2n) {
+	} else if (method === 2) {
 		result = await _proposeFingerPrintRecover(
 			signer,
 			pluginAddr,
@@ -49,7 +54,7 @@ export async function _proposeRecovery(
 			oldOwner,
 			newOwner
 		);
-	} else if (method === 3n) {
+	} else if (method === 3) {
 		result = await _proposeSecretRecover(
 			signer,
 			pluginAddr,
@@ -58,7 +63,7 @@ export async function _proposeRecovery(
 			newOwner,
 			secret
 		);
-	} else if (method === 4n) {
+	} else if (method === 4) {
 		result = await _proposeSocialRecover(
 			signer,
 			pluginAddr,
@@ -74,11 +79,11 @@ export async function _proposeRecovery(
 	return result;
 }
 
-async function sendTx(tx: any): Promise<txResult> {
+async function sendTx(tx: ContractTransactionResponse): Promise<txResult> {
 	try {
 		const txResponse = await tx.wait();
 		console.log("txResponse: ", txResponse);
-		return { result: true, txHash: txResponse.transactionHash };
+		return { result: true, txHash: txResponse.hash };
 	} catch (e) {
 		return { result: false, txHash: tx.hash };
 	}
@@ -87,19 +92,30 @@ async function sendTx(tx: any): Promise<txResult> {
 export async function _proposeEcrecoverRecover(
 	signer: Signer,
 	pluginAddr: string,
-	newThreshold: bigint,
+	newThreshold: number,
 	oldOwner: string,
 	newOwner: string
 ): Promise<txResult> {
 	const [msg, signature] = await getMsgAndSig(
 		signer,
-		1n,
+		1,
 		await signer.getAddress()
 	);
 	if (msg === "" || signature === "") return error;
 
 	const msgHash: string = ethers.hashMessage(msg);
 	const pubkey: string = SigningKey.recoverPublicKey(msgHash, signature);
+	console.log("msgHash: ", msgHash);
+	console.log("pubkey: ", pubkey);
+	console.log("msgHash len: ", ethers.dataLength(msgHash));
+	console.log("pubkey len: ", ethers.dataLength(pubkey));
+
+	console.log("msgHash getBytes: ", ethers.getBytes(msgHash));
+	const pubInputMsgHash = await parseUint8ArrayToBytes32(
+		ethers.getBytes(msgHash)
+	);
+
+	console.log("pubInputMsgHash: ", pubInputMsgHash);
 
 	const hashedAddr = await getHashedAddr(pluginAddr);
 
@@ -110,14 +126,10 @@ export async function _proposeEcrecoverRecover(
 		ethers.getBytes(msgHash)
 	);
 
-	const pubInputMsgHash = await parseUint8ArrayToBytes32(
-		ethers.getBytes(msgHash)
-	);
-	console.log("pubInputMsgHash: ", pubInputMsgHash);
 	console.log("ret.proof: ", ret.proof);
 
 	try {
-		const tx = await recoveryPluginSigner(
+		const tx: ContractTransactionResponse = await recoveryPluginSigner(
 			signer,
 			pluginAddr
 		).proposeEcrecoverRecover(
@@ -140,7 +152,7 @@ export async function _proposeEcrecoverRecover(
 export async function _proposeFingerPrintRecover(
 	signer: Signer,
 	pluginAddr: string,
-	newThreshold: bigint,
+	newThreshold: number,
 	oldOwner: string,
 	newOwner: string
 ): Promise<txResult> {
@@ -189,7 +201,7 @@ export async function _proposeFingerPrintRecover(
 export async function _proposeSecretRecover(
 	signer: Signer,
 	pluginAddr: string,
-	newThreshold: bigint,
+	newThreshold: number,
 	oldOwner: string,
 	newOwner: string,
 	secret: string
@@ -223,19 +235,19 @@ export async function _proposeSecretRecover(
 export async function _proposeSocialRecover(
 	signer: Signer,
 	pluginAddr: string,
-	newThreshold: bigint,
+	newThreshold: number,
 	oldOwner: string,
 	newOwner: string
 ): Promise<txResult> {
 	const signerAddr = await signer.getAddress();
-	const [msg, signature] = await getMsgAndSig(signer, 4n, signerAddr);
+	const [msg, signature] = await getMsgAndSig(signer, 4, signerAddr);
 	if (msg === "" || signature === "") return error;
 
 	try {
 		const msgHash: string = ethers.hashMessage(msg);
 		const pubkey: string = SigningKey.recoverPublicKey(msgHash, signature);
 
-		const _proposalId = (await getRecoveryCount(pluginAddr)) + 1n;
+		const _proposalId = (await getRecoveryCount(pluginAddr)) + 1;
 		const proposalId = "0x" + _proposalId.toString();
 
 		const root = await getGuardiansRoot(pluginAddr);
@@ -283,11 +295,11 @@ export async function _proposeSocialRecover(
 export async function _approveSocialRecovery(
 	signer: Signer,
 	pluginAddr: string,
-	proposalId: bigint
+	proposalId: number
 ): Promise<txResult> {
 	const [msg, signature] = await getMsgAndSig(
 		signer,
-		4n,
+		4,
 		await signer.getAddress()
 	);
 	if (msg === "" || signature === "") return error;
@@ -341,7 +353,7 @@ export async function _approveSocialRecovery(
 export async function _executeRecover(
 	signer: Signer,
 	pluginAddr: string,
-	proposalId: bigint
+	proposalId: number
 ): Promise<txResult> {
 	try {
 		const tx = await recoveryPluginSigner(signer, pluginAddr).execRecovery(
@@ -362,7 +374,7 @@ export async function _rejectRecover(
 	safeSDK: Safe,
 	safeAddr: string,
 	pluginAddr: string,
-	proposalId: bigint
+	proposalId: number
 ): Promise<txResult> {
 	const rejectionTx = pluginIface.encodeFunctionData("rejectRecovery", [
 		proposalId,
@@ -385,13 +397,13 @@ export async function _rejectRecover(
 
 const getMsgAndSig = async (
 	signer: Signer,
-	type: bigint,
+	type: number,
 	address: string
 ): Promise<any> => {
 	let methodStr;
-	if (type === 1n) {
+	if (type === 1) {
 		methodStr = "ecrecover_recovery";
-	} else if (type === 4n) {
+	} else if (type === 4) {
 		methodStr = "social_recovery";
 	}
 

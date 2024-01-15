@@ -13,7 +13,16 @@ import {
 } from "@chakra-ui/react";
 import { shortenTxHash } from "src/scripts/utils/address";
 
-function EnabledModal(props) {
+type EnabledResultModalType = {
+	isOpen: boolean;
+	onOpen: () => void;
+	onClose: () => void;
+	fucntionResult: boolean;
+	txHash: string;
+	enable: boolean;
+};
+
+function EnabledModal(props: EnabledResultModalType) {
 	return (
 		<>
 			<Modal
@@ -33,7 +42,7 @@ function EnabledModal(props) {
 					textAlign="center"
 					alignItems="center"
 				>
-					{props.result ? (
+					{props.fucntionResult ? (
 						<ModalHeader mt={4}>
 							{props.enable ? "Successfully Enabled!" : "Method Disabled"}
 						</ModalHeader>
