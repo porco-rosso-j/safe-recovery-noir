@@ -1,4 +1,4 @@
-import { Signer, utils } from "ethers";
+import { Signer, ethers, SigningKey } from "ethers";
 import { authenticateWebAuthn } from "../utils/webauthn/webauthn";
 import { getNullifierHashAndHashPath } from "../utils/merkle/merkle-helper";
 import {
@@ -98,23 +98,20 @@ export async function _proposeEcrecoverRecover(
 	);
 	if (msg === "" || signature === "") return error;
 
-	const msgHash: string = utils.hashMessage(msg);
-	const pubkey: string = utils.recoverPublicKey(
-		msgHash,
-		utils.arrayify(signature)
-	);
+	const msgHash: string = ethers.hashMessage(msg);
+	const pubkey: string = SigningKey.recoverPublicKey(msgHash, signature);
 
 	const hashedAddr = await getHashedAddr(pluginAddr);
 
 	const ret = await generateProofK256(
 		hashedAddr,
-		utils.arrayify(pubkey).slice(1, 65),
-		utils.arrayify(signature).slice(0, -1),
-		utils.arrayify(msgHash)
+		ethers.getBytes(pubkey).slice(1, 65),
+		ethers.getBytes(signature).slice(0, -1),
+		ethers.getBytes(msgHash)
 	);
 
 	const pubInputMsgHash = await parseUint8ArrayToBytes32(
-		utils.arrayify(msgHash)
+		ethers.getBytes(msgHash)
 	);
 	console.log("pubInputMsgHash: ", pubInputMsgHash);
 	console.log("ret.proof: ", ret.proof);
@@ -165,10 +162,10 @@ export async function _proposeFingerPrintRecover(
 		console.log("message: ", message);
 
 		const ret = await generateProofP256(
-			utils.arrayify(signature),
-			utils.arrayify(pubkey[0]),
-			utils.arrayify(pubkey[1]),
-			utils.arrayify(message)
+			ethers.getBytes(signature),
+			ethers.getBytes(pubkey[0]),
+			ethers.getBytes(pubkey[1]),
+			ethers.getBytes(message)
 		);
 
 		const tx = await recoveryPluginSigner(
@@ -235,15 +232,11 @@ export async function _proposeSocialRecover(
 	if (msg === "" || signature === "") return error;
 
 	try {
-		const msgHash: string = utils.hashMessage(msg);
-		const pubkey: string = utils.recoverPublicKey(
-			msgHash,
-			utils.arrayify(signature)
-		);
+		const msgHash: string = ethers.hashMessage(msg);
+		const pubkey: string = SigningKey.recoverPublicKey(msgHash, signature);
 
-		const proposalId = utils.hexlify(
-			Number(await getRecoveryCount(pluginAddr)) + 1
-		);
+		const _proposalId = Number(await getRecoveryCount(pluginAddr)) + 1;
+		const proposalId = "0x" + _proposalId.toString();
 
 		const root = await getGuardiansRoot(pluginAddr);
 		console.log("root: ", root);
@@ -255,15 +248,15 @@ export async function _proposeSocialRecover(
 			root,
 			response.nullHash,
 			proposalId,
-			utils.arrayify(pubkey).slice(1, 65),
-			utils.arrayify(signature).slice(0, -1),
-			utils.arrayify(msgHash),
+			ethers.getBytes(pubkey).slice(1, 65),
+			ethers.getBytes(signature).slice(0, -1),
+			ethers.getBytes(msgHash),
 			response.index.toString(),
 			response.hashPath
 		);
 
 		const pubInputMsgHash = await parseUint8ArrayToBytes32(
-			utils.arrayify(msgHash)
+			ethers.getBytes(msgHash)
 		);
 		console.log("pubInputMsgHash: ", pubInputMsgHash);
 
@@ -298,33 +291,31 @@ export async function _approveSocialRecovery(
 		await signer.getAddress()
 	);
 	if (msg === "" || signature === "") return error;
-	const msgHash: string = utils.hashMessage(msg);
-	const pubkey: string = utils.recoverPublicKey(
-		msgHash,
-		utils.arrayify(signature)
-	);
+	const msgHash: string = ethers.hashMessage(msg);
+	const pubkey: string = SigningKey.recoverPublicKey(msgHash, signature);
 
 	const root = await getGuardiansRoot(pluginAddr);
 
 	const { index, nullHash, hashPath } = await getNullifierHashAndHashPath(
 		root,
 		await signer.getAddress(),
-		utils.hexlify(proposalId)
+		// utils.hexlify(proposalId)
+		"0x" + proposalId.toString()
 	);
 
 	const ret = await generateProofSocial(
 		root,
 		nullHash,
 		proposalId.toString(),
-		utils.arrayify(pubkey).slice(1, 65),
-		utils.arrayify(signature).slice(0, -1),
-		utils.arrayify(msgHash),
+		ethers.getBytes(pubkey).slice(1, 65),
+		ethers.getBytes(signature).slice(0, -1),
+		ethers.getBytes(msgHash),
 		index.toString(),
 		hashPath
 	);
 
 	const pubInputMsgHash = await parseUint8ArrayToBytes32(
-		utils.arrayify(msgHash)
+		ethers.getBytes(msgHash)
 	);
 	console.log("pubInputMsgHash: ", pubInputMsgHash);
 
@@ -377,7 +368,7 @@ export async function _rejectRecover(
 		proposalId,
 	]);
 
-	const _data = utils.solidityPack(
+	const _data = ethers.solidityPacked(
 		["bytes", "address"],
 		[rejectionTx, safeAddr]
 	);
@@ -389,7 +380,7 @@ export async function _rejectRecover(
 		value: "0",
 	};
 
-	return await sendSafeTx(safeSDK, rejectionTxnTxData);
+	return await sendSafeTx(safeSDK, [rejectionTxnTxData]);
 }
 
 const getMsgAndSig = async (

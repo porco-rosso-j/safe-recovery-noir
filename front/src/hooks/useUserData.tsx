@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Signer, constants } from "ethers";
+import { Signer, ZeroAddress } from "ethers";
 import Safe from "@safe-global/protocol-kit";
 import {
 	getIsPluginEnabled,
 	getSafeOwners,
 	getSafePluginAddress,
 } from "src/scripts/utils/safe";
+import { getSafeSDK } from "src/scripts/utils/login";
 
 const useUserData = () => {
 	const [safeAddress, setSafeAddress] = useState<string | null>("");
@@ -36,7 +37,7 @@ const useUserData = () => {
 			if (safeAddress !== "" && pluginAddress === "") {
 				try {
 					const PluginAddr = await getSafePluginAddress(safeAddress);
-					if (PluginAddr !== constants.AddressZero) {
+					if (PluginAddr !== ZeroAddress) {
 						savePluginAddress(PluginAddr, true);
 					}
 				} catch (e) {

@@ -1,7 +1,6 @@
 import { Fr } from "@aztec/bb.js";
 import { MerkleTree } from "./merkle";
 import { pedersenHash } from "../pedersen";
-import { ethers } from "ethers";
 
 export async function getMerkleRootFromAddresses(
 	addresses: string[]

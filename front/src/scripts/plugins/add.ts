@@ -27,7 +27,7 @@ export async function _addEcrecoverRecover(
 		value: "0",
 	};
 
-	return await sendSafeTx(safeSDK, safeTxData);
+	return await sendSafeTx(safeSDK, [safeTxData]);
 }
 
 // costs about 1.6m gas
@@ -62,7 +62,7 @@ export async function _addWebAuthnRecover(
 		value: "0",
 	};
 
-	return await sendSafeTx(safeSDK, safeTxData);
+	return await sendSafeTx(safeSDK, [safeTxData]);
 }
 
 export async function _addSecretRecover(
@@ -87,7 +87,7 @@ export async function _addSecretRecover(
 		value: "0",
 	};
 
-	return await sendSafeTx(safeSDK, safeTxData);
+	return await sendSafeTx(safeSDK, [safeTxData]);
 }
 
 export async function _addSocialRecover(
@@ -112,5 +112,5 @@ export async function _addSocialRecover(
 		value: "0",
 	};
 
-	return await sendSafeTx(safeSDK, safeTxData);
+	return await sendSafeTx(safeSDK, [safeTxData]);
 }

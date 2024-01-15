@@ -15,7 +15,7 @@ import {
 	useWeb3Modal,
 	useWeb3ModalAccount,
 	useDisconnect,
-} from "@web3modal/ethers5/react";
+} from "@web3modal/ethers/react";
 import { Link } from "react-router-dom";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
 
@@ -30,17 +30,6 @@ export default function Header() {
 	const handleDisconnect = () => {
 		disconnect();
 		logout();
-	};
-
-	const handleCopy = () => {
-		navigator.clipboard
-			.writeText(address)
-			.then(() => {
-				console.log("Text copied to clipboard");
-			})
-			.catch((err) => {
-				console.error("Failed to copy text: ", err);
-			});
 	};
 
 	return (
@@ -62,6 +51,7 @@ export default function Header() {
 					justify="space-between"
 					wrap="wrap"
 					color="white"
+					ml={10}
 				>
 					<Box
 						display={{ base: "block", md: "none" }}
@@ -119,7 +109,6 @@ export default function Header() {
 						}}
 					>
 						<Text
-							onClick={handleCopy}
 							fontSize={17}
 							color={"#cccccc"}
 							mt={2}
@@ -130,6 +119,7 @@ export default function Header() {
 								color: "black",
 								cursor: "pointer",
 							}}
+							onClick={() => modal.open({ view: "Account" })}
 						>
 							{shortenAddressS(address)}
 						</Text>

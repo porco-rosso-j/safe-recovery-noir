@@ -131,7 +131,7 @@ export async function getCordinates(pubkey: string): Promise<any> {
 	let pubkeyBytes32Array: string[] = [];
 	let i = 0;
 	for (i; i < uint8ArrayPubkey.length; i++) {
-		pubkeyBytes32Array[i] = ethers.utils.hexZeroPad(
+		pubkeyBytes32Array[i] = ethers.zeroPadValue(
 			`0x${uint8ArrayPubkey[i].toString(16)}`,
 			32
 		);
@@ -142,7 +142,7 @@ export async function getCordinates(pubkey: string): Promise<any> {
 }
 
 export async function getSignature(_signature) {
-	const signatureParsed = await derToRS(bufferFromBase64(_signature));
+	const signatureParsed = derToRS(bufferFromBase64(_signature));
 
 	console.log(
 		"bufferToHex(signatureParsed[0]): ",
@@ -157,9 +157,7 @@ export async function getSignature(_signature) {
 		bufferToHex(signatureParsed[1]).slice(2)
 	);
 
-	const signature = ethers.BigNumber.from(
-		bufferToHex(signatureParsed[0]) + bufferToHex(signatureParsed[1]).slice(2)
-	);
-
+	const signature =
+		bufferToHex(signatureParsed[0]) + bufferToHex(signatureParsed[1]).slice(2);
 	return signature;
 }

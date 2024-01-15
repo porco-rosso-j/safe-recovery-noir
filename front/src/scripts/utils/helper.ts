@@ -1,4 +1,4 @@
-import { utils } from "ethers";
+import { ethers } from "ethers";
 export async function parseUint8ArrayToStrArray(
 	value: Uint8Array
 ): Promise<string[]> {
@@ -15,7 +15,7 @@ export async function parseUint8ArrayToBytes32(
 	let array: string[] = [];
 	let i = 0;
 	for (i; i < value.length; i++) {
-		array[i] = utils.hexZeroPad(`0x${value[i].toString(16)}`, 32);
+		array[i] = ethers.zeroPadValue(`0x${value[i].toString(16)}`, 32);
 	}
 	return array;
 }

@@ -48,7 +48,7 @@ export async function _getIsRecoveryExecutable(
 	try {
 		const ret = await recoveryPluginContract(
 			pluginAddr
-		).callStatic.getIsRecoveryExecutable(proposalId);
+		).getIsRecoveryExecutable(proposalId);
 
 		console.log("_getIsRecoveryExecutable: ", ret);
 		return {
@@ -56,7 +56,8 @@ export async function _getIsRecoveryExecutable(
 			reason: "",
 		} as IsRecoveryExecutableType;
 	} catch (error) {
-		if (error.code === ethers.errors.CALL_EXCEPTION) {
+		// if (error.code === ethers.errors.CALL_EXCEPTION) {
+		if (ethers.isCallException(error)) {
 			console.log("Revert reason:", error.reason);
 			return {
 				result: false,

@@ -1,6 +1,6 @@
 import { ethers, Signer } from "ethers";
 import Safe, { EthersAdapter } from "@safe-global/protocol-kit";
-import { createWeb3Modal, defaultConfig } from "@web3modal/ethers5/react";
+import { createWeb3Modal, defaultConfig } from "@web3modal/ethers/react";
 
 const projectId = "50c757cbaeca7cb60747337b3eebaef9";
 if (!projectId) {
@@ -93,7 +93,7 @@ export const switchNetwork = async (walletProvider: any) => {
 	try {
 		await walletProvider.request({
 			method: "wallet_switchEthereumChain",
-			params: [{ chainId: ethers.utils.hexValue(supportedChainID) }],
+			params: [{ chainId: ethers.toQuantity(supportedChainID) }],
 		});
 		console.log("done");
 	} catch (err) {
@@ -104,7 +104,7 @@ export const switchNetwork = async (walletProvider: any) => {
 				params: [
 					{
 						chainName: "Goerli",
-						chainId: ethers.utils.hexValue(supportedChainID),
+						chainId: ethers.toQuantity(supportedChainID),
 						nativeCurrency: {
 							name: "ETH",
 							decimals: 18,
@@ -127,23 +127,19 @@ export const getSafeSDK = async (
 		signerOrProvider: signer,
 	});
 
-	let safeSDK;
+	let safeSDK: Safe = null;
+
 	try {
-		console.log("safeAddr: ", safeAddr);
 		safeSDK = await Safe.create({
 			ethAdapter: ethAdapter,
 			safeAddress: safeAddr,
-			isL1SafeMasterCopy: true,
+			isL1SafeSingleton: true,
 		});
-		console.log("safeSDK: ", safeSDK);
 	} catch {
-		// setErrorMessage("Failed to set SafeSDK");
-		console.log("Failed to set SafeSDK", safeSDK);
 		return null;
 	}
 
 	if ((await safeSDK.getOwners())[0] === (await signer.getAddress())) {
-		// saveSafeSDK(safeSDK);
 		return safeSDK;
 	} else {
 		console.log("not owner");

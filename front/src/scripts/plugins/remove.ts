@@ -25,5 +25,5 @@ export async function _removeRecover(
 		value: "0",
 	};
 
-	return await sendSafeTx(safeSDK, safeTxData);
+	return await sendSafeTx(safeSDK, [safeTxData]);
 }

@@ -62,7 +62,7 @@ export async function enableModuleOnSafe(
 
 	console.log("pluginAddress: ", pluginAddress);
 	console.log("isModuleEnabled: ", isModuleEnabled);
-	if (isModuleEnabled && pluginAddress !== ethers.constants.AddressZero) {
+	if (isModuleEnabled && pluginAddress !== ethers.ZeroAddress) {
 		// addModule
 		try {
 			const tx = await registry.addModule(pluginAddress, 1, {
@@ -92,7 +92,11 @@ export async function enablePluginOnProtocolManager(
 	]);
 
 	console.log("enablePluginTx: ", enablePluginTx);
-	const _data = ethers.utils.solidityPack(
+	/*
+	ethers.solidityPackedKeccak256(types, values)
+	ethers.solidityPackedSha256(types, values)
+	*/
+	const _data = ethers.solidityPacked(
 		["bytes", "address"],
 		[enablePluginTx, safeAddr]
 	);
@@ -104,27 +108,27 @@ export async function enablePluginOnProtocolManager(
 		value: "0",
 	};
 
-	return await sendSafeTx(safeSDK, enablePluginTxData);
+	return await sendSafeTx(safeSDK, [enablePluginTxData]);
 }
 
 export async function sendSafeTx(
 	safeSDK: Safe,
-	safeTx: SafeTransactionDataPartial | MetaTransactionData[]
+	safeTx: MetaTransactionData[]
 ): Promise<txResult> {
 	try {
 		const safeTransaction = await safeSDK.createTransaction({
-			safeTransactionData: safeTx,
+			transactions: safeTx,
 		});
 		console.log("safeTransaction: ", safeTransaction);
 		const txResponse = await safeSDK.executeTransaction(safeTransaction, {
 			gasLimit: 1000000,
 		});
 		console.log("txResponse: ", txResponse);
-		const res: ethers.ContractReceipt =
+		const res: ethers.ContractTransactionReceipt =
 			await txResponse.transactionResponse?.wait();
 		console.log("res:", res);
 
-		return { result: true, txHash: res.transactionHash };
+		return { result: true, txHash: res.hash };
 	} catch (e) {
 		console.log("error: ", e);
 		return error;
@@ -145,7 +149,7 @@ export async function getSafePluginAddress(safeAddr: string): Promise<string> {
 // 	safeAddr: string
 // ): Promise<[boolean, string]> {
 // 	const pluginAddr = await getSafePluginAddress(safeAddr);
-// 	if (pluginAddr === ethers.constants.AddressZero) {
+// 	if (pluginAddr === ethers.ZeroAddress) {
 // 		return [false, ""];
 // 	} else {
 // 		return [true, pluginAddr];
@@ -170,6 +174,6 @@ export async function getSafeOwners(safe: string): Promise<string[]> {
 	return await safeContract(safe).getOwners();
 }
 
-async function computePluginAddr(safeAddr: string): Promise<string> {
-	return await pluginFac.getAddress(safeAddr, 0);
-}
+// async function computePluginAddr(safeAddr: string): Promise<string> {
+// 	return await pluginFac.getAddress(safeAddr, 0);
+// }

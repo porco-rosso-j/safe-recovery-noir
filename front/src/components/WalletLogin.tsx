@@ -18,8 +18,8 @@ import {
 	useWeb3ModalProvider,
 	useWeb3ModalState,
 	useWeb3ModalAccount,
-} from "@web3modal/ethers5/react";
-import { providers, Signer } from "ethers";
+} from "@web3modal/ethers/react";
+import { BrowserProvider, Signer } from "ethers";
 
 const WalletLogin: React.FC = () => {
 	const { safeAddress, saveSafeAddress, saveSafeSDK, saveSigner } =
@@ -51,17 +51,25 @@ const WalletLogin: React.FC = () => {
 		})();
 	});
 
+	const getSigner = async (): Promise<Signer> => {
+		console.log("getSigner walletProvider: ", walletProvider);
+		const provider = new BrowserProvider(walletProvider);
+		const signer = provider.getSigner();
+		return signer;
+	};
+
 	useEffect(() => {
 		(async () => {
 			if (walletProvider && safeAddress !== "") {
 				try {
 					// signer
 					const signer = await getSigner();
-					console.log("signer uf: ", signer);
 					if (signer) saveSigner(signer);
 
 					// safe sdk
+					console.log("signer true?: ", signer);
 					const safeSDK = await getSafeSDK(safeAddress, signer);
+					console.log("safeSDK 1:", safeSDK);
 					if (safeSDK) {
 						saveSafeSDK(safeSDK);
 					}
@@ -71,13 +79,6 @@ const WalletLogin: React.FC = () => {
 			}
 		})();
 	});
-
-	const getSigner = async (): Promise<Signer> => {
-		console.log("getSigner walletProvider: ", walletProvider);
-		const provider = new providers.Web3Provider(walletProvider);
-		const signer: Signer = provider.getSigner(0);
-		return signer;
-	};
 
 	const onClickLogin = async () => {
 		setErrorMessage("");
