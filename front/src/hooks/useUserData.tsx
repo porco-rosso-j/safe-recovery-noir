@@ -3,10 +3,9 @@ import { Signer, ZeroAddress } from "ethers";
 import Safe from "@safe-global/protocol-kit";
 import {
 	getIsPluginEnabled,
-	getSafeOwners,
+	getSafeOwner,
 	getSafePluginAddress,
 } from "src/scripts/utils/safe";
-import { getSafeSDK } from "src/scripts/utils/login";
 
 const useUserData = () => {
 	const [safeAddress, setSafeAddress] = useState<string | null>("");
@@ -49,10 +48,10 @@ const useUserData = () => {
 
 	useEffect(() => {
 		(async () => {
-			if (safeAddress !== "" && currentOwner === "") {
+			// if (safeAddress !== "" && currentOwner === "") {
+			if (safeAddress !== "") {
 				try {
-					const owners = await getSafeOwners(safeAddress);
-					const owner = owners[0];
+					const owner = await getSafeOwner(safeAddress);
 					saveCurrentOwner(owner, true);
 				} catch (e) {
 					console.log(e);

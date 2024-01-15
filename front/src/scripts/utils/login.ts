@@ -1,4 +1,4 @@
-import { ethers, Signer } from "ethers";
+import { BrowserProvider, ethers, Signer } from "ethers";
 import Safe, { EthersAdapter } from "@safe-global/protocol-kit";
 import { createWeb3Modal, defaultConfig } from "@web3modal/ethers/react";
 
@@ -34,60 +34,16 @@ createWeb3Modal({
 	chains,
 	projectId,
 	enableAnalytics: true,
-	// themeMode: "light",
-	// themeVariables: {
-	// 	"--w3m-color-mix": "#00DCFF",
-	// 	"--w3m-color-mix-strength": 20,
-	// },
 });
-
-// declare global {
-// 	interface Window {
-// 		ethereum: any;
-// 	}
-// }
 
 export const supportedChainID = 5;
 
-// export const getSigner = async (): Promise<Signer> => {
-// 	const provider = new providers.Web3Provider(window.ethereum);
-// 	await provider.send("eth_requestAccounts", []);
-// 	const signer: Signer = provider.getSigner(0);
-// 	console.log("signer: ", signer);
-// 	return signer;
-// };
-
-// export const switchNetwork = async () => {
-// 	if (window.ethereum.networkVersion !== supportedChainID) {
-// 		try {
-// 			// await window.ethereum.request({
-// 			// 	method: "wallet_switchEthereumChain",
-// 			// 	params: [{ chainId: ethers.utils.hexValue(supportedChainID) }],
-// 			// });
-
-// 			console.log("done");
-// 		} catch (err) {
-// 			// This error code indicates that the chain has not been added to MetaMask
-// 			if (err.code === 4902) {
-// 				// await window.ethereum.request({
-// 				// 	method: "wallet_addEthereumChain",
-// 				// 	params: [
-// 				// 		{
-// 				// 			chainName: "Goerli",
-// 				// 			chainId: ethers.utils.hexValue(supportedChainID),
-// 				// 			nativeCurrency: {
-// 				// 				name: "ETH",
-// 				// 				decimals: 18,
-// 				// 				symbol: "ETH",
-// 				// 			},
-// 				// 			rpcUrls: ["https://goerli.infura.io/v3/"],
-// 				// 		},
-// 				// 	],
-// 				// });
-// 			}
-// 		}
-// 	}
-// };
+export const getSigner = async (walletProvider: any): Promise<Signer> => {
+	console.log("getSigner walletProvider: ", walletProvider);
+	const provider = new BrowserProvider(walletProvider);
+	const signer = provider.getSigner();
+	return signer;
+};
 
 export const switchNetwork = async (walletProvider: any) => {
 	try {

@@ -6,79 +6,30 @@ import {
 	useColorModeValue,
 	Link,
 } from "@chakra-ui/react";
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import UserDataContext from "src/contexts/userData";
 import {
 	getSafeSDK,
+	getSigner,
 	supportedChainID,
 	switchNetwork,
 } from "../scripts/utils/login";
 import {
-	useWeb3Modal,
 	useWeb3ModalProvider,
 	useWeb3ModalState,
 	useWeb3ModalAccount,
 } from "@web3modal/ethers/react";
-import { BrowserProvider, Signer } from "ethers";
 
 const WalletLogin: React.FC = () => {
-	const { safeAddress, saveSafeAddress, saveSafeSDK, saveSigner } =
+	const { saveSafeAddress, saveSafeSDK, saveSigner } =
 		useContext(UserDataContext);
 	const { walletProvider } = useWeb3ModalProvider();
-	const modal = useWeb3Modal();
+
 	const { chainId } = useWeb3ModalAccount();
 	const { open, selectedNetworkId } = useWeb3ModalState();
 
 	const [safeAddressInput, setSafeAddressInput] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
-
-	useEffect(() => {
-		const timer = setTimeout(async () => {
-			if (!walletProvider) {
-				modal.open();
-			}
-		}, 10000);
-
-		return () => clearTimeout(timer);
-	}, [walletProvider, modal]);
-
-	useEffect(() => {
-		(async () => {
-			console.log("walletProvider uf: ", walletProvider);
-			if (walletProvider && chainId !== supportedChainID) {
-				await switchNetwork(walletProvider);
-			}
-		})();
-	});
-
-	const getSigner = async (): Promise<Signer> => {
-		console.log("getSigner walletProvider: ", walletProvider);
-		const provider = new BrowserProvider(walletProvider);
-		const signer = provider.getSigner();
-		return signer;
-	};
-
-	useEffect(() => {
-		(async () => {
-			if (walletProvider && safeAddress !== "") {
-				try {
-					// signer
-					const signer = await getSigner();
-					if (signer) saveSigner(signer);
-
-					// safe sdk
-					console.log("signer true?: ", signer);
-					const safeSDK = await getSafeSDK(safeAddress, signer);
-					console.log("safeSDK 1:", safeSDK);
-					if (safeSDK) {
-						saveSafeSDK(safeSDK);
-					}
-				} catch (e) {
-					console.log("e:", e);
-				}
-			}
-		})();
-	});
 
 	const onClickLogin = async () => {
 		setErrorMessage("");
@@ -97,17 +48,20 @@ const WalletLogin: React.FC = () => {
 			await switchNetwork(walletProvider);
 		}
 
-		const signer = await getSigner();
+		const signer = await getSigner(walletProvider);
 		console.log("signer: ", signer);
 		if (!signer) {
 			setErrorMessage("Please connect wallet first");
 			return;
 		}
 
+		saveSigner(signer);
+
 		if (safeAddressInput !== "") {
 			saveSafeAddress(safeAddressInput, true);
 			const safeSDK = await getSafeSDK(safeAddressInput, signer);
 			if (safeSDK) {
+				console.log("safeSDK: ", safeSDK);
 				saveSafeSDK(safeSDK);
 			} else {
 				setErrorMessage("Failed to instantiate safeSDK");

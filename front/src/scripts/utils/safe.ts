@@ -145,33 +145,15 @@ export async function getSafePluginAddress(safeAddr: string): Promise<string> {
 	// return await pluginFac.getPluginAddr(safeAddr);
 }
 
-// export async function getIsPluginDeployed(
-// 	safeAddr: string
-// ): Promise<[boolean, string]> {
-// 	const pluginAddr = await getSafePluginAddress(safeAddr);
-// 	if (pluginAddr === ethers.ZeroAddress) {
-// 		return [false, ""];
-// 	} else {
-// 		return [true, pluginAddr];
-// 	}
-// }
-
 export async function getIsPluginEnabled(
 	safe: string,
 	pluginAddr: string
 ): Promise<boolean> {
-	// return await manager.isPluginEnabled(safe, contracts.recoveryPlugin);
 	return await manager.isPluginEnabled(safe, pluginAddr);
 }
 
-export async function getSafeOwners(safe: string): Promise<string[]> {
-	// try {
-	// 	return await safeContract(safe).getOwners();
-	// } catch (e) {
-	// 	console.log("erorr:", e);
-	// 	return [""];
-	// }
-	return await safeContract(safe).getOwners();
+export async function getSafeOwner(safe: string): Promise<string> {
+	return (await safeContract(safe).getOwners())[0];
 }
 
 // async function computePluginAddr(safeAddr: string): Promise<string> {

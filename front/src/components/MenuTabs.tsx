@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
 	Box,
 	Tabs,
@@ -7,18 +9,41 @@ import {
 	TabPanel,
 	Text,
 } from "@chakra-ui/react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import UserDataContext from "src/contexts/userData";
 import { shortenAddress } from "src/scripts/utils/address";
 import MethodHeader from "./MethodHeader";
 import EnablePlugin from "./EnablePlugin";
 import WalletLogin from "./WalletLogin";
+import {
+	useWeb3Modal,
+	useWeb3ModalAccount,
+	useWeb3ModalProvider,
+} from "@web3modal/ethers/react";
+import {
+	getSafeSDK,
+	getSigner,
+	supportedChainID,
+	switchNetwork,
+} from "src/scripts/utils/login";
 
 const MenuTabs = () => {
-	const { signer, safeAddress, safeSDK, isPluginEnabled } =
-		useContext(UserDataContext);
+	const {
+		signer,
+		safeAddress,
+		safeSDK,
+		isPluginEnabled,
+		currentOwner,
+		saveSigner,
+		saveSafeSDK,
+	} = useContext(UserDataContext);
+	const { walletProvider } = useWeb3ModalProvider();
+	const modal = useWeb3Modal();
+	const { address, chainId } = useWeb3ModalAccount();
 	const [method, setMethod] = useState<number>(1);
 	const [tabIndex, setTabIndex] = useState(0);
+	const [tabOneDisplayIndex, setTabOneDisplayIndex] = useState<number>(0);
+	const [isNetworkWrong, setIsWrongNetwork] = useState<boolean>(true);
 
 	const updateMethod = (index: number) => {
 		setMethod(index);
@@ -36,6 +61,80 @@ const MenuTabs = () => {
 
 		return false;
 	};
+
+	const updateSignerAndSafe = async () => {
+		try {
+			const signer = await getSigner(walletProvider);
+			if (signer) saveSigner(signer);
+
+			const safeSDK = await getSafeSDK(safeAddress, signer);
+			if (safeSDK) {
+				saveSafeSDK(safeSDK);
+			} else {
+				saveSafeSDK(null);
+			}
+		} catch (e) {
+			console.log("e:", e);
+		}
+	};
+
+	useEffect(() => {
+		if (tabIndex === 0) {
+			console.log("address: ", address);
+
+			if (safeSDK && address === currentOwner && isPluginEnabled) {
+				setTabOneDisplayIndex(1);
+			} else if (safeSDK && address === currentOwner && !isPluginEnabled) {
+				setTabOneDisplayIndex(2);
+			} else {
+				setTabOneDisplayIndex(3);
+			}
+		}
+	}, [tabIndex, address, safeSDK, currentOwner, isPluginEnabled]);
+
+	// get walletProvider when walletProvider disconnected
+	useEffect(() => {
+		const timer = setTimeout(async () => {
+			if (!walletProvider) {
+				modal.open();
+			}
+		}, 10000);
+
+		return () => clearTimeout(timer);
+	}, [walletProvider, modal, saveSigner]);
+
+	useEffect(() => {
+		(async () => {
+			console.log("signer as; ", signer);
+			if (walletProvider) {
+				// update signer and safe when walletProvider is defined but signer/safe sdk is null
+				if (signer === null) {
+					await updateSignerAndSafe();
+				} else {
+					// re-save signer when it's switched to new account
+					const signerAddress = await signer.getAddress();
+					if (address !== signerAddress) {
+						await updateSignerAndSafe();
+					}
+				}
+			}
+		})();
+	}, [walletProvider, signer, updateSignerAndSafe]);
+
+	// ask for network change when walletProvider detects unsupported network
+	useEffect(() => {
+		(async () => {
+			console.log("walletProvider uf: ", walletProvider);
+			if (walletProvider && chainId !== supportedChainID) {
+				setIsWrongNetwork(false);
+				await switchNetwork(walletProvider);
+			} else if (walletProvider && chainId === supportedChainID) {
+				if (!isNetworkWrong) {
+					setIsWrongNetwork(true);
+				}
+			}
+		})();
+	});
 
 	return (
 		<Box
@@ -82,21 +181,21 @@ const MenuTabs = () => {
 						</TabList>
 						<TabPanels>
 							<TabPanel>
-								{safeSDK && isPluginEnabled ? (
+								{tabOneDisplayIndex === 1 ? (
 									<MethodHeader
 										updateMethod={updateMethod}
 										method={method}
 										index={tabIndex}
 									/>
-								) : safeSDK && !isPluginEnabled ? (
+								) : tabOneDisplayIndex === 2 ? (
 									<EnablePlugin />
-								) : (
-									<Box mt="10px">
+								) : tabOneDisplayIndex === 3 ? (
+									<Box my="50px">
 										<Text>
 											You are not an owner of Safe {shortenAddress(safeAddress)}
 										</Text>
 									</Box>
-								)}
+								) : null}
 							</TabPanel>
 							<TabPanel>
 								<MethodHeader

@@ -38,7 +38,6 @@ const ProposalDetail = (props: {
 	const [txHash, setTxHash] = useState<string>("");
 
 	const [fucntionResult, setFunctionResult] = useState<boolean>(false);
-	const [openProposedModal, setOpenProposedModal] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [loadingIndex, setLoadingIndex] = useState<number>(0);
 
@@ -71,9 +70,7 @@ const ProposalDetail = (props: {
 		if (ret.result) {
 			setFunctionResult(true);
 			if (funcType === 1) {
-				console.log("saveCurrentOwner called?: ");
 				saveCurrentOwner(proposal.newOwners[0], true);
-				console.log("saveCurrentOwner called 2?: ");
 			}
 		} else if (!ret.result && ret.txHash === "") {
 			console.log("ret.result: ", ret.result);
@@ -84,7 +81,7 @@ const ProposalDetail = (props: {
 		setTxHash(ret.txHash);
 		setFunctionType(funcType);
 		handleLoading(funcType, false);
-		openModal();
+		onOpen();
 		setLoading(false);
 		handleRefreshProposal();
 	};
@@ -115,18 +112,6 @@ const ProposalDetail = (props: {
 			setLoadingIndex(index);
 			setLoading(loading);
 		}
-	};
-
-	// Function to open the modal from the parent
-	const openModal = () => {
-		setOpenProposedModal(true);
-		onOpen();
-	};
-
-	// Function to close the modal from the parent
-	const closeModal = () => {
-		setOpenProposedModal(false);
-		onClose();
 	};
 
 	return (
@@ -288,9 +273,9 @@ const ProposalDetail = (props: {
 			</Flex>
 
 			<ExecutedModal
-				isOpen={isOpen || openProposedModal}
+				isOpen={isOpen}
 				onOpen={onOpen}
-				onClose={closeModal}
+				onClose={onClose}
 				fucntionResult={fucntionResult}
 				txHash={txHash}
 				functionType={functionType}
