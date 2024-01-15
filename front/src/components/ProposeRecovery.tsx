@@ -44,7 +44,7 @@ const ProposeRecovery = (props: {
 	const handleCheckProposal = async () => {
 		console.log("handleCheckProposal in ProposeRecovery");
 
-		const proposal = await getProposal(recoveryCount, pluginAddress);
+		const proposal = await getProposal(BigInt(recoveryCount), pluginAddress);
 		console.log("proposal");
 		setProposal(proposal);
 		console.log("proposal set: ", proposal);
@@ -63,7 +63,7 @@ const ProposeRecovery = (props: {
 				<Box>
 					<ProposalDetail
 						proposal={proposal}
-						proposalId={recoveryCount}
+						proposalId={BigInt(recoveryCount)}
 						fromProposeTab={true}
 						setOpenProposal={setOpenProposal}
 					/>
@@ -155,10 +155,10 @@ const ProposeRecovery = (props: {
 										console.log("method: ", props.methodIndex);
 										console.log("secret: ", secret);
 										const ret = await _proposeRecovery(
-											props.methodIndex,
+											BigInt(props.methodIndex),
 											signer,
 											pluginAddress,
-											threshold,
+											BigInt(threshold),
 											ownerReplaced,
 											pendingNewOwner,
 											secret

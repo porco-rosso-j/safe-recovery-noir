@@ -38,23 +38,23 @@ const useAddRecover = (onOpen: () => void) => {
 				safeSDK,
 				pluginAddress,
 				params.pendingNewOwner,
-				params.timeLock
+				BigInt(timeLock)
 			);
 		} else if (methodIndex === 2) {
-			ret = await _addWebAuthnRecover(safeSDK, pluginAddress, params.timeLock);
+			ret = await _addWebAuthnRecover(safeSDK, pluginAddress, BigInt(timeLock));
 		} else if (methodIndex === 3) {
 			ret = await _addSecretRecover(
 				safeSDK,
 				pluginAddress,
-				timeLock,
+				BigInt(timeLock),
 				params.secretWord
 			);
 		} else if (methodIndex === 4) {
 			ret = await _addSocialRecover(
 				safeSDK,
 				pluginAddress,
-				timeLock,
-				params.threshold,
+				BigInt(timeLock),
+				BigInt(params.threshold),
 				params.guardians
 			);
 		}

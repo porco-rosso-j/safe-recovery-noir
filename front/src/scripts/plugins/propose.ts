@@ -23,17 +23,17 @@ import { sendSafeTx } from "../utils/safe";
 import { NullifierHashAndHashPath } from "../utils/merkle/merkle-helper";
 
 export async function _proposeRecovery(
-	method: number,
+	method: bigint,
 	signer: Signer,
 	pluginAddr: string,
-	newThreshold: number,
+	newThreshold: bigint,
 	oldOwner: string,
 	newOwner: string,
 	secret?: string
 ): Promise<txResult> {
 	let result: txResult;
 
-	if (method === 1) {
+	if (method === 1n) {
 		result = await _proposeEcrecoverRecover(
 			signer,
 			pluginAddr,
@@ -41,7 +41,7 @@ export async function _proposeRecovery(
 			oldOwner,
 			newOwner
 		);
-	} else if (method === 2) {
+	} else if (method === 2n) {
 		result = await _proposeFingerPrintRecover(
 			signer,
 			pluginAddr,
@@ -49,7 +49,7 @@ export async function _proposeRecovery(
 			oldOwner,
 			newOwner
 		);
-	} else if (method === 3) {
+	} else if (method === 3n) {
 		result = await _proposeSecretRecover(
 			signer,
 			pluginAddr,
@@ -58,7 +58,7 @@ export async function _proposeRecovery(
 			newOwner,
 			secret
 		);
-	} else if (method === 4) {
+	} else if (method === 4n) {
 		result = await _proposeSocialRecover(
 			signer,
 			pluginAddr,
@@ -87,13 +87,13 @@ async function sendTx(tx: any): Promise<txResult> {
 export async function _proposeEcrecoverRecover(
 	signer: Signer,
 	pluginAddr: string,
-	newThreshold: number,
+	newThreshold: bigint,
 	oldOwner: string,
 	newOwner: string
 ): Promise<txResult> {
 	const [msg, signature] = await getMsgAndSig(
 		signer,
-		1,
+		1n,
 		await signer.getAddress()
 	);
 	if (msg === "" || signature === "") return error;
@@ -140,7 +140,7 @@ export async function _proposeEcrecoverRecover(
 export async function _proposeFingerPrintRecover(
 	signer: Signer,
 	pluginAddr: string,
-	newThreshold: number,
+	newThreshold: bigint,
 	oldOwner: string,
 	newOwner: string
 ): Promise<txResult> {
@@ -189,7 +189,7 @@ export async function _proposeFingerPrintRecover(
 export async function _proposeSecretRecover(
 	signer: Signer,
 	pluginAddr: string,
-	newThreshold: number,
+	newThreshold: bigint,
 	oldOwner: string,
 	newOwner: string,
 	secret: string
@@ -223,19 +223,19 @@ export async function _proposeSecretRecover(
 export async function _proposeSocialRecover(
 	signer: Signer,
 	pluginAddr: string,
-	newThreshold: number,
+	newThreshold: bigint,
 	oldOwner: string,
 	newOwner: string
 ): Promise<txResult> {
 	const signerAddr = await signer.getAddress();
-	const [msg, signature] = await getMsgAndSig(signer, 4, signerAddr);
+	const [msg, signature] = await getMsgAndSig(signer, 4n, signerAddr);
 	if (msg === "" || signature === "") return error;
 
 	try {
 		const msgHash: string = ethers.hashMessage(msg);
 		const pubkey: string = SigningKey.recoverPublicKey(msgHash, signature);
 
-		const _proposalId = Number(await getRecoveryCount(pluginAddr)) + 1;
+		const _proposalId = (await getRecoveryCount(pluginAddr)) + 1n;
 		const proposalId = "0x" + _proposalId.toString();
 
 		const root = await getGuardiansRoot(pluginAddr);
@@ -283,11 +283,11 @@ export async function _proposeSocialRecover(
 export async function _approveSocialRecovery(
 	signer: Signer,
 	pluginAddr: string,
-	proposalId: number
+	proposalId: bigint
 ): Promise<txResult> {
 	const [msg, signature] = await getMsgAndSig(
 		signer,
-		4,
+		4n,
 		await signer.getAddress()
 	);
 	if (msg === "" || signature === "") return error;
@@ -341,7 +341,7 @@ export async function _approveSocialRecovery(
 export async function _executeRecover(
 	signer: Signer,
 	pluginAddr: string,
-	proposalId: number
+	proposalId: bigint
 ): Promise<txResult> {
 	try {
 		const tx = await recoveryPluginSigner(signer, pluginAddr).execRecovery(
@@ -362,7 +362,7 @@ export async function _rejectRecover(
 	safeSDK: Safe,
 	safeAddr: string,
 	pluginAddr: string,
-	proposalId: number
+	proposalId: bigint
 ): Promise<txResult> {
 	const rejectionTx = pluginIface.encodeFunctionData("rejectRecovery", [
 		proposalId,
@@ -385,13 +385,13 @@ export async function _rejectRecover(
 
 const getMsgAndSig = async (
 	signer: Signer,
-	type: number,
+	type: bigint,
 	address: string
 ): Promise<any> => {
 	let methodStr;
-	if (type === 1) {
+	if (type === 1n) {
 		methodStr = "ecrecover_recovery";
-	} else if (type === 4) {
+	} else if (type === 4n) {
 		methodStr = "social_recovery";
 	}
 

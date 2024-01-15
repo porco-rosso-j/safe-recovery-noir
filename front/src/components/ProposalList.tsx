@@ -14,10 +14,10 @@ import { ProposalType } from "../scripts/plugins/types";
 import ProposalDetail from "./ProposalDetail";
 import { typeName } from "src/scripts/utils/helper";
 
-const ProposalList = (props) => {
+const ProposalList = () => {
 	const { pluginAddress } = useContext(UserDataContext);
-	const [proposalId, setProposalId] = useState<number>(0);
-	const [proposalLength, setProposalLength] = useState<number>(0);
+	const [proposalId, setProposalId] = useState<bigint>(0n);
+	const [proposalLength, setProposalLength] = useState<bigint>(0n);
 	const [proposals, setProposals] = useState<ProposalType[]>([]);
 	const [loadingProposals, setLoadingProposals] = useState<boolean>(true);
 	const [initialLoad, setInitialLoad] = useState<boolean>(true);
@@ -46,7 +46,7 @@ const ProposalList = (props) => {
 		}
 
 		const interval = setInterval(() => {
-			if (proposalId === 0) {
+			if (proposalId === 0n) {
 				fetchProposals();
 			}
 		}, 60000); // Update every 60 seconds
@@ -61,7 +61,7 @@ const ProposalList = (props) => {
 		proposalId,
 	]);
 
-	const handleSetProposalId = (id: number) => {
+	const handleSetProposalId = (id: bigint) => {
 		console.log("id: ", id);
 		console.log("proposals.length: ", proposals.length);
 		if (id < proposals.length) {
@@ -76,7 +76,7 @@ const ProposalList = (props) => {
 			<Text mb={5} fontSize={15} mx="75px">
 				Choose proposal and execute ⚡️
 			</Text>
-			{proposalId === 0 ? (
+			{proposalId === 0n ? (
 				<Box>
 					<Box mb={5}>
 						<label>Proposal ID:</label>
@@ -86,7 +86,7 @@ const ProposalList = (props) => {
 							size="sm"
 							placeholder="2"
 							onChange={(e) => {
-								handleSetProposalId(Number(e.target.value));
+								handleSetProposalId(BigInt(e.target.value));
 							}}
 						/>
 					</Box>
@@ -111,8 +111,10 @@ const ProposalList = (props) => {
 										}}
 									>
 										<HStack spacing={4} py={1}>
-											<Text ml={3}>ID: {proposal.id}</Text>
-											<Text flex={1}>{typeName(proposal.type)} Recovery</Text>
+											<Text ml={3}>ID: {Number(proposal.id)}</Text>
+											<Text flex={1}>
+												{typeName(Number(proposal.type))} Recovery
+											</Text>
 											{proposal.isExecutable.result ? (
 												<Text mr={3} color={"green"}>
 													{" "}
@@ -140,7 +142,7 @@ const ProposalList = (props) => {
 				</Box>
 			) : (
 				<ProposalDetail
-					proposal={proposals[proposalId]}
+					proposal={proposals[Number(proposalId)]}
 					proposalId={proposalId}
 					setProposalId={setProposalId}
 					fromProposeTab={false}

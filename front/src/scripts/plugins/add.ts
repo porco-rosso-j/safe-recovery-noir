@@ -11,7 +11,7 @@ export async function _addEcrecoverRecover(
 	safeSDK: any,
 	pluginAddr: string,
 	address: string,
-	timelock: number = 1
+	timelock: bigint = 1n
 ): Promise<txResult> {
 	const hashedAddr = await pedersenHash([address]);
 	console.log("hashedAddr: ", hashedAddr);
@@ -34,7 +34,7 @@ export async function _addEcrecoverRecover(
 export async function _addWebAuthnRecover(
 	safeSDK: Safe,
 	pluginAddr: string,
-	timelock: number = 1
+	timelock: bigint = 1n
 ): Promise<txResult> {
 	const safeAddr = await safeSDK.getAddress();
 
@@ -68,7 +68,7 @@ export async function _addWebAuthnRecover(
 export async function _addSecretRecover(
 	safeSDK: any,
 	pluginAddr: string,
-	timelock: number = 1,
+	timelock: bigint = 1n,
 	secret: string
 ): Promise<txResult> {
 	// hash in circuit should also be pedersen
@@ -93,8 +93,8 @@ export async function _addSecretRecover(
 export async function _addSocialRecover(
 	safeSDK: any,
 	pluginAddr: string,
-	timelock: number = 1,
-	threshold: number,
+	timelock: bigint = 1n,
+	threshold: bigint,
 	guardians: string[]
 ): Promise<txResult> {
 	console.log("guardians: ", guardians);

@@ -1,28 +1,28 @@
 export type ProposalType = {
-	id: number;
-	type: number;
+	id: bigint;
+	type: bigint;
 	newOwners: string[];
 	oldOwners: string[];
-	threshold: number;
-	timeLockEnd: number;
-	proposedTimestamp: number;
+	threshold: bigint;
+	timeLockEnd: bigint;
+	proposedTimestamp: bigint;
 	rejected: boolean;
-	approvals: number;
-	approvealThreshold: number;
+	approvals: bigint;
+	approvealThreshold: bigint;
 	isExecutable: IsRecoveryExecutableType;
 };
 
 export const emptyProposal: ProposalType = {
-	id: 0,
-	type: 0,
+	id: 0n,
+	type: 0n,
 	newOwners: [""],
 	oldOwners: [""],
-	threshold: 0,
-	timeLockEnd: 0,
-	proposedTimestamp: 0,
+	threshold: 0n,
+	timeLockEnd: 0n,
+	proposedTimestamp: 0n,
 	rejected: false,
-	approvals: 0,
-	approvealThreshold: 0,
+	approvals: 0n,
+	approvealThreshold: 0n,
 	isExecutable: { result: false, reason: "" },
 };
 

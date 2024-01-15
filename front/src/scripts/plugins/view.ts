@@ -43,7 +43,7 @@ export async function getNewOwnerForPoposal(
 
 export async function _getIsRecoveryExecutable(
 	pluginAddr: string,
-	proposalId: number
+	proposalId: bigint
 ): Promise<IsRecoveryExecutableType> {
 	try {
 		const ret = await recoveryPluginContract(
@@ -80,7 +80,7 @@ export async function getProposals(
 	console.log("count: ", count);
 	let proposals: ProposalType[] = [];
 	for (let i = 1; i <= count; i++) {
-		proposals[i] = await getProposal(i, pluginAddr);
+		proposals[i] = await getProposal(BigInt(i), pluginAddr);
 	}
 	console.log("proposals: ", proposals.length);
 
@@ -88,7 +88,7 @@ export async function getProposals(
 }
 
 export async function getProposal(
-	proposalId: number,
+	proposalId: bigint,
 	pluginAddr: string
 ): Promise<ProposalType> {
 	const res = await recoveryPluginContract(pluginAddr).getRecoveryByProposalId(
@@ -99,21 +99,21 @@ export async function getProposal(
 	const _isExecutable = await _getIsRecoveryExecutable(pluginAddr, proposalId);
 	console.log("_isExecutable: ", _isExecutable);
 
-	let _approvealThreshold = 0;
-	if (res[0] === 3) {
+	let _approvealThreshold = 0n;
+	if (res[0] === 3n) {
 		_approvealThreshold = await getSocialRecoveryThreshold(pluginAddr);
 	}
 
 	const proposal: ProposalType = {
 		id: proposalId,
-		type: Number(res[0] + 1),
+		type: res[0] + 1n,
 		newOwners: res[1],
 		oldOwners: res[2],
-		threshold: Number(res[3]),
-		timeLockEnd: Number(res[4]),
-		proposedTimestamp: Number(res[5]),
+		threshold: res[3],
+		timeLockEnd: res[4],
+		proposedTimestamp: res[5],
 		rejected: res[6],
-		approvals: Number(res[7]),
+		approvals: res[7],
 		approvealThreshold: _approvealThreshold,
 		isExecutable: _isExecutable,
 	};
@@ -130,7 +130,7 @@ export async function getHashedAddr(pluginAddr: string): Promise<string> {
 	return await recoveryPluginContract(pluginAddr).hashed_address();
 }
 
-export async function getRecoveryCount(pluginAddr: string): Promise<number> {
+export async function getRecoveryCount(pluginAddr: string): Promise<bigint> {
 	return recoveryPluginContract(pluginAddr).recoveryCount();
 }
 
@@ -159,6 +159,6 @@ export async function getGuardiansRoot(pluginAddr: string): Promise<string> {
 
 export async function getSocialRecoveryThreshold(
 	pluginAddr: string
-): Promise<number> {
-	return Number(await recoveryPluginContract(pluginAddr).approvalThreshold());
+): Promise<bigint> {
+	return await recoveryPluginContract(pluginAddr).approvalThreshold();
 }
