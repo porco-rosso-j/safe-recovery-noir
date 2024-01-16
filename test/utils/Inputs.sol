@@ -4,7 +4,7 @@ import "forge-std/console.sol";
 
 contract Inputs {
     bytes32 public secret_test =
-        0x15a52a0d6f0eedd4f63d72cb8275ae6826dcd005eafee769658486a2d3c09e1d;
+        0x15a52a0d6f0eedd4f63d72cb8275ae6826dcd005eafee769658486a2d3c09e1d; // "test"
 
     bytes32 public hashedAddr =
         0x01e32ef55c3585d88ccf0201b61bd7dea1f69b13f251ba9082cf0cb190d47071;
