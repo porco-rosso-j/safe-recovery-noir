@@ -48,7 +48,6 @@ const useUserData = () => {
 
 	useEffect(() => {
 		(async () => {
-			// if (safeAddress !== "" && currentOwner === "") {
 			if (safeAddress !== "") {
 				try {
 					const owner = await getSafeOwner(safeAddress);

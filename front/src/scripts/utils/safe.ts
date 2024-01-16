@@ -153,7 +153,8 @@ export async function getIsPluginEnabled(
 }
 
 export async function getSafeOwner(safe: string): Promise<string> {
-	return (await safeContract(safe).getOwners())[0];
+	const owners = await safeContract(safe).getOwners();
+	return owners[0];
 }
 
 // async function computePluginAddr(safeAddr: string): Promise<string> {
