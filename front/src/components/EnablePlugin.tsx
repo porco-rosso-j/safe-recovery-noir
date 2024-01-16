@@ -7,7 +7,7 @@ import {
 } from "../scripts/utils/safe";
 
 const EnablePlugin = () => {
-	const { safeAddress, safeSDK, savePluginAddress } =
+	const { safeAddress, safeSDK, savePluginAddress, savePluginEnabled } =
 		useContext(UserDataContext);
 
 	const [loading, setLoading] = useState(false);
@@ -69,6 +69,7 @@ const EnablePlugin = () => {
 						}
 						setSetupStatus("");
 						setLoading(false);
+						savePluginEnabled(true);
 					}}
 				>
 					Enable SafeRecover Plugin

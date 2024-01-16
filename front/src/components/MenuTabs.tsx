@@ -80,8 +80,6 @@ const MenuTabs = () => {
 
 	useEffect(() => {
 		if (tabIndex === 0) {
-			console.log("address: ", address);
-
 			if (safeSDK && address === currentOwner && isPluginEnabled) {
 				setTabOneDisplayIndex(1);
 			} else if (safeSDK && address === currentOwner && !isPluginEnabled) {
@@ -105,7 +103,6 @@ const MenuTabs = () => {
 
 	useEffect(() => {
 		(async () => {
-			console.log("signer as; ", signer);
 			if (walletProvider) {
 				// update signer and safe when walletProvider is defined but signer/safe sdk is null
 				if (signer === null) {
@@ -124,7 +121,6 @@ const MenuTabs = () => {
 	// ask for network change when walletProvider detects unsupported network
 	useEffect(() => {
 		(async () => {
-			console.log("walletProvider uf: ", walletProvider);
 			if (walletProvider && chainId !== supportedChainID) {
 				setIsWrongNetwork(false);
 				await switchNetwork(walletProvider);

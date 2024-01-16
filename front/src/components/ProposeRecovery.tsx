@@ -41,8 +41,6 @@ const ProposeRecovery = (props: {
 
 	const [currentMethod, setCurrentMethod] = useState<number>(0);
 
-	console.log("currentOwner: ", currentOwner);
-
 	const handleCheckProposal = async () => {
 		console.log("handleCheckProposal in ProposeRecovery");
 
@@ -60,8 +58,6 @@ const ProposeRecovery = (props: {
 	};
 
 	useEffect(() => {
-		console.log("currentMethod ;", currentMethod);
-		console.log("props.methodIndex ;", props.methodIndex);
 		if (currentMethod !== props.methodIndex) {
 			setCurrentMethod(props.methodIndex);
 			if (loading) {
@@ -69,7 +65,6 @@ const ProposeRecovery = (props: {
 			}
 		}
 	}, [currentMethod, props.methodIndex, loading]);
-	console.log("currentMethod ;", currentMethod);
 
 	return (
 		<Box pt="3px">
@@ -155,7 +150,7 @@ const ProposeRecovery = (props: {
 							colorScheme="teal"
 							w="35%"
 							isLoading={loading}
-							loadingText="Executing"
+							loadingText="Proposing"
 							onClick={async () => {
 								if (isMethodEnabled) {
 									setErrorMessage("");

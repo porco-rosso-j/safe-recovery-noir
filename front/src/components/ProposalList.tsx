@@ -17,49 +17,45 @@ import { typeName } from "src/scripts/utils/helper";
 const ProposalList = () => {
 	const { pluginAddress } = useContext(UserDataContext);
 	const [proposalId, setProposalId] = useState<number>(0);
-	const [proposalLength, setProposalLength] = useState<number>(0);
 	const [proposals, setProposals] = useState<ProposalType[]>([]);
-	const [loadingProposals, setLoadingProposals] = useState<boolean>(true);
+	const [loadingProposals, setLoadingProposals] = useState<boolean>(false);
 	const [initialLoad, setInitialLoad] = useState<boolean>(true);
+	const [proposalsFound, setProposalsFound] = useState<boolean>(false);
 
 	const fetchProposals = useCallback(async () => {
-		console.log("fetchProposals");
 		const proposalLen = Number(await getRecoveryCount(pluginAddress));
-		if (proposalLength !== proposalLen) {
+
+		if (proposalLen !== 0) {
+			setProposalsFound(true);
+			setLoadingProposals(true);
+
 			try {
 				const proposalsFetched = await getProposals(pluginAddress);
+
 				setProposals(proposalsFetched);
-				setProposalLength(proposalLen);
 				setLoadingProposals(false);
 			} catch (error) {
 				console.error("Error fetching proposals:", error);
 			}
+		} else {
+			setProposalsFound(false);
 		}
-	}, [pluginAddress, proposalLength]);
+	}, [pluginAddress]);
 
 	useEffect(() => {
 		if (initialLoad && pluginAddress !== "") {
-			setLoadingProposals(true);
 			fetchProposals();
 			setInitialLoad(false);
-			console.log("loadingProposals after: ", loadingProposals);
 		}
 
 		const interval = setInterval(() => {
-			if (proposalId === 0) {
+			if (proposalId === 0 && pluginAddress !== "") {
 				fetchProposals();
 			}
-		}, 60000); // Update every 60 seconds
+		}, 30000); // Update every 60 seconds
 
 		return () => clearInterval(interval);
-	}, [
-		initialLoad,
-		pluginAddress,
-		loadingProposals,
-		proposalLength,
-		fetchProposals,
-		proposalId,
-	]);
+	}, [initialLoad, pluginAddress, fetchProposals, proposalId]);
 
 	const handleSetProposalId = (id: number) => {
 		console.log("id: ", id);
@@ -68,6 +64,40 @@ const ProposalList = () => {
 			setProposalId(id);
 		} else {
 			console.log("invalid id");
+		}
+	};
+
+	const handleStatus = (proposal: ProposalType) => {
+		if (proposal.status === 0) {
+			if (proposal.isExecutable.result) {
+				return (
+					<Text mr={3} color={"green"}>
+						{" "}
+						Executable
+					</Text>
+				);
+			} else {
+				return (
+					<Text mr={3} color={"red.400"}>
+						{" "}
+						Non Executable
+					</Text>
+				);
+			}
+		} else if (proposal.status === 1) {
+			return (
+				<Text mr={3} color={"blue.400"}>
+					{" "}
+					Executed
+				</Text>
+			);
+		} else {
+			return (
+				<Text mr={3} color={"red.400"}>
+					{" "}
+					Rejected
+				</Text>
+			);
 		}
 	};
 
@@ -91,12 +121,27 @@ const ProposalList = () => {
 						/>
 					</Box>
 
-					<Box>
-						{!loadingProposals ? (
+					<Box mt={10} mb={50}>
+						{!proposalsFound || loadingProposals ? (
+							<Box>
+								{loadingProposals ? (
+									<Box>
+										<Text>Loading proposals...</Text>
+										<Flex justifyContent="center" alignItems="center">
+											<Spinner mt={10} color="gray.300" />
+										</Flex>
+									</Box>
+								) : (
+									<Text>No proposal found</Text>
+								)}
+							</Box>
+						) : (
+							// proposalNotFound == true && loadingProposals == false
 							<VStack
 								spacing={4}
 								align="stretch"
-								height="300px"
+								mx={5}
+								maxHeight="300px"
 								overflowY="auto"
 							>
 								{proposals.map((proposal) => (
@@ -115,28 +160,11 @@ const ProposalList = () => {
 											<Text flex={1}>
 												{typeName(Number(proposal.type))} Recovery
 											</Text>
-											{proposal.isExecutable.result ? (
-												<Text mr={3} color={"green"}>
-													{" "}
-													Executable
-												</Text>
-											) : (
-												<Text mr={3} color={"red.400"}>
-													{" "}
-													Non Executable
-												</Text>
-											)}
+											{handleStatus(proposal)}
 										</HStack>
 									</Box>
 								))}
 							</VStack>
-						) : (
-							<Box>
-								<Text mt={10}>Loading proposals...</Text>
-								<Flex justifyContent="center" alignItems="center">
-									<Spinner mt={10} mb={5} color="gray.300" />
-								</Flex>
-							</Box>
 						)}
 					</Box>
 				</Box>

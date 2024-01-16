@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import {ProposalStatus} from "../common/Constants.sol";
+
 contract RecoverBase {
     struct Recovery {
         uint8 recoveryType;
@@ -9,7 +11,7 @@ contract RecoverBase {
         uint newThreshold;
         uint proposedTimestamp;
         uint timeLockEnd;
-        bool rejected;
+        ProposalStatus status;
         // following two variables are for social recovery
         uint approvalCount;
         mapping(bytes32 => bool) nullifierHash;
@@ -55,6 +57,7 @@ contract RecoverBase {
         recovery.newThreshold = _newThreshold;
         recovery.timeLockEnd = block.timestamp + recoveryTimeLock;
         recovery.proposedTimestamp = block.timestamp;
+        recovery.status = ProposalStatus.PROPOSED;
 
         // should emit an event to notify owner
         return (newRecoveryCount, recovery.timeLockEnd);
@@ -74,7 +77,7 @@ contract RecoverBase {
             uint,
             uint,
             uint,
-            bool,
+            ProposalStatus,
             uint
         )
     {
@@ -87,7 +90,7 @@ contract RecoverBase {
             recovery.newThreshold,
             recovery.timeLockEnd,
             recovery.proposedTimestamp,
-            recovery.rejected,
+            recovery.status,
             recovery.approvalCount
         );
     }

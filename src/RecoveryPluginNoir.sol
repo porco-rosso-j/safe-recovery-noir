@@ -19,7 +19,7 @@ import {WebAuthnRecover} from "./recover/WebAuthnRecover.sol";
 import {SecretRecover} from "./recover/SecretRecover.sol";
 import {EcrecoverRecover} from "./recover/EcrecoverRecover.sol";
 import {SocialRecover} from "./recover/SocialRecover.sol";
-import {RECOVERY_TYPE_K256, RECOVERY_TYPE_P256, RECOVERY_TYPE_SECRET, RECOVERY_TYPE_SOCIAL} from "./common/Constants.sol";
+import {RECOVERY_TYPE_K256, RECOVERY_TYPE_P256, RECOVERY_TYPE_SECRET, RECOVERY_TYPE_SOCIAL, ProposalStatus} from "./common/Constants.sol";
 
 import "forge-std/console.sol";
 
@@ -264,8 +264,12 @@ contract RecoveryPluginNoir is
 
     function rejectRecovery(uint _proposalId) public onlySafe {
         Recovery storage recovery = recoveries[_proposalId];
-        if (recovery.rejected) revert("ALREADY_REJECTED");
-        recovery.rejected = true;
+        if (recovery.status == ProposalStatus.REJECTED) {
+            revert("ALREADY_REJECTED");
+        } else if (recovery.status == ProposalStatus.EXECUTED) {
+            revert("ALREADY_EXECUTED");
+        }
+        recovery.status = ProposalStatus.REJECTED;
     }
 
     function execRecovery(uint _proposalId) public returns (bool) {
@@ -317,6 +321,7 @@ contract RecoveryPluginNoir is
         }
 
         lastExecutionTimestamp = block.timestamp;
+        recovery.status = ProposalStatus.EXECUTED;
         return true;
     }
 
@@ -354,7 +359,12 @@ contract RecoveryPluginNoir is
             recovery.newThreshold
         );
 
-        require(!recovery.rejected, "PROPOSAL_REJECTED");
+        if (recovery.status == ProposalStatus.REJECTED) {
+            revert("ALREADY_REJECTED");
+        } else if (recovery.status == ProposalStatus.EXECUTED) {
+            revert("ALREADY_EXECUTED");
+        }
+
         require(block.timestamp >= recovery.timeLockEnd, "TIMELOCK_NOT_ENDED");
 
         require(

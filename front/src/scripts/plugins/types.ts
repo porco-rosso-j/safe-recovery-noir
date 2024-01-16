@@ -6,7 +6,7 @@ export type ProposalType = {
 	threshold: number;
 	timeLockEnd: number;
 	proposedTimestamp: number;
-	rejected: boolean;
+	status: number;
 	approvals: number;
 	approvealThreshold: number;
 	isExecutable: IsRecoveryExecutableType;
@@ -20,7 +20,7 @@ export const emptyProposal: ProposalType = {
 	threshold: 0,
 	timeLockEnd: 0,
 	proposedTimestamp: 0,
-	rejected: false,
+	status: 0,
 	approvals: 0,
 	approvealThreshold: 0,
 	isExecutable: { result: false, reason: "" },

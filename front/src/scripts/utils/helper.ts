@@ -53,7 +53,7 @@ export function calcTimeDiff(solidityTimestamp: number) {
 	if (minutes > 0 && days === 0 && hours === 0) {
 		result += `${minutes} mins`;
 	} else {
-		result = "will be ready soon";
+		result = "Ready in under a min";
 	}
 
 	return result;

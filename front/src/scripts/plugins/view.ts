@@ -82,8 +82,6 @@ export async function getProposals(
 	for (let i = 1; i <= Number(count); i++) {
 		proposals[i] = await getProposal(i, pluginAddr);
 	}
-	console.log("proposals: ", proposals.length);
-
 	return proposals;
 }
 
@@ -112,7 +110,7 @@ export async function getProposal(
 		threshold: Number(res[3]),
 		timeLockEnd: Number(res[4]),
 		proposedTimestamp: Number(res[5]),
-		rejected: res[6],
+		status: Number(res[6]),
 		approvals: Number(res[7]),
 		approvealThreshold: Number(_approvealThreshold),
 		isExecutable: _isExecutable,

@@ -24,6 +24,7 @@ function App() {
 		saveSigner,
 		savePluginAddress,
 		saveCurrentOwner,
+		savePluginEnabled,
 		logout,
 	} = useUserData();
 
@@ -42,6 +43,7 @@ function App() {
 					saveSigner,
 					savePluginAddress,
 					saveCurrentOwner,
+					savePluginEnabled,
 					logout,
 				}}
 			>

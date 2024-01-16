@@ -126,13 +126,17 @@ const useUserData = () => {
 		setSigner(_signer);
 	};
 
+	const savePluginEnabled = (enableld: boolean) => {
+		setIsPluginEnabled(enableld);
+	};
+
 	const logout = () => {
 		removeSafeAddress();
 		removePluginAddress();
 		removeCurrentOwner();
 		saveSafeSDK(null);
 		saveSigner(null);
-		setIsPluginEnabled(false);
+		savePluginEnabled(false);
 	};
 
 	return {
@@ -147,6 +151,7 @@ const useUserData = () => {
 		saveSigner,
 		savePluginAddress,
 		saveCurrentOwner,
+		savePluginEnabled,
 		logout,
 	};
 };

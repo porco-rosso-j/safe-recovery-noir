@@ -154,13 +154,15 @@ const ProposalDetail = (props: {
 							<Text>・ Current Approval Count:</Text>
 						) : null}
 						{proposal.type === 4 ? <Text>・ Approval Threshold:</Text> : null}
-						<Text>・ Executable:</Text>
-						{!proposal.isExecutable.result ? (
+						<Text>・ Status:</Text>
+						{proposal.status === 0 ? <Text>・ Executable:</Text> : null}
+						{proposal.status === 0 && !proposal.isExecutable.result ? (
 							<Text ml={4} color="red.400">
 								*Reason:
 							</Text>
 						) : null}
-						{!proposal.isExecutable.result &&
+						{proposal.status === 0 &&
+						!proposal.isExecutable.result &&
 						proposal.isExecutable.reason === "TIMELOCK_NOT_ENDED" ? (
 							<Text>・ Executable After:</Text>
 						) : null}
@@ -176,15 +178,25 @@ const ProposalDetail = (props: {
 						{proposal.type === 4 ? (
 							<Text>{Number(proposal.approvealThreshold)}</Text>
 						) : null}
-						{proposal.isExecutable.result ? (
+
+						{proposal.status === 0 ? (
+							<Text>Proposed</Text>
+						) : proposal.status === 1 ? (
+							<Text color={"blue.400"}>Executed</Text>
+						) : proposal.status === 2 ? (
+							<Text color="red.400">Rejected</Text>
+						) : null}
+
+						{proposal.status === 0 && proposal.isExecutable.result ? (
 							<Text color="green.400"> Yes </Text>
-						) : (
+						) : proposal.status === 0 && !proposal.isExecutable.result ? (
 							<Text color="red.400"> No </Text>
-						)}
-						{!proposal.isExecutable.result ? (
+						) : null}
+						{proposal.status === 0 && !proposal.isExecutable.result ? (
 							<Text color="red.400">{proposal.isExecutable.reason}</Text>
 						) : null}
-						{!proposal.isExecutable.result &&
+						{proposal.status === 0 &&
+						!proposal.isExecutable.result &&
 						proposal.isExecutable.reason === "TIMELOCK_NOT_ENDED" ? (
 							<Text>{calcTimeDiff(Number(proposal.timeLockEnd))}</Text>
 						) : null}
@@ -202,13 +214,9 @@ const ProposalDetail = (props: {
 								bg: "#9B2C2C",
 							}}
 							onClick={async () => {
-								if (!proposal.rejected) {
-									await handleFunction(3);
-								} else {
-									setErrorMessage("This proposal has already been rejected");
-								}
+								await handleFunction(3);
 							}}
-							isDisabled={proposal.rejected}
+							isDisabled={proposal.status === 1 || proposal.status === 2}
 						>
 							Reject
 						</Button>
