@@ -91,9 +91,16 @@ const WalletLogin: React.FC = () => {
 				boxShadow="lg"
 				backgroundColor={"#2e2e2e"}
 			>
-				<Text textAlign={"center"} fontSize="xl" fontWeight="bold" mb={6}>
+				<Text textAlign={"center"} fontSize="xl" fontWeight="bold" mb={3}>
 					Connect wallet and enter your Safe Address!
 				</Text>
+				<Box justifyContent={"center"} display={"flex"}>
+					<Text fontSize="15" mb={6}>
+						1. Connect Safe owner's wallet via Wallet Connect <br />
+						2. Enter your Safe address below <br />
+						3. Press 'Enter the app' button
+					</Text>
+				</Box>
 				<Box mb={4}>
 					<Text mb={2}>Safe address:</Text>
 					<Input
@@ -103,11 +110,13 @@ const WalletLogin: React.FC = () => {
 						onChange={(e) => setSafeAddressInput(e.target.value)}
 					/>
 				</Box>
-				<Text color="red.400" mb={10}>
-					{errorMessage}
-				</Text>
+				{errorMessage !== "" ? (
+					<Text color="red.400" mb={10}>
+						{errorMessage}
+					</Text>
+				) : null}
 				<Button w="100%" onClick={onClickLogin}>
-					Login
+					Enter the app
 				</Button>
 				<Text mt={7}>
 					Don't have a Safe wallet?{" "}
