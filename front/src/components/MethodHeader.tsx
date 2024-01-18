@@ -1,6 +1,6 @@
 import { Box, Divider, Select } from "@chakra-ui/react";
 import ProposeRecovery from "./ProposeRecovery";
-import ProposalList from "./ProposalList";
+import ProposalList from "./Proposal/ProposalList";
 import {
 	BackupAddress,
 	FingerPrint,

@@ -62,21 +62,23 @@ export async function enableModuleOnSafe(
 
 	console.log("pluginAddress: ", pluginAddress);
 	console.log("isModuleEnabled: ", isModuleEnabled);
-	if (isModuleEnabled && pluginAddress !== ethers.ZeroAddress) {
-		// addModule
-		try {
-			const tx = await registry.addModule(pluginAddress, 1, {
-				gasLimit: 200000,
-			});
-			await tx.wait();
-		} catch (e) {
-			console.log("error:", e);
-			return [error, ""];
-		}
-
+	if (isModuleEnabled && pluginAddress !== "") {
 		return [batchResult, pluginAddress];
 	} else {
 		return [error, ""];
+	}
+}
+
+export async function addModule(pluginAddress: string): Promise<txResult> {
+	try {
+		const tx = await registry.addModule(pluginAddress, 1, {
+			gasLimit: 200000,
+		});
+		await tx.wait();
+		return { result: true, txHash: tx.hash };
+	} catch (e) {
+		console.log("error:", e);
+		return error;
 	}
 }
 
@@ -86,16 +88,11 @@ export async function enablePluginOnProtocolManager(
 	pluginAddr: string
 ): Promise<txResult> {
 	const enablePluginTx = managerIface.encodeFunctionData("enablePlugin", [
-		// contracts.recoveryPlugin,
 		pluginAddr,
 		2,
 	]);
 
 	console.log("enablePluginTx: ", enablePluginTx);
-	/*
-	ethers.solidityPackedKeccak256(types, values)
-	ethers.solidityPackedSha256(types, values)
-	*/
 	const _data = ethers.solidityPacked(
 		["bytes", "address"],
 		[enablePluginTx, safeAddr]

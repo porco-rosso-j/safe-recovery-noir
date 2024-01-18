@@ -10,13 +10,19 @@ import {
 } from "@chakra-ui/react";
 import { InfoIcon } from "@chakra-ui/icons";
 import { inputStyle } from "src/theme";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
 import { Timelock, TimelockInput } from "./Common";
 import { useIsMethodEnabled, useAddRecover } from "src/hooks";
+import { getHashedAddr, recoveryTimeLock } from "src/scripts/plugins/view";
+import UserDataContext from "src/contexts/userData";
+import { shortenAddress } from "src/scripts/utils/address";
+import { getTimeFromTimestamp } from "src/scripts/utils/helper";
+import { pedersenHash } from "src/scripts/utils/pedersen";
 
 const EnableBackupAddress = (props) => {
+	const { pluginAddress } = useContext(UserDataContext);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const { isMethodEnabled } = useIsMethodEnabled(props.methodIndex);
 	const { loading, errorMessage, txHash, result, setErrorMessage, addRecover } =
@@ -25,14 +31,44 @@ const EnableBackupAddress = (props) => {
 	const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
 	const [timeLock, setTimelock] = useState<number>(0);
 
+	const [backupAddressHash, setBackupAddressHash] = useState<string>("");
+	const [isCorrectHash, setIsCorrectHash] = useState<boolean>(false);
+	const [addressInput, setAddressInput] = useState<string>("");
+
+	useEffect(() => {
+		(async () => {
+			if (isMethodEnabled && pluginAddress) {
+				const hashedAddr = await getHashedAddr(pluginAddress);
+				if (hashedAddr !== "") {
+					setBackupAddressHash(hashedAddr);
+				}
+
+				const timelock = await recoveryTimeLock(pluginAddress);
+				if (timelock !== 0) {
+					setTimelock(Number(timelock));
+				}
+			}
+		})();
+	});
+
+	const handleCompareAddrWithHash = async (address: string) => {
+		if (address !== "") {
+			setAddressInput(address);
+			const hash = await pedersenHash([address]);
+			if (hash === backupAddressHash) {
+				setIsCorrectHash(true);
+			} else {
+				setIsCorrectHash(false);
+			}
+		} else {
+			setIsCorrectHash(false);
+			setAddressInput("");
+		}
+	};
+
 	return (
 		<Box pt="10px">
-			{isMethodEnabled ? (
-				<Box>
-					This method has already been enabled
-					<MethodRemoval method={1} />
-				</Box>
-			) : (
+			{!isMethodEnabled ? (
 				<Box>
 					<Text mb={8} fontSize={15} mx="25px">
 						Register private backup address. Only its hash is stored on the
@@ -99,6 +135,60 @@ const EnableBackupAddress = (props) => {
 							{errorMessage}
 						</Text>
 					</Box>
+				</Box>
+			) : (
+				<Box
+					p={5}
+					borderRadius="lg"
+					boxShadow="lg"
+					borderColor={"white"}
+					borderWidth={"1px"}
+				>
+					<Text as="b">Setting</Text>
+					<Flex
+						mt="20px"
+						justifyContent="center"
+						alignItems="strech"
+						w="100%"
+						gap={10}
+					>
+						<VStack spacing={2} fontSize={14} align="start">
+							<Text>- Status :</Text>
+							<Text>- Timelock :</Text>
+							<Text>- Backup address hash :</Text>
+						</VStack>
+						<VStack spacing={2} fontSize={14} align="end">
+							<Text>Enabled</Text>
+							<Text>{getTimeFromTimestamp(timeLock)}</Text>
+							<Text>{shortenAddress(backupAddressHash)}</Text>
+						</VStack>
+					</Flex>
+					<Box mt={7}>
+						<Text fontSize={14} mb={3}>
+							Compare an address with the hash
+						</Text>
+						<Input
+							sx={inputStyle}
+							textAlign="center"
+							w={350}
+							px={10}
+							size="xs"
+							type="address"
+							placeholder="0xAbCd..."
+							onChange={(e) => handleCompareAddrWithHash(e.target.value)}
+						/>
+						{isCorrectHash && addressInput !== "" ? (
+							<Text mt={2} fontSize={13} color={"green.400"}>
+								This is correct backup address!
+							</Text>
+						) : !isCorrectHash && addressInput !== "" ? (
+							<Text mt={2} fontSize={13} color={"red.400"}>
+								wrong backup address
+							</Text>
+						) : null}
+					</Box>
+
+					<MethodRemoval method={1} />
 				</Box>
 			)}
 			<EnabledModal

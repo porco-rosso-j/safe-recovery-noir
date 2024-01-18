@@ -4,17 +4,20 @@ import {
 	Text,
 	Flex,
 	VStack,
-	Spinner,
 	useDisclosure,
 	Link,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
 import { Timelock, TimelockInput } from "./Common";
 import { useIsMethodEnabled, useAddRecover } from "src/hooks";
+import { recoveryTimeLock } from "src/scripts/plugins/view";
+import UserDataContext from "src/contexts/userData";
+import { getTimeFromTimestamp } from "src/scripts/utils/helper";
 
 const EnableFingerPrint = (props) => {
+	const { pluginAddress } = useContext(UserDataContext);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const { isMethodEnabled } = useIsMethodEnabled(props.methodIndex);
 
@@ -22,6 +25,17 @@ const EnableFingerPrint = (props) => {
 		useAddRecover(onOpen);
 
 	const [timeLock, setTimelock] = useState<number>(0);
+
+	useEffect(() => {
+		(async () => {
+			if (isMethodEnabled && pluginAddress) {
+				const timelock = await recoveryTimeLock(pluginAddress);
+				if (timelock !== 0) {
+					setTimelock(Number(timelock));
+				}
+			}
+		})();
+	});
 
 	return (
 		<Box pt="10px">
@@ -78,8 +92,30 @@ const EnableFingerPrint = (props) => {
 					</Box>
 				</Box>
 			) : (
-				<Box>
-					This method has already been enabled
+				<Box
+					p={5}
+					borderRadius="lg"
+					boxShadow="lg"
+					borderColor={"white"}
+					borderWidth={"1px"}
+				>
+					<Text as="b">Setting</Text>
+					<Flex
+						mt="20px"
+						justifyContent="center"
+						alignItems="strech"
+						w="100%"
+						gap={10}
+					>
+						<VStack spacing={2} fontSize={14} align="start">
+							<Text>- Status :</Text>
+							<Text>- Timelock :</Text>
+						</VStack>
+						<VStack spacing={2} fontSize={14} align="end">
+							<Text>Enabled</Text>
+							<Text>{getTimeFromTimestamp(timeLock)}</Text>
+						</VStack>
+					</Flex>
 					<MethodRemoval method={2} />
 				</Box>
 			)}

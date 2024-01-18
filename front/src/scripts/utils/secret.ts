@@ -25,7 +25,7 @@ export async function getSecretBytesAndHashFromSecret(
 	return { secretBytes: PaddedSecretBytes, hash: _hash };
 }
 
-async function getPaddedSecretBytes(_secret: string): Promise<string[]> {
+export async function getPaddedSecretBytes(_secret: string): Promise<string[]> {
 	const textEncoder = new TextEncoder();
 	const secretBytes = textEncoder.encode(_secret);
 	console.log("secretBytes: ", secretBytes);

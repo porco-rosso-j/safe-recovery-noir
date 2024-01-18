@@ -128,6 +128,10 @@ export async function getHashedAddr(pluginAddr: string): Promise<string> {
 	return await recoveryPluginContract(pluginAddr).hashed_address();
 }
 
+export async function getHashededSecret(pluginAddr: string): Promise<string> {
+	return await recoveryPluginContract(pluginAddr).hashed_secret();
+}
+
 export async function getRecoveryCount(pluginAddr: string): Promise<number> {
 	return Number(await recoveryPluginContract(pluginAddr).recoveryCount());
 }
@@ -153,6 +157,10 @@ export async function computeMessage(
 
 export async function getGuardiansRoot(pluginAddr: string): Promise<string> {
 	return await recoveryPluginContract(pluginAddr).guardiansRoot();
+}
+
+export async function recoveryTimeLock(pluginAddr: string): Promise<number> {
+	return Number(await recoveryPluginContract(pluginAddr).recoveryTimeLock());
 }
 
 export async function getSocialRecoveryThreshold(

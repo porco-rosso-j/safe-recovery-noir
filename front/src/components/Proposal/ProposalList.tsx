@@ -9,8 +9,8 @@ import {
 } from "@chakra-ui/react";
 import { useContext, useState, useEffect, useCallback } from "react";
 import UserDataContext from "src/contexts/userData";
-import { getProposals, getRecoveryCount } from "../scripts/plugins/index";
-import { ProposalType } from "../scripts/plugins/types";
+import { getProposals, getRecoveryCount } from "src/scripts/plugins/index";
+import { ProposalType } from "src/scripts/plugins/types";
 import ProposalDetail from "./ProposalDetail";
 import { typeName } from "src/scripts/utils/helper";
 

@@ -24,37 +24,92 @@ export async function parseUint8ArrayToBytes32(
 }
 
 export function calcTimeDiff(solidityTimestamp: number) {
-	let timeDiffInSeconds = solidityTimestamp - Math.floor(Date.now() / 1000);
-	if (timeDiffInSeconds < 0) {
+	if (solidityTimestamp < 1000) {
 		return "*Reload the page, already executable";
 	}
+	const diff = solidityTimestamp - Math.floor(Date.now() / 1000);
+	let result = convertTimestampIntoTime(diff);
 
+	// const secondsInAMinute = 60;
+	// const secondsInAnHour = secondsInAMinute * 60;
+	// const secondsInADay = secondsInAnHour * 24;
+
+	// const days = Math.floor(timeDiffInSeconds / secondsInADay);
+	// timeDiffInSeconds -= days * secondsInADay;
+
+	// const hours = Math.floor(timeDiffInSeconds / secondsInAnHour);
+	// timeDiffInSeconds -= hours * secondsInAnHour;
+
+	// const minutes = Math.floor(timeDiffInSeconds / secondsInAMinute);
+
+	// // Construct the result string
+	// let result = "";
+
+	// if (days > 0) {
+	// 	result += `${days} days `;
+	// }
+	// if (hours > 0 && days === 0) {
+	// 	result += `${hours} hours `;
+	// }
+	// if (minutes > 0 && days === 0 && hours === 0) {
+	// 	result += `${minutes} mins`;
+	// }
+
+	if (result === "") {
+		result = "Ready in under a min";
+	}
+
+	return result;
+}
+
+export function getTimeFromTimestamp(time: number) {
+	if (time < 60) {
+		return time + "seconds";
+	} else {
+		return convertTimestampIntoTime(time);
+	}
+}
+
+export function convertTimestampIntoTime(timestamp: number) {
 	const secondsInAMinute = 60;
 	const secondsInAnHour = secondsInAMinute * 60;
 	const secondsInADay = secondsInAnHour * 24;
 
-	const days = Math.floor(timeDiffInSeconds / secondsInADay);
-	timeDiffInSeconds -= days * secondsInADay;
+	const days = Math.floor(timestamp / secondsInADay);
+	timestamp -= days * secondsInADay;
 
-	const hours = Math.floor(timeDiffInSeconds / secondsInAnHour);
-	timeDiffInSeconds -= hours * secondsInAnHour;
+	const hours = Math.floor(timestamp / secondsInAnHour);
+	timestamp -= hours * secondsInAnHour;
 
-	const minutes = Math.floor(timeDiffInSeconds / secondsInAMinute);
+	const minutes = Math.floor(timestamp / secondsInAMinute);
+	timestamp -= minutes * secondsInAMinute;
 
-	// Construct the result string
 	let result = "";
 
-	if (days > 0) {
-		result += `${days} days `;
-	}
-	if (hours > 0 && days === 0) {
-		result += `${hours} hours `;
-	}
-	if (minutes > 0 && days === 0 && hours === 0) {
-		result += `${minutes} mins`;
-	} else {
-		result = "Ready in under a min";
-	}
+	// if (days > 0) {
+	// 	result += ` ${days} days `;
+	// }
+
+	result += days > 0 ? ` ${days} days +` : "0 days &";
+	result += hours > 0 ? ` ${hours} :` : " 00 : ";
+	result += minutes > 0 ? ` ${minutes} :` : " 00 : ";
+	result += timestamp > 0 ? ` ${timestamp}` : " 00";
+	// result += " (s)";
+
+	// if (hours > 0 && days === 0) {
+	// 	result += ` ${hours} hours `;
+	// }
+
+	// if (minutes > 0 && days === 0 && hours === 0) {
+	// 	result += ` ${minutes} mins`;
+	// }
+
+	// if (timestamp > 0 && minutes <= 60 && days === 0 && hours === 0) {
+	// 	result += ` ${timestamp} secs`;
+	// }
+
+	console.log("result: ", result);
+	console.log("timestamp: ", timestamp);
 
 	return result;
 }

@@ -12,13 +12,18 @@ import {
 } from "@chakra-ui/react";
 import { InfoIcon, AddIcon } from "@chakra-ui/icons";
 import { inputStyle } from "src/theme";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
 import { Timelock, TimelockInput } from "./Common";
 import { useIsMethodEnabled, useAddRecover } from "src/hooks";
+import UserDataContext from "src/contexts/userData";
+import { getGuardiansRoot, recoveryTimeLock } from "src/scripts/plugins/view";
+import { getTimeFromTimestamp } from "src/scripts/utils/helper";
+import { shortenAddress } from "src/scripts/utils/address";
 
 const SocialRecovery = (props: { methodIndex: number }) => {
+	const { pluginAddress } = useContext(UserDataContext);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const { isMethodEnabled } = useIsMethodEnabled(props.methodIndex);
 	const { loading, errorMessage, txHash, result, setErrorMessage, addRecover } =
@@ -29,6 +34,10 @@ const SocialRecovery = (props: { methodIndex: number }) => {
 	const [timeLock, setTimelock] = useState(0);
 	const [threshold, setThreshold] = useState<number>(0);
 	const [guardians, setGuardians] = useState<string[]>([""]);
+
+	const [guardianAddrHash, setMerkleRoot] = useState<string>("");
+	// const [isCorrectHash, setIsCorrectHash] = useState<boolean>(false);
+	const [addressInput, setAddressInput] = useState<string>("");
 
 	const addGuardian = (newValue, index) => {
 		const updatedGuardians = [...guardians];
@@ -48,6 +57,43 @@ const SocialRecovery = (props: { methodIndex: number }) => {
 	};
 	const handleAddGuardian = () => {
 		setGuardians([...guardians, ""]);
+	};
+
+	useEffect(() => {
+		(async () => {
+			if (isMethodEnabled && pluginAddress) {
+				const merkleRoot = await getGuardiansRoot(pluginAddress);
+				if (merkleRoot !== "") {
+					setMerkleRoot(merkleRoot);
+				}
+
+				const timelock = await recoveryTimeLock(pluginAddress);
+				if (timelock !== 0) {
+					setTimelock(Number(timelock));
+				}
+			}
+		})();
+	});
+
+	const handleCompareAddrWithHash = async (address: string) => {
+		// if (address !== "") {
+		// 	setAddressInput(address);
+		// 	const hash = await pedersenHash([address]);
+		// 	if (hash === guardianAddrHash) {
+		// 		setIsCorrectHash(true);
+		// 	} else {
+		// 		setIsCorrectHash(false);
+		// 	}
+		// } else {
+		// 	setIsCorrectHash(false);
+		// 	setAddressInput("");
+		// }
+
+		if (address !== "") {
+			setAddressInput(address);
+		} else {
+			setAddressInput("");
+		}
 	};
 
 	return (
@@ -185,8 +231,52 @@ const SocialRecovery = (props: { methodIndex: number }) => {
 					</Box>
 				</Box>
 			) : (
-				<Box>
-					This method has already been enabled
+				<Box
+					p={5}
+					borderRadius="lg"
+					boxShadow="lg"
+					borderColor={"white"}
+					borderWidth={"1px"}
+				>
+					<Text as="b">Setting</Text>
+					<Flex
+						mt="20px"
+						justifyContent="center"
+						alignItems="strech"
+						w="100%"
+						gap={10}
+					>
+						<VStack spacing={2} fontSize={14} align="start">
+							<Text>- Status :</Text>
+							<Text>- Timelock :</Text>
+							<Text>- Guardian's merkle root hash :</Text>
+						</VStack>
+						<VStack spacing={2} fontSize={14} align="end">
+							<Text>Enabled</Text>
+							<Text>{getTimeFromTimestamp(timeLock)}</Text>
+							<Text>{shortenAddress(guardianAddrHash)}</Text>
+						</VStack>
+					</Flex>
+					<Box mt={7}>
+						<Text fontSize={14} mb={3}>
+							Verify an address is one of the guardians
+						</Text>
+						<Input
+							sx={inputStyle}
+							textAlign="center"
+							w={350}
+							px={10}
+							size="xs"
+							type="address"
+							placeholder="0xAbCd..."
+							onChange={(e) => handleCompareAddrWithHash(e.target.value)}
+						/>
+						{addressInput !== "" ? (
+							<Text mt={2} fontSize={13}>
+								Sorry, this is feature in work in progress.
+							</Text>
+						) : null}
+					</Box>
 					<MethodRemoval method={4} />
 				</Box>
 			)}

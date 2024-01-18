@@ -11,15 +11,10 @@ import {
 import { RepeatIcon } from "@chakra-ui/icons";
 import { useContext, useState } from "react";
 import UserDataContext from "src/contexts/userData";
-import { shortenAddress } from "../scripts/utils/address";
-// import {
-// 	_approveSocialRecovery,
-// 	_executeRecover,
-// 	_rejectRecover,
-// } from "../scripts/plugins/index";
-import ExecutedModal from "./Modals/ExecuteModal";
+import { shortenAddress } from "src/scripts/utils/address";
+import ExecutedModal from "../Modals/ExecuteModal";
 import { calcTimeDiff, typeName } from "src/scripts/utils/helper";
-import { ProposalType, txResult } from "../scripts/plugins/types";
+import { ProposalType, txResult } from "src/scripts/plugins/types";
 import { getProposal } from "src/scripts/plugins/view";
 import useProposeRecover from "src/hooks/useProposeRecover";
 import ProposalStatus from "./ProposalStatus";
@@ -252,13 +247,7 @@ const ProposalDetail = (props: {
 						</Button>
 					)}
 				</HStack>
-				{/* {loading && loadingIndex === 2 ? (
-					<Text mt={5}>
-						{" "}
-						*you need to sign a message on connected wallet <br /> to generate
-						zk-proof{" "}
-					</Text>
-				) : null} */}
+
 				<ProposalStatus
 					loading={loading}
 					methodIndex={props.proposal.type}

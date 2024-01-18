@@ -13,11 +13,11 @@ import UserDataContext from "src/contexts/userData";
 import { getRecoveryCount } from "../scripts/plugins/index";
 import { getProposal } from "src/scripts/plugins/view";
 import ProposedModal from "./Modals/ProposedModal";
-import ProposalDetail from "./ProposalDetail";
+import ProposalDetail from "./Proposal/ProposalDetail";
+import ProposalStatus from "./Proposal/ProposalStatus";
 import { ProposalType } from "../scripts/plugins/types";
 import useIsMethodEnabled from "src/hooks/useIsMethodEnabled";
 import useProposeRecover from "src/hooks/useProposeRecover";
-import ProposalStatus from "./ProposalStatus";
 
 const ProposeRecovery = (props: {
 	methodIndex: number;
@@ -27,7 +27,6 @@ const ProposeRecovery = (props: {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const { isMethodEnabled } = useIsMethodEnabled(props.methodIndex);
 	const [proposeStatus, setProposeStatus] = useState<number>(0);
-	console.log("proposeStatus: ", proposeStatus);
 	const { _proposeRecovery } = useProposeRecover(setProposeStatus);
 
 	const [ownerReplaced, setOwnerReplaced] = useState<string>(currentOwner);

@@ -20,14 +20,28 @@ const ProposalStatus = (props: {
 	const sendingTx = "Sending transaction to network...";
 
 	useEffect(() => {
-		if (!props.loading || props.isApproval) {
-			if (props.methodIndex === 1 || props.methodIndex === 4) {
-				setStatusMsg(requestingSignature);
-			} else if (!props.loading && props.methodIndex === 2) {
-				setStatusMsg(requestingWebauthn);
+		if (!props.isApproval) {
+			if (!props.loading) {
+				if (props.methodIndex === 1 || props.methodIndex === 4) {
+					setStatusMsg(requestingSignature);
+				} else if (!props.loading && props.methodIndex === 2) {
+					setStatusMsg(requestingWebauthn);
+				}
+			}
+			if (props.loading) {
+				if (props.statusIndex === 1) {
+					setStatusMsg(generatingProof);
+				} else if (props.statusIndex === 2) {
+					setStatusMsg(creatingTx);
+				} else if (props.statusIndex === 3) {
+					setStatusMsg(sendingTx);
+				}
 			}
 		}
-		if (props.loading) {
+	}, [props.isApproval, props.loading, props.methodIndex, props.statusIndex]);
+
+	useEffect(() => {
+		if (props.isApproval && props.loading) {
 			if (props.statusIndex === 1) {
 				setStatusMsg(generatingProof);
 			} else if (props.statusIndex === 2) {
