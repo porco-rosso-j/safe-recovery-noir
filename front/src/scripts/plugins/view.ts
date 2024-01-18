@@ -98,7 +98,7 @@ export async function getProposal(
 	console.log("_isExecutable: ", _isExecutable);
 
 	let _approvealThreshold = 0;
-	if (res[0] === 3) {
+	if (res[0] === 3n) {
 		_approvealThreshold = await getSocialRecoveryThreshold(pluginAddr);
 	}
 
@@ -129,11 +129,11 @@ export async function getHashedAddr(pluginAddr: string): Promise<string> {
 }
 
 export async function getRecoveryCount(pluginAddr: string): Promise<number> {
-	return recoveryPluginContract(pluginAddr).recoveryCount();
+	return Number(await recoveryPluginContract(pluginAddr).recoveryCount());
 }
 
 export async function getCredentialID(pluginAddr: string): Promise<string> {
-	return recoveryPluginContract(pluginAddr).credentialId();
+	return await recoveryPluginContract(pluginAddr).credentialId();
 }
 
 export async function getWebAuthnPubkey(pluginAddr: string): Promise<any> {

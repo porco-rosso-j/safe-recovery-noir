@@ -12,15 +12,17 @@ import { RepeatIcon } from "@chakra-ui/icons";
 import { useContext, useState } from "react";
 import UserDataContext from "src/contexts/userData";
 import { shortenAddress } from "../scripts/utils/address";
-import {
-	_approveSocialRecovery,
-	_executeRecover,
-	_rejectRecover,
-} from "../scripts/plugins/index";
+// import {
+// 	_approveSocialRecovery,
+// 	_executeRecover,
+// 	_rejectRecover,
+// } from "../scripts/plugins/index";
 import ExecutedModal from "./Modals/ExecuteModal";
 import { calcTimeDiff, typeName } from "src/scripts/utils/helper";
 import { ProposalType, txResult } from "../scripts/plugins/types";
 import { getProposal } from "src/scripts/plugins/view";
+import useProposeRecover from "src/hooks/useProposeRecover";
+import ProposalStatus from "./ProposalStatus";
 
 const ProposalDetail = (props: {
 	proposal: ProposalType;
@@ -29,9 +31,13 @@ const ProposalDetail = (props: {
 	fromProposeTab: boolean;
 	setOpenProposal?: (value: boolean) => void;
 }) => {
-	const { safeSDK, safeAddress, signer, saveCurrentOwner, pluginAddress } =
+	const { safeSDK, safeAddress, saveCurrentOwner, pluginAddress } =
 		useContext(UserDataContext);
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	const [proposeStatus, setProposeStatus] = useState<number>(0);
+	console.log("proposeStatus: ", proposeStatus);
+	const { _approveSocialRecovery, _executeRecover, _rejectRecover } =
+		useProposeRecover(setProposeStatus);
 
 	const [functionType, setFunctionType] = useState<number>(0);
 	const [errorMessage, setErrorMessage] = useState<string>("");
@@ -44,6 +50,9 @@ const ProposalDetail = (props: {
 	const [proposal, setProposal] = useState<ProposalType>(props.proposal);
 	const [refreshing, setRefreshing] = useState(false);
 
+	const isApprovable =
+		proposal.type === 4 && proposal.approvals < proposal.approvealThreshold;
+
 	const handleFunction = async (funcType: number) => {
 		setErrorMessage("");
 		handleLoading(funcType, true);
@@ -51,20 +60,11 @@ const ProposalDetail = (props: {
 		let ret: txResult = { result: false, txHash: "" };
 
 		if (funcType === 1) {
-			ret = await _executeRecover(signer, pluginAddress, props.proposalId);
+			ret = await _executeRecover(props.proposalId);
 		} else if (funcType === 2) {
-			ret = await _approveSocialRecovery(
-				signer,
-				pluginAddress,
-				props.proposalId
-			);
+			ret = await _approveSocialRecovery(props.proposalId);
 		} else {
-			ret = await _rejectRecover(
-				safeSDK,
-				safeAddress,
-				pluginAddress,
-				props.proposalId
-			);
+			ret = await _rejectRecover(props.proposalId);
 		}
 
 		if (ret.result) {
@@ -76,6 +76,7 @@ const ProposalDetail = (props: {
 			console.log("ret.result: ", ret.result);
 			setErrorMessage("Something went wrong");
 			setLoading(false);
+			setProposeStatus(0);
 			return;
 		}
 		setTxHash(ret.txHash);
@@ -83,6 +84,7 @@ const ProposalDetail = (props: {
 		handleLoading(funcType, false);
 		onOpen();
 		setLoading(false);
+		setProposeStatus(0);
 		handleRefreshProposal();
 	};
 
@@ -113,6 +115,8 @@ const ProposalDetail = (props: {
 			setLoading(loading);
 		}
 	};
+
+	console.log("loadingIndex:", loadingIndex);
 
 	return (
 		<Box mt={3}>
@@ -221,8 +225,7 @@ const ProposalDetail = (props: {
 							Reject
 						</Button>
 					) : null}
-					{proposal.type === 4 &&
-					proposal.approvals < proposal.approvealThreshold ? (
+					{isApprovable ? (
 						<Button
 							sx={{ mt: "35px" }}
 							colorScheme="blue"
@@ -249,18 +252,25 @@ const ProposalDetail = (props: {
 						</Button>
 					)}
 				</HStack>
-				{loading && loadingIndex === 2 ? (
+				{/* {loading && loadingIndex === 2 ? (
 					<Text mt={5}>
 						{" "}
 						*you need to sign a message on connected wallet <br /> to generate
 						zk-proof{" "}
 					</Text>
-				) : null}
-				{errorMessage !== "" ? (
+				) : null} */}
+				<ProposalStatus
+					loading={loading}
+					methodIndex={props.proposal.type}
+					statusIndex={proposeStatus}
+					isApproval={true}
+				/>
+
+				{errorMessage !== "" ?? (
 					<Text mt={4} color="red.400" mb={4}>
 						{errorMessage}
 					</Text>
-				) : null}
+				)}
 				<Button
 					fontSize={15}
 					mt="30px"

@@ -10,20 +10,25 @@ import {
 import { inputStyle } from "src/theme";
 import { useContext, useEffect, useState } from "react";
 import UserDataContext from "src/contexts/userData";
-import { getRecoveryCount, _proposeRecovery } from "../scripts/plugins/index";
+import { getRecoveryCount } from "../scripts/plugins/index";
 import { getProposal } from "src/scripts/plugins/view";
 import ProposedModal from "./Modals/ProposedModal";
 import ProposalDetail from "./ProposalDetail";
 import { ProposalType } from "../scripts/plugins/types";
 import useIsMethodEnabled from "src/hooks/useIsMethodEnabled";
+import useProposeRecover from "src/hooks/useProposeRecover";
+import ProposalStatus from "./ProposalStatus";
 
 const ProposeRecovery = (props: {
 	methodIndex: number;
 	setTabIndex: (index: number) => void;
 }) => {
-	const { signer, currentOwner, pluginAddress } = useContext(UserDataContext);
+	const { currentOwner, pluginAddress } = useContext(UserDataContext);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const { isMethodEnabled } = useIsMethodEnabled(props.methodIndex);
+	const [proposeStatus, setProposeStatus] = useState<number>(0);
+	console.log("proposeStatus: ", proposeStatus);
+	const { _proposeRecovery } = useProposeRecover(setProposeStatus);
 
 	const [ownerReplaced, setOwnerReplaced] = useState<string>(currentOwner);
 	const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
@@ -165,8 +170,6 @@ const ProposeRecovery = (props: {
 										console.log("secret: ", secret);
 										const ret = await _proposeRecovery(
 											props.methodIndex,
-											signer,
-											pluginAddress,
 											threshold,
 											ownerReplaced,
 											pendingNewOwner,
@@ -183,11 +186,13 @@ const ProposeRecovery = (props: {
 											console.log("ret.result: ", ret.result);
 											setErrorMessage("Something went wrong");
 											setLoading(false);
+											setProposeStatus(0);
 											return;
 										}
 										setTxHash(ret.txHash);
 										onOpen();
 										setLoading(false);
+										setProposeStatus(0);
 									} else {
 										setErrorMessage("Addresses not correctly set");
 									}
@@ -198,19 +203,11 @@ const ProposeRecovery = (props: {
 						>
 							Propose Recovery
 						</Button>
-						{loading && (props.methodIndex === 1 || props.methodIndex === 4) ? (
-							<Text mt={5}>
-								{" "}
-								*you need to sign a message on connected wallet <br /> to
-								generate zk-proof{" "}
-							</Text>
-						) : loading && props.methodIndex === 2 ? (
-							<Text mt={5}>
-								{" "}
-								*you need to provide TouchID fingerprint or Yubikey PIN <br />
-								for WebAuthn to generate zk-proof{" "}
-							</Text>
-						) : null}
+						<ProposalStatus
+							loading={loading}
+							methodIndex={props.methodIndex}
+							statusIndex={proposeStatus}
+						/>
 						<Text mt={4} color="red.400" mb={4}>
 							{errorMessage}
 						</Text>
