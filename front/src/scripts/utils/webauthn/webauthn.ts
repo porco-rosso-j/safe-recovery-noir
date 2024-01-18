@@ -90,7 +90,7 @@ async function getWebAuthnInputs(_signature, _authenticatorData, _clientData) {
 	const abiCoder = new ethers.AbiCoder();
 	const webauthnInputs = abiCoder.encode(
 		["bytes", "bytes1", "bytes", "string", "uint"],
-		[authenticatorData, 0x05, clientData, challenge, challengeOffset]
+		[authenticatorData, "0x05", clientData, challenge, challengeOffset]
 	);
 
 	return [signature, ethers.getBytes(webauthnInputs)];

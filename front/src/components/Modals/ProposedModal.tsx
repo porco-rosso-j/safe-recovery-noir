@@ -12,7 +12,8 @@ import {
 	Flex,
 	Box,
 } from "@chakra-ui/react";
-import { shortenTxHash } from "src/scripts/utils/address";
+import { useEtherscanLink } from "src/hooks";
+import { shortenTxHash } from "src/scripts/utils/helper";
 
 type ProposeResultModalType = {
 	isOpen: boolean;
@@ -25,6 +26,7 @@ type ProposeResultModalType = {
 };
 
 function ProposedModal(props: ProposeResultModalType) {
+	const { etherscanLink } = useEtherscanLink();
 	const handleCheckProposal = () => {
 		console.log("handleCheckProposal in Modal");
 
@@ -72,7 +74,7 @@ function ProposedModal(props: ProposeResultModalType) {
 											<Text>{props.recoveryCount}</Text>
 											<Link
 												ml={2}
-												href={"https://goerli.etherscan.io/tx/" + props.txHash}
+												href={etherscanLink(props.txHash)}
 												isExternal
 												textDecoration="underline"
 											>
@@ -111,7 +113,7 @@ function ProposedModal(props: ProposeResultModalType) {
 										<VStack spacing={1} fontSize={16} align="end">
 											<Link
 												ml={2}
-												href={"https://goerli.etherscan.io/tx/" + props.txHash}
+												href={etherscanLink(props.txHash)}
 												isExternal
 												textDecoration="underline"
 											>

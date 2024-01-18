@@ -1,16 +1,18 @@
-import { useEffect, useState } from "react";
-import { Signer, ZeroAddress } from "ethers";
+import { useContext, useEffect, useState } from "react";
+import { Signer } from "ethers";
 import Safe from "@safe-global/protocol-kit";
-import {
-	getIsPluginEnabled,
-	getSafeOwner,
-	getSafePluginAddress,
-} from "src/scripts/utils/safe";
+import useViewContract from "../useViewContract";
+import { ContractDataContext } from "src/contexts/contextData";
 
 const useUserData = () => {
+	// const { managerAddr, pluginFacAddr } = useContext(ContractDataContext);
+
+	const { getSafeOwner, getSafePluginAddress, getIsPluginEnabled } =
+		useViewContract();
+
 	const [safeAddress, setSafeAddress] = useState<string | null>("");
 	const [pluginAddress, setPluginAddress] = useState<string | null>("");
-	const [currentOwner, setCurrentOwner] = useState<string>("");
+	const [currentOwner, setCurrentOwner] = useState<string | null>("");
 
 	const [safeSDK, setSafeSDK] = useState<Safe | null>(null);
 	const [signer, setSigner] = useState<Signer | null>(null);
@@ -19,6 +21,7 @@ const useUserData = () => {
 	// in case browser storage is still present
 	useEffect(() => {
 		(async () => {
+			// if (safeAddress && pluginAddress && currentOwner) {
 			const safe_address = localStorage.getItem(`safe_address`);
 			setSafeAddress(safe_address ? JSON.parse(safe_address) : "");
 
@@ -27,30 +30,29 @@ const useUserData = () => {
 
 			const current_owner = localStorage.getItem(`current_owner`);
 			setCurrentOwner(current_owner ? JSON.parse(current_owner) : "");
+			// }
 		})();
 	});
 
 	// in case not
 	useEffect(() => {
 		(async () => {
-			if (safeAddress !== "" && pluginAddress === "") {
-				try {
-					const PluginAddr = await getSafePluginAddress(safeAddress);
-					if (PluginAddr !== ZeroAddress) {
-						savePluginAddress(PluginAddr, true);
-					}
-				} catch (e) {
-					console.log(e);
-				}
+			// if (safeAddress !== "" && pluginAddress === "" && pluginFacAddr) {
+			// if (safeAddress && !pluginAddress) {
+			//console.log("pluginFacAddr d: ", pluginFacAddr);
+			const PluginAddr = await getSafePluginAddress();
+			if (PluginAddr !== "") {
+				savePluginAddress(PluginAddr, true);
 			}
+			// }
 		})();
 	});
 
 	useEffect(() => {
 		(async () => {
-			if (safeAddress !== "") {
+			if (safeAddress !== "" && safeSDK !== null) {
 				try {
-					const owner = await getSafeOwner(safeAddress);
+					const owner = await getSafeOwner(safeSDK);
 					saveCurrentOwner(owner, true);
 				} catch (e) {
 					console.log(e);
@@ -59,13 +61,19 @@ const useUserData = () => {
 		})();
 	});
 
+	console.log("isPluginEnabled d: ", isPluginEnabled);
+	console.log("safeAddress d: ", safeAddress);
+	console.log("pluginAddress d: ", pluginAddress);
 	useEffect(() => {
 		(async () => {
-			if (safeAddress !== "" && pluginAddress !== "" && !isPluginEnabled) {
-				const _isPluginEnabled = await getIsPluginEnabled(
-					safeAddress,
-					pluginAddress
-				);
+			if (
+				// managerAddr &&
+				safeAddress !== "" &&
+				pluginAddress !== "" &&
+				!isPluginEnabled
+			) {
+				// console.log("manager in before: ", managerAddr);
+				const _isPluginEnabled = await getIsPluginEnabled();
 				if (_isPluginEnabled) {
 					setIsPluginEnabled(_isPluginEnabled);
 				}

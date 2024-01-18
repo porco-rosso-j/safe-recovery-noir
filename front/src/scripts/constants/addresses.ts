@@ -1,19 +1,25 @@
 import dep from "./addresses.json";
 
-const deployedContracts = {
-	registry: "0x15B15BeA9b7E813893d202822d3179242Bd0a881",
-	factory: "0x1c8c2cAFe136510308cd1C9088525fAc11f59Ca2",
-	manager: "0xaae651C4437a722CF53e2b5eA029c076eBbfF276",
-};
-
-const isLOCAL = process.env.REACT_APP_ENV === "LOCAL";
-
-// deployed contract addresses
 export const contracts = {
-	safeProtocolRegistry: isLOCAL ? dep.contracts[0] : deployedContracts.registry,
-	recoveryPluginFac: isLOCAL ? dep.contracts[1] : deployedContracts.factory,
-	safeProotcolManager: isLOCAL ? dep.contracts[2] : deployedContracts.manager,
+	local: {
+		registry: dep.contracts[0],
+		factory: dep.contracts[1],
+		manager: dep.contracts[2],
+	},
+	goerli: {
+		registry: "0x5cC391124fB11a56D974FDaf754f07c67908B6bd",
+		factory: "0xb2Ee66FeFfbf9e82D2e86bCF08bC96eb567bA880",
+		manager: "0xF95639DaAc47f1e1a2E443E7A58b758BDf773AEc",
+	},
+
+	sepolia: {
+		registry: "0x8D10DB8716D76d061320CC5B074f264b8177e3F9",
+		factory: "0x485b9a90CAe4365aa80F62062EF5D1F470fAB442",
+		manager: "0x0dD6Ba234FE0193a1075aac539B39baedDDc057A",
+	},
 };
+
+// forge script script/DeployGoerli.s.sol:Deploy --rpc-url sepolia --broadcast
 
 // addresses for local test
 export const addresses = [

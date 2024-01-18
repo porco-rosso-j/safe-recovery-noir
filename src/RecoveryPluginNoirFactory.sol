@@ -120,5 +120,6 @@ contract RecoveryPluginNoirFactory is Ownable {
 
     function getPluginAddr(address _safe) public view returns (address) {
         return safeToPlugins[_safe];
+        // safeToPlugins[_safe] == address(0) ? address(0) : afeToPlugins[_safe];
     }
 }

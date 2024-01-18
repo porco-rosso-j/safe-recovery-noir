@@ -11,7 +11,8 @@ import {
 	Link,
 	Flex,
 } from "@chakra-ui/react";
-import { shortenTxHash } from "src/scripts/utils/address";
+import { useEtherscanLink } from "src/hooks";
+import { shortenTxHash } from "src/scripts/utils/helper";
 
 type ExecuteResultModalType = {
 	isOpen: boolean;
@@ -24,6 +25,7 @@ type ExecuteResultModalType = {
 };
 
 function ExecutedModal(props: ExecuteResultModalType) {
+	const { etherscanLink } = useEtherscanLink();
 	const handleClose = () => {
 		props.setFunctionType(0);
 		props.onClose();
@@ -82,7 +84,7 @@ function ExecutedModal(props: ExecuteResultModalType) {
 								<VStack spacing={1} fontSize={16} align="end">
 									<Link
 										ml={2}
-										href={"https://goerli.etherscan.io/tx/" + props.txHash}
+										href={etherscanLink(props.txHash)}
 										isExternal
 										textDecoration="underline"
 									>

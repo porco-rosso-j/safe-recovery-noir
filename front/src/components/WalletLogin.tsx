@@ -7,23 +7,20 @@ import {
 	Link,
 } from "@chakra-ui/react";
 import React, { useState, useContext } from "react";
-import UserDataContext from "src/contexts/userData";
-import {
-	getSafeSDK,
-	getSigner,
-	supportedChainID,
-	switchNetwork,
-} from "../scripts/utils/login";
+import { useLogin } from "src/hooks";
 import {
 	useWeb3ModalProvider,
 	useWeb3ModalState,
 	useWeb3ModalAccount,
 } from "@web3modal/ethers/react";
+import { chainIds } from "src/scripts/constants";
+import { UserDataContext } from "src/contexts/contextData";
 
 const WalletLogin: React.FC = () => {
 	const { saveSafeAddress, saveSafeSDK, saveSigner } =
 		useContext(UserDataContext);
 	const { walletProvider } = useWeb3ModalProvider();
+	const { getSafeSDK, getSigner, switchNetwork } = useLogin();
 
 	const { chainId } = useWeb3ModalAccount();
 	const { open, selectedNetworkId } = useWeb3ModalState();
@@ -44,11 +41,11 @@ const WalletLogin: React.FC = () => {
 
 		console.log("chainId: ", chainId);
 		console.log("selectedChainid: ", selectedNetworkId);
-		if (chainId !== supportedChainID) {
-			await switchNetwork(walletProvider);
+		if (chainId === chainIds.goerli || chainId === chainIds.sepolia) {
+			await switchNetwork();
 		}
 
-		const signer = await getSigner(walletProvider);
+		const signer = await getSigner();
 		console.log("signer: ", signer);
 		if (!signer) {
 			setErrorMessage("Please connect wallet first");
@@ -59,7 +56,7 @@ const WalletLogin: React.FC = () => {
 
 		if (safeAddressInput !== "") {
 			saveSafeAddress(safeAddressInput, true);
-			const safeSDK = await getSafeSDK(safeAddressInput, signer);
+			const safeSDK = await getSafeSDK(signer, safeAddressInput);
 			if (safeSDK) {
 				console.log("safeSDK: ", safeSDK);
 				saveSafeSDK(safeSDK);

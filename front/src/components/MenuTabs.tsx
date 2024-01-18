@@ -10,8 +10,7 @@ import {
 	Text,
 } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
-import UserDataContext from "src/contexts/userData";
-import { shortenAddress } from "src/scripts/utils/address";
+import { shortenAddress } from "src/scripts/utils/helper";
 import MethodHeader from "./MethodHeader";
 import EnablePlugin from "./EnablePlugin";
 import WalletLogin from "./WalletLogin";
@@ -20,12 +19,9 @@ import {
 	useWeb3ModalAccount,
 	useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
-import {
-	getSafeSDK,
-	getSigner,
-	supportedChainID,
-	switchNetwork,
-} from "src/scripts/utils/login";
+import { useLogin } from "src/hooks";
+import { chainIds } from "src/scripts/constants";
+import { UserDataContext } from "src/contexts/contextData";
 
 const MenuTabs = () => {
 	const {
@@ -40,6 +36,7 @@ const MenuTabs = () => {
 	const { walletProvider } = useWeb3ModalProvider();
 	const modal = useWeb3Modal();
 	const { address, chainId } = useWeb3ModalAccount();
+	const { getSafeSDK, getSigner, switchNetwork } = useLogin();
 	const [method, setMethod] = useState<number>(1);
 	const [tabIndex, setTabIndex] = useState(0);
 	const [tabOneDisplayIndex, setTabOneDisplayIndex] = useState<number>(0);
@@ -64,10 +61,10 @@ const MenuTabs = () => {
 
 	const updateSignerAndSafe = async () => {
 		try {
-			const signer = await getSigner(walletProvider);
+			const signer = await getSigner();
 			if (signer) saveSigner(signer);
 
-			const safeSDK = await getSafeSDK(safeAddress, signer);
+			const safeSDK = await getSafeSDK(signer);
 			if (safeSDK) {
 				saveSafeSDK(safeSDK);
 			} else {
@@ -121,10 +118,12 @@ const MenuTabs = () => {
 	// ask for network change when walletProvider detects unsupported network
 	useEffect(() => {
 		(async () => {
-			if (walletProvider && chainId !== supportedChainID) {
+			const isChainSupported =
+				chainId === chainIds.goerli || chainId === chainIds.sepolia;
+			if (walletProvider && !isChainSupported) {
 				setIsWrongNetwork(false);
-				await switchNetwork(walletProvider);
-			} else if (walletProvider && chainId === supportedChainID) {
+				await switchNetwork();
+			} else if (walletProvider && isChainSupported) {
 				if (!isNetworkWrong) {
 					setIsWrongNetwork(true);
 				}

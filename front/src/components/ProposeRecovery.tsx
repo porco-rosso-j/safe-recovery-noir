@@ -9,21 +9,25 @@ import {
 } from "@chakra-ui/react";
 import { inputStyle } from "src/theme";
 import { useContext, useEffect, useState } from "react";
-import UserDataContext from "src/contexts/userData";
-import { getRecoveryCount, _proposeRecovery } from "../scripts/plugins/index";
-import { getProposal } from "src/scripts/plugins/view";
 import ProposedModal from "./Modals/ProposedModal";
 import ProposalDetail from "./ProposalDetail";
-import { ProposalType } from "../scripts/plugins/types";
-import useIsMethodEnabled from "src/hooks/useIsMethodEnabled";
+import { ProposalType } from "src/scripts/types";
+import {
+	useIsMethodEnabled,
+	useProposeRecover,
+	useViewContract,
+} from "src/hooks";
+import { UserDataContext } from "src/contexts/contextData";
 
 const ProposeRecovery = (props: {
 	methodIndex: number;
 	setTabIndex: (index: number) => void;
 }) => {
-	const { signer, currentOwner, pluginAddress } = useContext(UserDataContext);
+	const { currentOwner } = useContext(UserDataContext);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const { isMethodEnabled } = useIsMethodEnabled(props.methodIndex);
+	const { getProposal, getRecoveryCount } = useViewContract();
+	const { _proposeRecovery } = useProposeRecover();
 
 	const [ownerReplaced, setOwnerReplaced] = useState<string>(currentOwner);
 	const [pendingNewOwner, setPendingNewOwner] = useState<string>("");
@@ -44,7 +48,7 @@ const ProposeRecovery = (props: {
 	const handleCheckProposal = async () => {
 		console.log("handleCheckProposal in ProposeRecovery");
 
-		const proposal = await getProposal(recoveryCount, pluginAddress);
+		const proposal = await getProposal(recoveryCount);
 		console.log("proposal");
 		setProposal(proposal);
 		console.log("proposal set: ", proposal);
@@ -165,8 +169,6 @@ const ProposeRecovery = (props: {
 										console.log("secret: ", secret);
 										const ret = await _proposeRecovery(
 											props.methodIndex,
-											signer,
-											pluginAddress,
 											threshold,
 											ownerReplaced,
 											pendingNewOwner,
@@ -174,9 +176,7 @@ const ProposeRecovery = (props: {
 										);
 										console.log("ret: ", ret);
 										if (ret.result) {
-											const _recoveryCount = await getRecoveryCount(
-												pluginAddress
-											);
+											const _recoveryCount = await getRecoveryCount();
 											setRecoveryCount(_recoveryCount);
 											setResult(true);
 										} else if (!ret.result && ret.txHash === "") {

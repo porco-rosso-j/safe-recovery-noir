@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import UserDataContext from "src/contexts/userData";
+
 import logo from "../../assets/logo.png";
 
 import {
@@ -10,7 +10,7 @@ import {
 	HStack,
 	useDisclosure,
 } from "@chakra-ui/react";
-import { shortenAddressS } from "src/scripts/utils/address";
+import { shortenAddressS } from "src/scripts/utils/helper";
 import {
 	useWeb3Modal,
 	useWeb3ModalAccount,
@@ -18,9 +18,11 @@ import {
 } from "@web3modal/ethers/react";
 import { Link } from "react-router-dom";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
+import { ContractDataContext, UserDataContext } from "src/contexts/contextData";
 
 export default function Header() {
 	const { logout } = useContext(UserDataContext);
+	const { logoutContract } = useContext(ContractDataContext);
 	const { disconnect } = useDisconnect();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -30,6 +32,7 @@ export default function Header() {
 	const handleDisconnect = () => {
 		disconnect();
 		logout();
+		logoutContract();
 	};
 
 	return (

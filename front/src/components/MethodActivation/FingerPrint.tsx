@@ -4,7 +4,6 @@ import {
 	Text,
 	Flex,
 	VStack,
-	Spinner,
 	useDisclosure,
 	Link,
 } from "@chakra-ui/react";
@@ -16,7 +15,9 @@ import { useIsMethodEnabled, useAddRecover } from "src/hooks";
 
 const EnableFingerPrint = (props) => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const { isMethodEnabled } = useIsMethodEnabled(props.methodIndex);
+	const { isMethodEnabled, handleUpdate } = useIsMethodEnabled(
+		props.methodIndex
+	);
 
 	const { loading, errorMessage, txHash, result, addRecover } =
 		useAddRecover(onOpen);
@@ -28,7 +29,9 @@ const EnableFingerPrint = (props) => {
 			{!isMethodEnabled ? (
 				<Box>
 					<Text mb={8} fontSize={15} mx="25px">
-						{"Create a keypair that is generated from your fingerprint via "}
+						{
+							"Create a keypair with available authenticators on your device, which are supported by "
+						}
 						<Link
 							textDecoration="underline"
 							href="https://webauthn.io/"
@@ -36,7 +39,9 @@ const EnableFingerPrint = (props) => {
 						>
 							WebAuthn
 						</Link>
-						{". Private key will be stored on your device securely."}
+						{", such as TouchID and Yubikey."}
+						<br />
+						{"Private key will be stored on your device securely."}
 					</Text>
 					<Flex
 						mt="20px"
@@ -80,7 +85,7 @@ const EnableFingerPrint = (props) => {
 			) : (
 				<Box>
 					This method has already been enabled
-					<MethodRemoval method={2} />
+					<MethodRemoval method={2} handleDisable={handleUpdate(false)} />
 				</Box>
 			)}
 			<EnabledModal

@@ -1,15 +1,18 @@
 import { useContext, useState, useEffect } from "react";
-import UserDataContext from "src/contexts/userData";
-import { _isMethodEnabled } from "../scripts/plugins/index";
+import { useViewContract } from "./index";
+import { UserDataContext } from "src/contexts/contextData";
 
 const useIsMethodEnabled = (methodIndex: number) => {
-	const { pluginAddress, isPluginEnabled } = useContext(UserDataContext);
+	const { isPluginEnabled, pluginAddress } = useContext(UserDataContext);
 	const [isMethodEnabled, setIsMethodEnabled] = useState<boolean>(false);
+	const { _isMethodEnabled } = useViewContract();
+	console.log("isMethodEnabled: ", isMethodEnabled);
+	console.log("methodIndex: ", methodIndex);
 
 	useEffect(() => {
 		(async () => {
-			if (isPluginEnabled) {
-				const isEnabled = await _isMethodEnabled(methodIndex, pluginAddress);
+			if (isPluginEnabled && pluginAddress !== "") {
+				const isEnabled = await _isMethodEnabled(methodIndex);
 				if (isEnabled) {
 					setIsMethodEnabled(isEnabled);
 				} else {
@@ -19,7 +22,11 @@ const useIsMethodEnabled = (methodIndex: number) => {
 		})();
 	});
 
-	return { isMethodEnabled };
+	const handleUpdate = (enabled: boolean) => {
+		setIsMethodEnabled(enabled);
+	};
+
+	return { isMethodEnabled, handleUpdate };
 };
 
 export default useIsMethodEnabled;

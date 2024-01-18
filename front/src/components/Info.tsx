@@ -1,7 +1,7 @@
 import { Flex, Text, VStack } from "@chakra-ui/react";
 import { useContext } from "react";
-import UserDataContext from "src/contexts/userData";
-import { shortenTxHash } from "src/scripts/utils/address";
+import { UserDataContext } from "src/contexts/contextData";
+import { shortenTxHash } from "src/scripts/utils/helper";
 const Info = () => {
 	const { safeAddress, pluginAddress, isPluginEnabled, currentOwner } =
 		useContext(UserDataContext);

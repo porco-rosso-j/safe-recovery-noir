@@ -1,12 +1,11 @@
 import { Box, Button, useDisclosure, Text } from "@chakra-ui/react";
-import { useState, useContext } from "react";
-import UserDataContext from "src/contexts/userData";
-import { _removeRecover } from "../../scripts/plugins/index";
+import { useState } from "react";
 import EnabledModal from "../Modals/EnabledModal";
+import useRemoveRecover from "src/hooks/plugins/useRemoveRecover";
 
 const MethodRemoval = (props) => {
-	const { safeSDK, pluginAddress } = useContext(UserDataContext);
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	const { _removeRecover } = useRemoveRecover();
 
 	const [loading, setLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string>("");
@@ -29,14 +28,11 @@ const MethodRemoval = (props) => {
 					setErrorMessage("");
 
 					setLoading(true);
-					const ret = await _removeRecover(
-						safeSDK,
-						pluginAddress,
-						props.method
-					);
+					const ret = await _removeRecover(props.method);
 					console.log("ret: ", ret);
 					if (ret.result) {
 						setResult(true);
+						props.handleDisable();
 					} else if (!ret.result && ret.txHash === "") {
 						console.log("ret.result: ", ret.result);
 						setErrorMessage("Something went wrong");

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
 	Box,
 	Input,
@@ -7,30 +8,32 @@ import {
 	HStack,
 	Spinner,
 } from "@chakra-ui/react";
-import { useContext, useState, useEffect, useCallback } from "react";
-import UserDataContext from "src/contexts/userData";
-import { getProposals, getRecoveryCount } from "../scripts/plugins/index";
-import { ProposalType } from "../scripts/plugins/types";
+import { useContext, useState, useEffect } from "react";
+import { ProposalType } from "src/scripts/types";
 import ProposalDetail from "./ProposalDetail";
 import { typeName } from "src/scripts/utils/helper";
+import { useViewContract } from "src/hooks";
+import { UserDataContext } from "src/contexts/contextData";
 
 const ProposalList = () => {
 	const { pluginAddress } = useContext(UserDataContext);
+	const { getProposals, getRecoveryCount } = useViewContract();
+
 	const [proposalId, setProposalId] = useState<number>(0);
 	const [proposals, setProposals] = useState<ProposalType[]>([]);
 	const [loadingProposals, setLoadingProposals] = useState<boolean>(false);
 	const [initialLoad, setInitialLoad] = useState<boolean>(true);
 	const [proposalsFound, setProposalsFound] = useState<boolean>(false);
 
-	const fetchProposals = useCallback(async () => {
-		const proposalLen = Number(await getRecoveryCount(pluginAddress));
+	const fetchProposals = async () => {
+		const proposalLen = Number(await getRecoveryCount());
 
 		if (proposalLen !== 0) {
 			setProposalsFound(true);
 			setLoadingProposals(true);
 
 			try {
-				const proposalsFetched = await getProposals(pluginAddress);
+				const proposalsFetched = await getProposals();
 
 				setProposals(proposalsFetched);
 				setLoadingProposals(false);
@@ -40,7 +43,7 @@ const ProposalList = () => {
 		} else {
 			setProposalsFound(false);
 		}
-	}, [pluginAddress]);
+	};
 
 	useEffect(() => {
 		if (initialLoad && pluginAddress !== "") {

@@ -16,6 +16,9 @@ import "forge-std/Script.sol";
 contract Deploy is Script {
     address deployerAddress = vm.envAddress("ADDRESS");
     uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+    // address deployerAddress = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+    // uint256 deployerPrivateKey =
+    //     0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
 
     SafeProtocolRegistry public registry;
     SafeProtocolManager public manager;

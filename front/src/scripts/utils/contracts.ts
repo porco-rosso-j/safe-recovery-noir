@@ -1,57 +1,71 @@
-import { Signer, ethers, Wallet } from "ethers";
+import { Contract, ethers, JsonRpcProvider, Signer, Wallet } from "ethers";
 import {
 	RecoveryPlugin,
 	RecoveryPluginFac,
 	SafeProtocolManager,
-	SafeAbi,
 	SafeProtocolRegistry,
-} from "../artifacts/contracts/index";
-import { contracts, privatekeys } from "../constants/addresses";
-
-const ALCHEMY_GOERLI = process.env.REACT_APP_ALCHEMY_GOERLI;
-const PRIVATE_KEY = process.env.REACT_APP_PRIVATE_KEY;
-export const provider = new ethers.JsonRpcProvider(
-	process.env.REACT_APP_ENV === "LOCAL"
-		? "http://127.0.0.1:8545"
-		: ALCHEMY_GOERLI
-);
-
-export const nonce = async (address: string): Promise<number> => {
-	return await provider.getTransactionCount(address);
-};
-export const dummyWallet = new Wallet(privatekeys[0], provider);
+} from "src/scripts/artifacts/contracts/index";
+import {
+	LOCAL_URL,
+	ALCHEMY_GOERLI,
+	ALCHEMY_SEPOLIA,
+	ENV,
+} from "src/scripts/constants";
 
 export const managerIface = new ethers.Interface(SafeProtocolManager.abi);
 
-export const manager = new ethers.Contract(
-	contracts.safeProotcolManager,
-	SafeProtocolManager.abi,
-	provider
-);
-
-export const registry = new ethers.Contract(
-	contracts.safeProtocolRegistry,
-	SafeProtocolRegistry.abi,
-	new Wallet(PRIVATE_KEY, provider)
-);
-
 export const pluginIface = new ethers.Interface(RecoveryPlugin.abi);
+
 export const pluginFacIface = new ethers.Interface(RecoveryPluginFac.abi);
 
-export const pluginFac = new ethers.Contract(
-	contracts.recoveryPluginFac,
-	RecoveryPluginFac.abi,
-	provider
-);
+export const provider = (chainId: number) => {
+	let JSON_RPC_URL = "";
 
-export const recoveryPluginContract = (pluginAddr: string) => {
-	return new ethers.Contract(pluginAddr, RecoveryPlugin.abi, provider);
+	if (ENV === "LOCAL") {
+		JSON_RPC_URL = LOCAL_URL;
+	} else {
+		console.log("here.....: ");
+		if (chainId === 5) {
+			JSON_RPC_URL = ALCHEMY_GOERLI;
+			console.log("JSON_RPC_URL..: ", JSON_RPC_URL);
+		} else if (chainId === 11155111) {
+			JSON_RPC_URL = ALCHEMY_SEPOLIA;
+		} else {
+			return;
+		}
+
+		return new JsonRpcProvider(JSON_RPC_URL);
+	}
 };
 
-export const recoveryPluginSigner = (signer: Signer, pluginAddr: string) => {
+export const factory = (factoryAddr: string, chainId: number) => {
+	return new ethers.Contract(
+		factoryAddr,
+		RecoveryPluginFac.abi,
+		provider(chainId)
+	);
+};
+
+export const registry = (registryAddr: string, chainId: number) => {
+	return new ethers.Contract(
+		registryAddr,
+		SafeProtocolRegistry.abi,
+		provider(chainId)
+	);
+};
+
+export const manager = (managerAddr: string, chainId: number) => {
+	return new ethers.Contract(
+		managerAddr,
+		SafeProtocolManager.abi,
+		provider(chainId)
+	);
+};
+
+export const plugin = (pluginAddr: string, chainId: number) => {
+	return new ethers.Contract(pluginAddr, RecoveryPlugin.abi, provider(chainId));
+};
+
+export const pluginSigner = (pluginAddr: string, signer: Signer) => {
 	return new ethers.Contract(pluginAddr, RecoveryPlugin.abi, signer);
-};
-
-export const safeContract = (safeAddr: string) => {
-	return new ethers.Contract(safeAddr, SafeAbi, provider);
 };
