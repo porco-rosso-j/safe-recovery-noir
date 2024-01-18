@@ -67,7 +67,15 @@ const EnableBackupAddress = (props) => {
 	};
 
 	return (
-		<Box pt="10px">
+		<Box
+			py={5}
+			px={1}
+			mt={6}
+			borderRadius="lg"
+			boxShadow="lg"
+			borderColor={"white"}
+			borderWidth={"1px"}
+		>
 			{!isMethodEnabled ? (
 				<Box>
 					<Text mb={8} fontSize={15} mx="25px">
@@ -137,13 +145,7 @@ const EnableBackupAddress = (props) => {
 					</Box>
 				</Box>
 			) : (
-				<Box
-					p={5}
-					borderRadius="lg"
-					boxShadow="lg"
-					borderColor={"white"}
-					borderWidth={"1px"}
-				>
+				<Box>
 					<Text as="b">Setting</Text>
 					<Flex
 						mt="20px"

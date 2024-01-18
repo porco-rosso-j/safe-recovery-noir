@@ -1,6 +1,11 @@
 import { error, txResult } from "src/scripts/plugins/types";
 import { useContext } from "react";
-import { ContractTransactionResponse, SigningKey, ethers } from "ethers";
+import {
+	ContractTransactionResponse,
+	Signer,
+	SigningKey,
+	ethers,
+} from "ethers";
 import { parseUint8ArrayToBytes32 } from "src/scripts/utils/helper";
 import { authenticateWebAuthn } from "src/scripts/utils/webauthn/webauthn";
 import {
@@ -48,6 +53,8 @@ const useProposeRecover = (setProposeStatus: (index: number) => void) => {
 	): Promise<txResult> {
 		let result: txResult;
 
+		setProposeStatus(1);
+
 		if (method === 1) {
 			result = await _proposeEcrecoverRecover(newThreshold, oldOwner, newOwner);
 		} else if (method === 2) {
@@ -74,7 +81,7 @@ const useProposeRecover = (setProposeStatus: (index: number) => void) => {
 	}
 
 	async function sendTx(tx: ContractTransactionResponse): Promise<txResult> {
-		setProposeStatus(3);
+		setProposeStatus(4);
 		try {
 			const txResponse = await tx.wait();
 			console.log("txResponse: ", txResponse);
@@ -89,37 +96,37 @@ const useProposeRecover = (setProposeStatus: (index: number) => void) => {
 		oldOwner: string,
 		newOwner: string
 	): Promise<txResult> {
-		const [msg, signature] = await getMsgAndSig(1);
-		if (msg === "" || signature === "") return error;
-
-		const msgHash: string = ethers.hashMessage(msg);
-		const pubkey: string = SigningKey.recoverPublicKey(msgHash, signature);
-		console.log("msgHash: ", msgHash);
-		console.log("pubkey: ", pubkey);
-		console.log("msgHash len: ", ethers.dataLength(msgHash));
-		console.log("pubkey len: ", ethers.dataLength(pubkey));
-
-		console.log("msgHash getBytes: ", ethers.getBytes(msgHash));
-		const pubInputMsgHash = await parseUint8ArrayToBytes32(
-			ethers.getBytes(msgHash)
-		);
-
-		console.log("pubInputMsgHash: ", pubInputMsgHash);
-
-		const hashedAddr = await getHashedAddr(pluginAddress);
-
-		setProposeStatus(1);
-		const ret = await generateProofK256(
-			hashedAddr,
-			ethers.getBytes(pubkey).slice(1, 65),
-			ethers.getBytes(signature).slice(0, -1),
-			ethers.getBytes(msgHash)
-		);
-		setProposeStatus(2);
-
-		console.log("ret.proof: ", ret.proof);
-
 		try {
+			const [msg, signature] = await getMsgAndSig(1);
+			if (msg === "" || signature === "") return error;
+
+			const msgHash: string = ethers.hashMessage(msg);
+			const pubkey: string = SigningKey.recoverPublicKey(msgHash, signature);
+			console.log("msgHash: ", msgHash);
+			console.log("pubkey: ", pubkey);
+			console.log("msgHash len: ", ethers.dataLength(msgHash));
+			console.log("pubkey len: ", ethers.dataLength(pubkey));
+
+			console.log("msgHash getBytes: ", ethers.getBytes(msgHash));
+			const pubInputMsgHash = await parseUint8ArrayToBytes32(
+				ethers.getBytes(msgHash)
+			);
+
+			console.log("pubInputMsgHash: ", pubInputMsgHash);
+
+			const hashedAddr = await getHashedAddr(pluginAddress);
+
+			setProposeStatus(2);
+			const ret = await generateProofK256(
+				hashedAddr,
+				ethers.getBytes(pubkey).slice(1, 65),
+				ethers.getBytes(signature).slice(0, -1),
+				ethers.getBytes(msgHash)
+			);
+			setProposeStatus(3);
+
+			console.log("ret.proof: ", ret.proof);
+
 			const tx: ContractTransactionResponse =
 				await plugin.proposeEcrecoverRecover(
 					[oldOwner],
@@ -134,7 +141,7 @@ const useProposeRecover = (setProposeStatus: (index: number) => void) => {
 			return await sendTx(tx);
 		} catch (e) {
 			console.log("e: ", e);
-			return error;
+			return { result: false, txHash: "" };
 		}
 	}
 
@@ -160,14 +167,14 @@ const useProposeRecover = (setProposeStatus: (index: number) => void) => {
 			const message = await computeMessage(webauthnInputs, pluginAddress);
 			console.log("message: ", message);
 
-			setProposeStatus(1);
+			setProposeStatus(2);
 			const ret = await generateProofP256(
 				ethers.getBytes(signature),
 				ethers.getBytes(pubkey[0]),
 				ethers.getBytes(pubkey[1]),
 				ethers.getBytes(message)
 			);
-			setProposeStatus(2);
+			setProposeStatus(3);
 
 			const tx = await plugin.proposeWebAuthnRecover(
 				[oldOwner],
@@ -190,16 +197,16 @@ const useProposeRecover = (setProposeStatus: (index: number) => void) => {
 		newOwner: string,
 		secret: string
 	): Promise<txResult> {
-		console.log("oldOwner: ", oldOwner);
-		console.log("newOwner: ", newOwner);
-		console.log("newThreshold: ", newThreshold);
-
-		setProposeStatus(1);
-		const ret = await generateProofSecret(secret);
-		setProposeStatus(2);
-		console.log("ret: ", ret);
-
 		try {
+			console.log("oldOwner: ", oldOwner);
+			console.log("newOwner: ", newOwner);
+			console.log("newThreshold: ", newThreshold);
+
+			setProposeStatus(2);
+			const ret = await generateProofSecret(secret);
+			setProposeStatus(3);
+			console.log("ret: ", ret);
+
 			const tx = await plugin.proposeSecretRecover(
 				[oldOwner],
 				[newOwner],
@@ -237,7 +244,7 @@ const useProposeRecover = (setProposeStatus: (index: number) => void) => {
 			const response: NullifierHashAndHashPath =
 				await getNullifierHashAndHashPath(root, signerAddr, proposalId);
 
-			setProposeStatus(1);
+			setProposeStatus(2);
 			const ret = await generateProofSocial(
 				root,
 				response.nullHash,
@@ -248,7 +255,7 @@ const useProposeRecover = (setProposeStatus: (index: number) => void) => {
 				response.index.toString(),
 				response.hashPath
 			);
-			setProposeStatus(2);
+			setProposeStatus(3);
 
 			const pubInputMsgHash = await parseUint8ArrayToBytes32(
 				ethers.getBytes(msgHash)
@@ -275,39 +282,39 @@ const useProposeRecover = (setProposeStatus: (index: number) => void) => {
 	async function _approveSocialRecovery(
 		_proposalId: number
 	): Promise<txResult> {
-		const [msg, signature] = await getMsgAndSig(4);
-		if (msg === "" || signature === "") return error;
-		const msgHash: string = ethers.hashMessage(msg);
-		const pubkey: string = SigningKey.recoverPublicKey(msgHash, signature);
-
-		const root = await getGuardiansRoot(pluginAddress);
-		const proposalId = `0x${_proposalId.toString(16).padStart(2, "0")}`;
-
-		const { index, nullHash, hashPath } = await getNullifierHashAndHashPath(
-			root,
-			await signer.getAddress(),
-			proposalId
-		);
-
-		setProposeStatus(1);
-		const ret = await generateProofSocial(
-			root,
-			nullHash,
-			_proposalId.toString(),
-			ethers.getBytes(pubkey).slice(1, 65),
-			ethers.getBytes(signature).slice(0, -1),
-			ethers.getBytes(msgHash),
-			index.toString(),
-			hashPath
-		);
-		setProposeStatus(2);
-
-		const pubInputMsgHash = await parseUint8ArrayToBytes32(
-			ethers.getBytes(msgHash)
-		);
-		console.log("pubInputMsgHash: ", pubInputMsgHash);
-
 		try {
+			const [msg, signature] = await getMsgAndSig(4);
+			if (msg === "" || signature === "") return error;
+			const msgHash: string = ethers.hashMessage(msg);
+			const pubkey: string = SigningKey.recoverPublicKey(msgHash, signature);
+
+			const root = await getGuardiansRoot(pluginAddress);
+			const proposalId = `0x${_proposalId.toString(16).padStart(2, "0")}`;
+
+			const { index, nullHash, hashPath } = await getNullifierHashAndHashPath(
+				root,
+				await signer.getAddress(),
+				proposalId
+			);
+
+			setProposeStatus(2);
+			const ret = await generateProofSocial(
+				root,
+				nullHash,
+				_proposalId.toString(),
+				ethers.getBytes(pubkey).slice(1, 65),
+				ethers.getBytes(signature).slice(0, -1),
+				ethers.getBytes(msgHash),
+				index.toString(),
+				hashPath
+			);
+			setProposeStatus(3);
+
+			const pubInputMsgHash = await parseUint8ArrayToBytes32(
+				ethers.getBytes(msgHash)
+			);
+			console.log("pubInputMsgHash: ", pubInputMsgHash);
+
 			const tx = await plugin.approveSocialRecovery(
 				proposalId,
 				ret.proof,
@@ -365,25 +372,25 @@ const useProposeRecover = (setProposeStatus: (index: number) => void) => {
 			methodStr = "social_recovery";
 		}
 
-		console.log("signerAddr???: ", signerAddr);
 		const user_nonce = await nonce(signerAddr);
-		const msg =
-			"safe_recover_" +
-			methodStr +
-			"_address_" +
-			signerAddr +
-			"_nonce_" +
-			user_nonce;
+
+		const message = `[safe_recover signature]
+		\nmethod: ${methodStr} 
+		\nsigner_address: ${signerAddr} 
+		\nsigner nonce: ${user_nonce}
+		\nplugin_address: ${pluginAddress} 
+		\nsafe_address: ${safeAddress}
+		`;
 
 		let signature: string;
 		try {
-			signature = await signer.signMessage(msg);
+			signature = await signer.signMessage(message);
 		} catch (e) {
 			console.log("error: ", e);
 			return ["", ""];
 		}
 
-		return [msg, signature];
+		return [message, signature];
 	};
 
 	return {

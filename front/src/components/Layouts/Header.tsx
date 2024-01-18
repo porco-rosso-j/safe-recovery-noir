@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import UserDataContext from "src/contexts/userData";
 import logo from "../../assets/logo.png";
 
@@ -27,9 +27,14 @@ export default function Header() {
 	const modal = useWeb3Modal();
 	const { address, isConnected } = useWeb3ModalAccount();
 
+	const [selectedItem, setSelectedItem] = useState<string>("Recovery");
+
 	const handleDisconnect = () => {
 		disconnect();
 		logout();
+	};
+	const selectItem = (item) => {
+		setSelectedItem(item);
 	};
 
 	return (
@@ -69,25 +74,29 @@ export default function Header() {
 					>
 						<Link to="/">
 							<Button
-								color={"#cccccc"}
+								// color={"#cccccc"}
+								onClick={() => selectItem("Recovery")}
+								color={selectedItem === "Recovery" ? "#5B9F79" : "#cccccc"}
 								background="transparent"
 								_hover={{ bg: "transparent" }}
 							>
 								Recovery
 							</Button>
 						</Link>
-						<Link to="/info">
+						<Link to="/proposals">
 							<Button
-								color={"#cccccc"}
+								onClick={() => selectItem("Proposals")}
+								color={selectedItem === "Proposals" ? "#5B9F79" : "#cccccc"}
 								background="transparent"
 								_hover={{ bg: "transparent" }}
 							>
-								Info
+								Proposals
 							</Button>
 						</Link>
 						<Link to="/doc">
 							<Button
-								color={"#cccccc"}
+								onClick={() => selectItem("Doc")}
+								color={selectedItem === "Doc" ? "#5B9F79" : "#cccccc"}
 								background="transparent"
 								_hover={{ bg: "transparent" }}
 							>

@@ -9,33 +9,28 @@ const ProposalStatus = (props: {
 }) => {
 	const [statusMsg, setStatusMsg] = useState<string>("");
 
-	console.log("statusMsg: ", statusMsg);
-
 	// status msg
-	const requestingSignature = "You will sign a message to generate zk-proof";
+	const requestingSignature = "Sign message to generate zk-proof";
 	const requestingWebauthn =
-		"You need to provide TouchID fingerprint or Yubikey PIN for WebAuthn to generate zk-proof";
+		"Use TouchID or Yubikey PIN for WebAuthn to generate zk-proof";
 	const generatingProof = "Generating proof... it may take 1~2 minutes.";
 	const creatingTx = "Sign transaction for broadcasting";
 	const sendingTx = "Sending transaction to network...";
 
 	useEffect(() => {
-		if (!props.isApproval) {
-			if (!props.loading) {
+		if (!props.isApproval && props.loading) {
+			if (props.statusIndex === 1) {
 				if (props.methodIndex === 1 || props.methodIndex === 4) {
 					setStatusMsg(requestingSignature);
 				} else if (!props.loading && props.methodIndex === 2) {
 					setStatusMsg(requestingWebauthn);
 				}
-			}
-			if (props.loading) {
-				if (props.statusIndex === 1) {
-					setStatusMsg(generatingProof);
-				} else if (props.statusIndex === 2) {
-					setStatusMsg(creatingTx);
-				} else if (props.statusIndex === 3) {
-					setStatusMsg(sendingTx);
-				}
+			} else if (props.statusIndex === 2) {
+				setStatusMsg(generatingProof);
+			} else if (props.statusIndex === 3) {
+				setStatusMsg(creatingTx);
+			} else if (props.statusIndex === 4) {
+				setStatusMsg(sendingTx);
 			}
 		}
 	}, [props.isApproval, props.loading, props.methodIndex, props.statusIndex]);
@@ -43,14 +38,22 @@ const ProposalStatus = (props: {
 	useEffect(() => {
 		if (props.isApproval && props.loading) {
 			if (props.statusIndex === 1) {
-				setStatusMsg(generatingProof);
+				setStatusMsg(requestingSignature);
 			} else if (props.statusIndex === 2) {
-				setStatusMsg(creatingTx);
+				setStatusMsg(generatingProof);
 			} else if (props.statusIndex === 3) {
+				setStatusMsg(creatingTx);
+			} else if (props.statusIndex === 4) {
 				setStatusMsg(sendingTx);
 			}
 		}
 	}, [props.isApproval, props.loading, props.methodIndex, props.statusIndex]);
+
+	useEffect(() => {
+		if (props.statusIndex === 0) {
+			setStatusMsg("");
+		}
+	}, [props.statusIndex]);
 
 	return (
 		<Text mx={20} fontSize={14} mt={5}>

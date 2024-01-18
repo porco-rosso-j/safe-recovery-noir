@@ -13,6 +13,7 @@ import { getProposals, getRecoveryCount } from "src/scripts/plugins/index";
 import { ProposalType } from "src/scripts/plugins/types";
 import ProposalDetail from "./ProposalDetail";
 import { typeName } from "src/scripts/utils/helper";
+import { inputStyle } from "src/theme";
 
 const ProposalList = () => {
 	const { pluginAddress } = useContext(UserDataContext);
@@ -102,80 +103,110 @@ const ProposalList = () => {
 	};
 
 	return (
-		<Box pt="3px">
-			{proposalId === 0 ? (
-				<Box>
-					<Text mb={5} fontSize={15} mx="75px">
-						Choose proposal and execute ⚡️
+		<Box
+			display="flex"
+			flexDirection="column"
+			justifyContent="center"
+			alignItems="center"
+			flex="1"
+			pt={20}
+		>
+			<Box
+				p={5}
+				backgroundColor={"#2e2e2e"}
+				borderRadius="lg"
+				boxShadow="lg"
+				textAlign="center"
+				maxW="1024px"
+				width="600px"
+				mx="auto"
+			>
+				<Box
+					p={5}
+					borderRadius="lg"
+					boxShadow="lg"
+					borderColor={"#444745"}
+					borderWidth={"1px"}
+				>
+					<Text mt={5} mb={25} fontSize={25}>
+						Proposals
 					</Text>
-					<Box mb={5}>
-						<label>Proposal ID:</label>
-						<Input
-							ml={3}
-							sx={{ w: "50px" }}
-							size="sm"
-							placeholder="2"
-							onChange={(e) => {
-								handleSetProposalId(Number(e.target.value));
-							}}
-						/>
-					</Box>
+					{proposalId === 0 ? (
+						<Box>
+							<HStack mb={5} justifyContent={"center"} gap={3}>
+								<Text>Proposal ID:</Text>
+								<Input
+									textAlign={"center"}
+									style={inputStyle}
+									// ml={3}
+									sx={{ w: "55px" }}
+									size="sm"
+									placeholder="2"
+									onChange={(e) => {
+										handleSetProposalId(Number(e.target.value));
+									}}
+								/>
+							</HStack>
 
-					<Box mt={10} mb={50}>
-						{!proposalsFound || loadingProposals ? (
-							<Box>
-								{loadingProposals ? (
+							<Box mt={10} mb={30}>
+								{!proposalsFound || loadingProposals ? (
 									<Box>
-										<Text>Loading proposals...</Text>
-										<Flex justifyContent="center" alignItems="center">
-											<Spinner mt={10} color="gray.300" />
-										</Flex>
+										{loadingProposals ? (
+											<Box>
+												<Text>Loading proposals...</Text>
+												<Flex justifyContent="center" alignItems="center">
+													<Spinner mt={10} color="gray.300" />
+												</Flex>
+											</Box>
+										) : (
+											<Text>No proposal found</Text>
+										)}
 									</Box>
 								) : (
-									<Text>No proposal found</Text>
+									// proposalNotFound == true && loadingProposals == false
+									<VStack
+										spacing={4}
+										align="stretch"
+										mx={10}
+										maxHeight="400px"
+										overflowY="auto"
+									>
+										{proposals.map((proposal) => (
+											<Box
+												key={proposal.id}
+												p={1}
+												borderWidth="1px"
+												borderRadius="md"
+												_hover={{ shadow: "md", cursor: "pointer" }}
+												onClick={() => {
+													handleSetProposalId(proposal.id);
+												}}
+											>
+												<HStack spacing={4} py={1}>
+													<Text ml={3}>ID: {Number(proposal.id)}</Text>
+													<Text flex={1}>
+														{typeName(Number(proposal.type))} Recovery
+													</Text>
+													{handleStatus(proposal)}
+												</HStack>
+											</Box>
+										))}
+									</VStack>
 								)}
 							</Box>
-						) : (
-							// proposalNotFound == true && loadingProposals == false
-							<VStack
-								spacing={4}
-								align="stretch"
-								mx={5}
-								maxHeight="300px"
-								overflowY="auto"
-							>
-								{proposals.map((proposal) => (
-									<Box
-										key={proposal.id}
-										p={1}
-										borderWidth="1px"
-										borderRadius="md"
-										_hover={{ shadow: "md", cursor: "pointer" }}
-										onClick={() => {
-											handleSetProposalId(proposal.id);
-										}}
-									>
-										<HStack spacing={4} py={1}>
-											<Text ml={3}>ID: {Number(proposal.id)}</Text>
-											<Text flex={1}>
-												{typeName(Number(proposal.type))} Recovery
-											</Text>
-											{handleStatus(proposal)}
-										</HStack>
-									</Box>
-								))}
-							</VStack>
-						)}
-					</Box>
+						</Box>
+					) : (
+						<Box mx={3}>
+							<ProposalDetail
+								proposal={proposals[Number(proposalId)]}
+								proposalId={proposalId}
+								setProposalId={setProposalId}
+								fromProposeTab={false}
+							/>
+						</Box>
+					)}
 				</Box>
-			) : (
-				<ProposalDetail
-					proposal={proposals[Number(proposalId)]}
-					proposalId={proposalId}
-					setProposalId={setProposalId}
-					fromProposeTab={false}
-				/>
-			)}
+			</Box>
 		</Box>
 	);
 };

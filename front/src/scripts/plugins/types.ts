@@ -34,6 +34,7 @@ export type IsRecoveryExecutableType = {
 export type txResult = {
 	result: boolean;
 	txHash: string;
+	reason?: string;
 };
 
 export const empTxResult = {

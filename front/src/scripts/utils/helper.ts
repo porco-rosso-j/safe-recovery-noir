@@ -30,31 +30,6 @@ export function calcTimeDiff(solidityTimestamp: number) {
 	const diff = solidityTimestamp - Math.floor(Date.now() / 1000);
 	let result = convertTimestampIntoTime(diff);
 
-	// const secondsInAMinute = 60;
-	// const secondsInAnHour = secondsInAMinute * 60;
-	// const secondsInADay = secondsInAnHour * 24;
-
-	// const days = Math.floor(timeDiffInSeconds / secondsInADay);
-	// timeDiffInSeconds -= days * secondsInADay;
-
-	// const hours = Math.floor(timeDiffInSeconds / secondsInAnHour);
-	// timeDiffInSeconds -= hours * secondsInAnHour;
-
-	// const minutes = Math.floor(timeDiffInSeconds / secondsInAMinute);
-
-	// // Construct the result string
-	// let result = "";
-
-	// if (days > 0) {
-	// 	result += `${days} days `;
-	// }
-	// if (hours > 0 && days === 0) {
-	// 	result += `${hours} hours `;
-	// }
-	// if (minutes > 0 && days === 0 && hours === 0) {
-	// 	result += `${minutes} mins`;
-	// }
-
 	if (result === "") {
 		result = "Ready in under a min";
 	}
@@ -118,7 +93,7 @@ export const typeName = (type: number) => {
 	if (type === 1) {
 		return "Backup Address";
 	} else if (type === 2) {
-		return "Fingerprint";
+		return "TouchID/Yubikey";
 	} else if (type === 3) {
 		return "Secret";
 	} else if (type === 4) {

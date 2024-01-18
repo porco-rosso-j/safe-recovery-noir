@@ -1,6 +1,5 @@
 import { Box, Divider, Select } from "@chakra-ui/react";
 import ProposeRecovery from "./ProposeRecovery";
-import ProposalList from "./Proposal/ProposalList";
 import {
 	BackupAddress,
 	FingerPrint,
@@ -26,7 +25,7 @@ const MethodHeader = (props: MethodHeaderType) => {
 					value={props.method}
 				>
 					<option value="1">1. Backup Address Recovery</option>
-					<option value="2"> 2. FingerPrint Recovery</option>
+					<option value="2"> 2. TouchID/Yubikey Recovery</option>
 					<option value="3"> 3. Secret Word Recovery</option>
 					<option value="4"> 4. Social Recovery</option>
 				</Select>
@@ -56,8 +55,6 @@ const MethodHeader = (props: MethodHeaderType) => {
 					methodIndex={props.method}
 					setTabIndex={props.setTabIndex}
 				/>
-			) : props.index === 2 ? (
-				<ProposalList />
 			) : null}
 			<Divider mt="30px" borderColor={"white.400"}></Divider>
 		</Box>

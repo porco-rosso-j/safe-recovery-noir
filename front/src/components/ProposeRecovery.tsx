@@ -90,7 +90,13 @@ const ProposeRecovery = (props: {
 					</Text>
 				</Box>
 			) : (
-				<Box>
+				<Box
+					p={5}
+					borderRadius="lg"
+					boxShadow="lg"
+					borderColor={"white"}
+					borderWidth={"1px"}
+				>
 					<Box>
 						<Text mb={8} fontSize={15}>
 							The old owner will be replaced with the new owner.
@@ -184,14 +190,15 @@ const ProposeRecovery = (props: {
 										} else if (!ret.result && ret.txHash === "") {
 											console.log("ret.result: ", ret.result);
 											setErrorMessage("Something went wrong");
-											setLoading(false);
 											setProposeStatus(0);
+											setLoading(false);
+
 											return;
 										}
 										setTxHash(ret.txHash);
 										onOpen();
-										setLoading(false);
 										setProposeStatus(0);
+										setLoading(false);
 									} else {
 										setErrorMessage("Addresses not correctly set");
 									}

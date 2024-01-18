@@ -8,8 +8,8 @@ import MenuTabs from "src/components/MenuTabs";
 import chakraDefaultTheme from "src/theme";
 
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import Info from "./components/Info";
 import Doc from "./components/Doc";
+import ProposalList from "./components/Proposal/ProposalList";
 
 function App() {
 	const {
@@ -52,7 +52,7 @@ function App() {
 						<Header />
 						<Routes>
 							<Route path="/" element={<MenuTabs />} />
-							<Route path="/info" element={<Info />} />
+							<Route path="/proposals" element={<ProposalList />} />
 							<Route path="/doc" element={<Doc />} />
 						</Routes>
 						<Footer />

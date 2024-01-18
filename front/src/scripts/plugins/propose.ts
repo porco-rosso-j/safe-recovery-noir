@@ -96,39 +96,39 @@ export async function _proposeEcrecoverRecover(
 	oldOwner: string,
 	newOwner: string
 ): Promise<txResult> {
-	const [msg, signature] = await getMsgAndSig(
-		signer,
-		1,
-		await signer.getAddress()
-	);
-	if (msg === "" || signature === "") return error;
-
-	const msgHash: string = ethers.hashMessage(msg);
-	const pubkey: string = SigningKey.recoverPublicKey(msgHash, signature);
-	console.log("msgHash: ", msgHash);
-	console.log("pubkey: ", pubkey);
-	console.log("msgHash len: ", ethers.dataLength(msgHash));
-	console.log("pubkey len: ", ethers.dataLength(pubkey));
-
-	console.log("msgHash getBytes: ", ethers.getBytes(msgHash));
-	const pubInputMsgHash = await parseUint8ArrayToBytes32(
-		ethers.getBytes(msgHash)
-	);
-
-	console.log("pubInputMsgHash: ", pubInputMsgHash);
-
-	const hashedAddr = await getHashedAddr(pluginAddr);
-
-	const ret = await generateProofK256(
-		hashedAddr,
-		ethers.getBytes(pubkey).slice(1, 65),
-		ethers.getBytes(signature).slice(0, -1),
-		ethers.getBytes(msgHash)
-	);
-
-	console.log("ret.proof: ", ret.proof);
-
 	try {
+		const [msg, signature] = await getMsgAndSig(
+			signer,
+			1,
+			await signer.getAddress()
+		);
+		if (msg === "" || signature === "") return error;
+
+		const msgHash: string = ethers.hashMessage(msg);
+		const pubkey: string = SigningKey.recoverPublicKey(msgHash, signature);
+		console.log("msgHash: ", msgHash);
+		console.log("pubkey: ", pubkey);
+		console.log("msgHash len: ", ethers.dataLength(msgHash));
+		console.log("pubkey len: ", ethers.dataLength(pubkey));
+
+		console.log("msgHash getBytes: ", ethers.getBytes(msgHash));
+		const pubInputMsgHash = await parseUint8ArrayToBytes32(
+			ethers.getBytes(msgHash)
+		);
+
+		console.log("pubInputMsgHash: ", pubInputMsgHash);
+
+		const hashedAddr = await getHashedAddr(pluginAddr);
+
+		const ret = await generateProofK256(
+			hashedAddr,
+			ethers.getBytes(pubkey).slice(1, 65),
+			ethers.getBytes(signature).slice(0, -1),
+			ethers.getBytes(msgHash)
+		);
+
+		console.log("ret.proof: ", ret.proof);
+
 		const tx: ContractTransactionResponse = await recoveryPluginSigner(
 			signer,
 			pluginAddr

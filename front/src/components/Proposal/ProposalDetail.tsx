@@ -30,7 +30,6 @@ const ProposalDetail = (props: {
 		useContext(UserDataContext);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [proposeStatus, setProposeStatus] = useState<number>(0);
-	console.log("proposeStatus: ", proposeStatus);
 	const { _approveSocialRecovery, _executeRecover, _rejectRecover } =
 		useProposeRecover(setProposeStatus);
 

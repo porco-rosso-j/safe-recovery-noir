@@ -33,13 +33,17 @@ export async function generateProofK256(
 
 	console.log("input: ", input);
 
-	const proof: ProofData = await noir.generateFinalProof(input);
-	console.log("proof: ", proof);
+	try {
+		const proof: ProofData = await noir.generateFinalProof(input);
+		console.log("proof: ", proof);
+		console.log("proof: ", proof.publicInputs);
+		return proof;
+	} catch (e) {
+		console.log("proof generation failed: ", e);
+	}
 
 	// const result = await noir.verifyFinalProof(proof);
 	// console.log("result: ", result);
-
-	return proof;
 }
 
 export async function generateProofP256(
@@ -72,15 +76,17 @@ export async function generateProofP256(
 	};
 
 	console.log("input: ", input);
-
-	const proof: ProofData = await noir.generateFinalProof(input);
-	console.log("proof: ", proof);
-	console.log("proof: ", proof.publicInputs);
+	try {
+		const proof: ProofData = await noir.generateFinalProof(input);
+		console.log("proof: ", proof);
+		console.log("proof: ", proof.publicInputs);
+		return proof;
+	} catch (e) {
+		console.log("proof generation failed: ", e);
+	}
 
 	// const result = await noir.verifyFinalProof(proof);
 	// console.log("result: ", result);
-
-	return proof;
 }
 
 export async function generateProofSecret(_secret: string): Promise<ProofData> {

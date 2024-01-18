@@ -97,7 +97,15 @@ const SocialRecovery = (props: { methodIndex: number }) => {
 	};
 
 	return (
-		<Box pt="10px">
+		<Box
+			py={5}
+			px={1}
+			mt={6}
+			borderRadius="lg"
+			boxShadow="lg"
+			borderColor={"white"}
+			borderWidth={"1px"}
+		>
 			{!isMethodEnabled ? (
 				<Box>
 					<Tooltip
@@ -231,13 +239,7 @@ const SocialRecovery = (props: { methodIndex: number }) => {
 					</Box>
 				</Box>
 			) : (
-				<Box
-					p={5}
-					borderRadius="lg"
-					boxShadow="lg"
-					borderColor={"white"}
-					borderWidth={"1px"}
-				>
+				<Box>
 					<Text as="b">Setting</Text>
 					<Flex
 						mt="20px"

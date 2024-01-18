@@ -155,7 +155,6 @@ const MenuTabs = () => {
 					width="600px"
 					mx="auto"
 				>
-					{/* <AddressInfo /> */}
 					<Tabs
 						index={tabIndex}
 						onChange={handleTabsChange}
@@ -163,16 +162,13 @@ const MenuTabs = () => {
 						borderColor="gray"
 					>
 						<TabList>
-							<Tab w="33%" color="white">
-								<Text fontSize={18} mb={3}>
-									Enable Recovery
+							<Tab w="50%" color="#CBDAD1">
+								<Text fontSize={20} mb={3}>
+									Enable
 								</Text>
 							</Tab>
-							<Tab fontSize={18} w="33%" color="white">
-								<Text mb={3}>Propose Recovery</Text>
-							</Tab>
-							<Tab fontSize={18} w="33%" color="white">
-								<Text mb={3}>Proposals</Text>
+							<Tab fontSize={20} w="50%" color="#CBDAD1">
+								<Text mb={3}>Propose</Text>
 							</Tab>
 						</TabList>
 						<TabPanels>
@@ -187,9 +183,14 @@ const MenuTabs = () => {
 									<EnablePlugin />
 								) : tabOneDisplayIndex === 3 ? (
 									<Box my="50px">
-										<Text>
-											You are not an owner of Safe {shortenAddress(safeAddress)}
-										</Text>
+										{walletProvider ? (
+											<Text>
+												You are not an owner of Safe{" "}
+												{shortenAddress(safeAddress)}
+											</Text>
+										) : (
+											<Text>Connect your wallet</Text>
+										)}
 									</Box>
 								) : null}
 							</TabPanel>
@@ -197,13 +198,6 @@ const MenuTabs = () => {
 								<MethodHeader
 									updateMethod={updateMethod}
 									setTabIndex={handleTabsChange}
-									method={method}
-									index={tabIndex}
-								/>
-							</TabPanel>
-							<TabPanel>
-								<MethodHeader
-									updateMethod={updateMethod}
 									method={method}
 									index={tabIndex}
 								/>
