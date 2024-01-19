@@ -143,14 +143,11 @@ export async function generateProofSocial(
 	};
 
 	console.log("input: ", input);
+	const ret = await noir.execute(input);
+	console.log("ret: ", ret);
 
 	const proof: ProofData = await noir.generateFinalProof(input);
 	console.log("proof: ", proof);
-	// const proof = dummyProof();
-	// console.log("proof: ", proof);
-
-	// // const { witness } = await noir.execute(input);
-	// // const proof = await backend.generateFinalProof(witness);
 
 	// const result = await noir.verifyFinalProof(proof);
 	// console.log("result: ", result);

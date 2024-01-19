@@ -55,6 +55,7 @@ const EnableBackupAddress = (props) => {
 		if (address !== "") {
 			setAddressInput(address);
 			const hash = await pedersenHash([address]);
+			console.log("hash: ", hash);
 			if (hash === backupAddressHash) {
 				setIsCorrectHash(true);
 			} else {

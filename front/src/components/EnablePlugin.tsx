@@ -44,7 +44,7 @@ const EnablePlugin = () => {
 						setLoading(true);
 						setErrorMessage("");
 						setSetupStatus(
-							"1/3. SafeRecover plugin is being deployed & Safe is enabling the module..."
+							"1/3: SafeRecover plugin is being deployed & Safe is enabling the module..."
 						);
 						const [res1, _pluginAddress] = await enableModuleOnSafe(
 							safeSDK,
@@ -59,7 +59,7 @@ const EnablePlugin = () => {
 						}
 
 						setSetupStatus(
-							"2/3. Safe Protocol Registry is registering the module..."
+							"2/3: Safe Protocol Registry is registering the module..."
 						);
 						const res2 = await addModule(_pluginAddress);
 						if (!res2.result) {
@@ -70,7 +70,7 @@ const EnablePlugin = () => {
 						}
 
 						setSetupStatus(
-							"3/3. Enabling SafeRecover on SafeProtocolManager..."
+							"3/3: Enabling SafeRecover on SafeProtocolManager..."
 						);
 						const res3 = await enablePluginOnProtocolManager(
 							safeAddress,

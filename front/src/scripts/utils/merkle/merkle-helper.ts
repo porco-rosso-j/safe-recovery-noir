@@ -19,7 +19,15 @@ export async function getMerkleRootFromAddresses(
 		hashed_nodes[hashed_nodes.length] = hashed_nodes[hashed_nodes.length - 1];
 	}
 
-	console.log("hashed_nodes: ", hashed_nodes);
+	console.log("hashed_nodes after ood: ", hashed_nodes);
+
+	if (hashed_nodes.length === 6) {
+		// make it 8 so as to have complete binary tree with 8 nodes
+		hashed_nodes.push(hashed_nodes[hashed_nodes.length - 1]);
+		hashed_nodes.push(hashed_nodes[hashed_nodes.length - 1]);
+	}
+
+	console.log("hashed_nodes after pad: ", hashed_nodes);
 
 	// const tree = await getMerkleTree(hashed_node);
 	const mappedAddrs = hashed_nodes.map((nodes) => Fr.fromString(nodes));
@@ -74,6 +82,16 @@ export async function getNullifierHashAndHashPath(
 
 	console.log("nodesFr: ", nodesFr);
 
+	console.log("nodes[index]: ", nodes[index]);
+	console.log("proposal_id: ", proposal_id);
+	console.log("address: ", address);
+
+	const nullifierHash = await pedersenHash([
+		nodes[index],
+		address,
+		proposal_id,
+	]);
+
 	let merkleTree: MerkleTree;
 	const depth = calculateDepth(nodes.length);
 	console.log("depth: ", depth);
@@ -85,17 +103,12 @@ export async function getNullifierHashAndHashPath(
 	for (let i = 0; i < pathElements.length; i++) {
 		hash_path.push(pathElements[i].toString());
 	}
+	const supplement = 4 - hash_path.length;
+	for (let i = 0; i < supplement; i++) {
+		hash_path.push("0x00");
+	}
+
 	console.log("hash_path: ", hash_path);
-
-	console.log("nodes[index]: ", nodes[index]);
-	console.log("proposal_id: ", proposal_id);
-	console.log("address: ", address);
-
-	const nullifierHash = await pedersenHash([
-		nodes[index],
-		address,
-		proposal_id,
-	]);
 
 	return { index: index, nullHash: nullifierHash, hashPath: hash_path };
 }

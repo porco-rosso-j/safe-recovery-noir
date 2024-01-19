@@ -1,4 +1,4 @@
-hash_path = ["0x2746750d26fb25a124823d57b15a2bcdffab42e0b3902a9555d8c8406fb63a59", "0x0a10de25cde1addf30bc53a2b6aa790783757bab845628a4e4cbf6bbead561ff"]
+hash_path = ["0x2746750d26fb25a124823d57b15a2bcdffab42e0b3902a9555d8c8406fb63a59", "0x0a10de25cde1addf30bc53a2b6aa790783757bab845628a4e4cbf6bbead561ff", "0", "0"]
 hashed_message = [
   '82', '154', '122', '115',
   '3',  '254',  '180',  '9',

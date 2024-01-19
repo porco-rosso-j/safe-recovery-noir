@@ -6,12 +6,6 @@ import {
 } from "./add";
 import { _removeRecover } from "./remove";
 import {
-	_proposeRecovery,
-	_approveSocialRecovery,
-	_executeRecover,
-	_rejectRecover,
-} from "./propose";
-import {
 	_isMethodEnabled,
 	getNewOwnerForPoposal,
 	_getIsRecoveryExecutable,
@@ -27,10 +21,6 @@ export {
 	_addSecretRecover,
 	_addSocialRecover,
 	_removeRecover,
-	_proposeRecovery,
-	_approveSocialRecovery,
-	_executeRecover,
-	_rejectRecover,
 	getNewOwnerForPoposal,
 	_getIsRecoveryExecutable,
 	getRecoveryCount,

@@ -1,11 +1,6 @@
 import { error, txResult } from "src/scripts/plugins/types";
 import { useContext } from "react";
-import {
-	ContractTransactionResponse,
-	Signer,
-	SigningKey,
-	ethers,
-} from "ethers";
+import { ContractTransactionResponse, SigningKey, ethers } from "ethers";
 import { parseUint8ArrayToBytes32 } from "src/scripts/utils/helper";
 import { authenticateWebAuthn } from "src/scripts/utils/webauthn/webauthn";
 import {

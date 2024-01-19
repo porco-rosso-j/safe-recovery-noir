@@ -39,7 +39,7 @@ export function calcTimeDiff(solidityTimestamp: number) {
 
 export function getTimeFromTimestamp(time: number) {
 	if (time < 60) {
-		return time + "seconds";
+		return time + " secs";
 	} else {
 		return convertTimestampIntoTime(time);
 	}

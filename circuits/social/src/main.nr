@@ -1,6 +1,6 @@
 use dep::std;
 use dep::ecrecover;
-
+mod root;
 // nargo 0.19.2 (git version hash: 4646a93f5e95604b5710353764b2c4295efaef6b, is dirty: true)
 
 fn main(
@@ -11,25 +11,26 @@ fn main(
     pub_key: [u8; 64],
     signature: [u8; 64],
     index: Field,
-    hash_path: [Field; 2]
+    hash_path: [Field; 4]
 ) {
     let key = ecrecover::secp256k1::PubKey::from_unified(pub_key);
     let address = ecrecover::ecrecover(key.pub_x, key.pub_y, signature, hashed_message);
 
-    std::println(address);
+    // std::println(address);
 
     // Compute input note commitment a.k.a leaf
     let leaf = std::hash::pedersen_hash([address]);
-    std::println(leaf);
+    // std::println(leaf);
 
-    let computed_root = std::merkle::compute_merkle_root(leaf, index, hash_path);
-    std::println(computed_root);
+    // let computed_root = std::merkle::compute_merkle_root(leaf, index, hash_path);
+    let computed_root = root::compute_root_flexible_path_len(leaf, index, hash_path);
+    // std::println(computed_root);
     assert(computed_root == root);
 
     // Compute input note nullifier
     let nullifier = std::hash::pedersen_hash([leaf, address, proposal_id]);
-    //assert(nullifierHash == nullifier);
-    std::println(nullifier);
+    // std::println(nullifier);
+    assert(nullifierHash == nullifier);
 }
 
 #[test]
@@ -38,7 +39,7 @@ fn test_main() {
 
     let proposal_id = 3;
 
-    let nullifierHash = 0x2598862d49813e0f738ffb2b316339155fb2ec921ae17ab80c1997651cf6a568;
+    let nullifierHash = 0x0c695a74173659d121f2264c036fc65f6e59cd5907154d41dd5a5e895cf7520d;
 
     let hashed_message = [
         254, 4, 178, 55, 182, 20, 133, 27, 54, 59, 132, 217, 75, 246, 157, 107, 49, 161, 99, 72, 15, 190, 232, 130, 233, 246, 13, 168, 119, 173, 127, 20
@@ -54,9 +55,11 @@ fn test_main() {
 
     let index = 0;
 
-    let hash_path: [Field; 2] = [
+    let hash_path: [Field; 4] = [
         0x137ad2247d8e089ca5dc03f9a70e5bc68392ac2916495968a80c35582c1a3c37,
-        0x072beba6c02ef2bc3bd7c391ab32e6f0d8ee0a178e95640966e1deb7df1c9f7a
+        0x072beba6c02ef2bc3bd7c391ab32e6f0d8ee0a178e95640966e1deb7df1c9f7a,
+        0,
+        0
     ];
 
     main(
