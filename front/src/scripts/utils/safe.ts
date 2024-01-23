@@ -154,6 +154,10 @@ export async function getSafeOwner(safe: string): Promise<string> {
 	return owners[0];
 }
 
+export async function getSafeOwners(safe: string): Promise<string[]> {
+	return await safeContract(safe).getOwners();
+}
+
 // async function computePluginAddr(safeAddr: string): Promise<string> {
 // 	return await pluginFac.getAddress(safeAddr, 0);
 // }

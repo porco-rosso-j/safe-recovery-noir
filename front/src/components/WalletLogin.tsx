@@ -5,6 +5,7 @@ import {
 	Text,
 	useColorModeValue,
 	Link,
+	VStack,
 } from "@chakra-ui/react";
 import React, { useState, useContext } from "react";
 import UserDataContext from "src/contexts/userData";
@@ -19,6 +20,7 @@ import {
 	useWeb3ModalState,
 	useWeb3ModalAccount,
 } from "@web3modal/ethers/react";
+import { getSafeOwners } from "src/scripts/utils/safe";
 
 const WalletLogin: React.FC = () => {
 	const { saveSafeAddress, saveSafeSDK, saveSigner } =
@@ -72,6 +74,26 @@ const WalletLogin: React.FC = () => {
 		}
 	};
 
+	const handleSafeAddressInput = async (address: string) => {
+		setErrorMessage("");
+		if (address !== "") {
+			try {
+				const owners = await getSafeOwners(address);
+				console.log("owners: ", owners);
+				if (owners.length === 1) {
+					setSafeAddressInput(address);
+				} else {
+					setErrorMessage(
+						"SafeRecover hasn't added support for Safe with multi signers yet"
+					);
+				}
+			} catch (e) {
+				console.log("e: ", e);
+				setErrorMessage("Invalid Safe address");
+			}
+		}
+	};
+
 	return (
 		<Box>
 			<Text
@@ -94,24 +116,28 @@ const WalletLogin: React.FC = () => {
 				<Text textAlign={"center"} fontSize="xl" fontWeight="bold" mb={3}>
 					Connect wallet and enter your Safe Address!
 				</Text>
-				<Box justifyContent={"center"} display={"flex"}>
-					<Text fontSize="15" mb={6}>
+				<VStack justifyContent={"center"} display={"flex"} gap={2}>
+					<Text fontSize="15" mb={1}>
 						1. Connect Safe owner's wallet via Wallet Connect <br />
 						2. Enter your Safe address below <br />
-						3. Press 'Enter the app' button
+						3. Press 'Enter the app' button <br />
 					</Text>
-				</Box>
+					<Text fontSize={14} mb={5} color={"yellow.200"}>
+						Note: please use signle-signer Safe, as this app hasn't <br />
+						added support for multi-signer Safe yet.
+					</Text>
+				</VStack>
 				<Box mb={4}>
 					<Text mb={2}>Safe address:</Text>
 					<Input
 						placeholder="0xAbCd..."
 						type="address"
 						defaultValue={""}
-						onChange={(e) => setSafeAddressInput(e.target.value)}
+						onChange={(e) => handleSafeAddressInput(e.target.value)}
 					/>
 				</Box>
 				{errorMessage !== "" ? (
-					<Text color="red.400" mb={10}>
+					<Text color="red.400" mb={5}>
 						{errorMessage}
 					</Text>
 				) : null}
