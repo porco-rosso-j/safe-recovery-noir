@@ -5,8 +5,6 @@ import "./RecoverBase.sol";
 import {RECOVERY_TYPE_SECRET} from "../Common/Constants.sol";
 
 contract SecretRecover is RecoverBase {
-    // address public secretVerifier;
-    // bool public isSecretRecoverEnabled;
     bytes32 public hashed_secret;
 
     function addSecretRecover(

@@ -6,8 +6,6 @@ import {RECOVERY_TYPE_P256} from "../Common/Constants.sol";
 
 contract WebAuthnRecover is RecoverBase {
     using WebAuthnHelper for bytes;
-    // address public webAuthnVerifier;
-    // bool public isWebAuthnRecoverEnabled;
     bytes32 public pubkey_x;
     bytes32 public pubkey_y;
     string public credentialId;

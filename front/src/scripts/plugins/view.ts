@@ -14,18 +14,6 @@ export async function _isMethodEnabled(
 	moduleId: number,
 	pluginAddr: string
 ): Promise<boolean> {
-	// let ret;
-	// if (moduleId === 1) {
-	// 	ret = await recoveryPluginContract(pluginAddr).isEcrecoverRecoverEnabled();
-	// } else if (moduleId === 2) {
-	// 	ret = await recoveryPluginContract(pluginAddr).isWebAuthnRecoverEnabled();
-	// } else if (moduleId === 3) {
-	// 	ret = await recoveryPluginContract(pluginAddr).isSecretRecoverEnabled();
-	// } else if (moduleId === 4) {
-	// 	ret = await recoveryPluginContract(pluginAddr).isSocialRecoverEnabled();
-	// } else {
-	// 	return false;
-	// }
 	return await recoveryPluginContract(pluginAddr).getIsMethodEnabled(moduleId);
 }
 
@@ -56,7 +44,6 @@ export async function _getIsRecoveryExecutable(
 			reason: "",
 		} as IsRecoveryExecutableType;
 	} catch (error) {
-		// if (error.code === ethers.errors.CALL_EXCEPTION) {
 		if (ethers.isCallException(error)) {
 			console.log("Revert reason:", error.reason);
 			return {
@@ -98,14 +85,12 @@ export async function getProposal(
 	console.log("_isExecutable: ", _isExecutable);
 
 	let _approvealThreshold = 0;
-	// if (res[0] === 3n) {
 	if (res[0] === 4n) {
 		_approvealThreshold = await getSocialRecoveryThreshold(pluginAddr);
 	}
 
 	const proposal: ProposalType = {
 		id: Number(proposalId),
-		// type: Number(res[0]) + 1,
 		type: Number(res[0]),
 		newOwners: res[1],
 		oldOwners: res[2],
@@ -123,7 +108,7 @@ export async function getProposal(
 }
 
 export async function getProposalCount(pluginAddr: string): Promise<number> {
-	return await recoveryPluginContract(pluginAddr).proposalCount();
+	return Number(await recoveryPluginContract(pluginAddr).proposalCount());
 }
 
 export async function getHashedAddr(pluginAddr: string): Promise<string> {
@@ -161,7 +146,6 @@ export async function getRecoveryTimelock(
 	type: number
 ): Promise<number> {
 	return Number(
-		// await recoveryPluginContract(pluginAddr).getRecoveryTimelock(type)
 		await recoveryPluginContract(pluginAddr).recoveryTimelocks(type)
 	);
 }

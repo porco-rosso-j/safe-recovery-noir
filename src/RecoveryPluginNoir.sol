@@ -56,10 +56,6 @@ contract RecoveryPluginNoir is
         );
         safe = _safe;
         safeProtocolManager = ISafeProtocolManager(_safeProtocolManager);
-        // ecrecoverVerifier = _ecrecoverVerifier;
-        // webAuthnVerifier = _webAuthnVerifier;
-        // secretVerifier = _secretVerifier;
-        // socialRecoverVerifier = _socialRecoverVerifier;
         _setVerifier(RECOVERY_TYPE_K256, _ecrecoverVerifier);
         _setVerifier(RECOVERY_TYPE_P256, _webAuthnVerifier);
         _setVerifier(RECOVERY_TYPE_SECRET, _secretVerifier);
@@ -74,7 +70,6 @@ contract RecoveryPluginNoir is
         bytes32[] memory _message
     ) public returns (uint, uint) {
         require(msg.sender != safe, "INVALID_SENDER");
-        // require(isEcrecoverRecoverEnabled, "NOT_ENABLED");
         require(isMethodEnabled[RECOVERY_TYPE_K256], "NOT_ENABLED");
         bytes32 proofNullifier = keccak256(_proof);
         require(
@@ -91,9 +86,6 @@ contract RecoveryPluginNoir is
         bytes32[] memory publicInputs = new bytes32[](33);
 
         publicInputs = _getPublicInputEcrecover(publicInputs, _message);
-
-        // if (!IUltraVerifier(ecrecoverVerifier).verify(_proof, publicInputs))
-        //     revert PROOF_VERIFICATION_FAILED();
 
         if (
             !IUltraVerifier(verifiers[RECOVERY_TYPE_K256]).verify(
@@ -121,7 +113,6 @@ contract RecoveryPluginNoir is
         bytes memory _webAuthnInputs
     ) public returns (uint, uint) {
         require(msg.sender != safe, "INVALID_SENDER");
-        // require(isWebAuthnRecoverEnabled, "NOT_ENABLED");
         require(isMethodEnabled[RECOVERY_TYPE_SECRET], "NOT_ENABLED");
         bytes32 proofNullifier = keccak256(_proof);
         require(
@@ -140,8 +131,6 @@ contract RecoveryPluginNoir is
         bytes32[] memory publicInputs = new bytes32[](32);
         publicInputs = _getPublicInputWebAuthn(message);
 
-        // if (!IUltraVerifier(webAuthnVerifier).verify(_proof, publicInputs))
-        //     revert PROOF_VERIFICATION_FAILED();
         if (
             !IUltraVerifier(verifiers[RECOVERY_TYPE_SECRET]).verify(
                 _proof,
@@ -167,7 +156,6 @@ contract RecoveryPluginNoir is
         bytes memory _proof
     ) public returns (uint, uint) {
         require(msg.sender != safe, "INVALID_SENDER");
-        // require(isSecretRecoverEnabled, "NOT_ENABLED");
         require(isMethodEnabled[RECOVERY_TYPE_SECRET], "NOT_ENABLED");
 
         bytes32 proofNullifier = keccak256(_proof);
@@ -184,9 +172,6 @@ contract RecoveryPluginNoir is
 
         bytes32[] memory publicInputs = new bytes32[](1);
         publicInputs[0] = hashed_secret;
-
-        // if (!IUltraVerifier(secretVerifier).verify(_proof, publicInputs))
-        //     revert PROOF_VERIFICATION_FAILED();
 
         if (
             !IUltraVerifier(verifiers[RECOVERY_TYPE_SECRET]).verify(
@@ -215,7 +200,6 @@ contract RecoveryPluginNoir is
         bytes32[] memory _message
     ) public returns (uint, uint) {
         require(msg.sender != safe, "INVALID_SENDER");
-        // require(isSocialRecoverEnabled, "NOT_ENABLED");
         require(isMethodEnabled[RECOVERY_TYPE_SOCIAL], "NOT_ENABLED");
         bytes32 proofNullifier = keccak256(_proof);
         require(
@@ -239,8 +223,6 @@ contract RecoveryPluginNoir is
             _nullifierHash
         );
 
-        // if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
-        //     revert PROOF_VERIFICATION_FAILED();
         if (
             !IUltraVerifier(verifiers[RECOVERY_TYPE_SOCIAL]).verify(
                 _proof,
@@ -286,8 +268,6 @@ contract RecoveryPluginNoir is
             nullifierHash
         );
 
-        // if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
-        //     revert PROOF_VERIFICATION_FAILED();
         if (
             !IUltraVerifier(verifiers[RECOVERY_TYPE_SOCIAL]).verify(
                 _proof,

@@ -22,7 +22,6 @@ contract RecoverBase {
     // uint256 public constant MIN_TIMELOCK = 30 days;
     // set to 0 for testing
     uint256 public constant MIN_TIMELOCK = 0;
-    // uint256 public recoveryTimeLock;
     mapping(uint => uint) public recoveryTimelocks;
 
     // enabled

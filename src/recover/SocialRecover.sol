@@ -21,17 +21,12 @@ contract SocialRecover is RecoverBase {
         guardiansRoot = _guardiansRoot;
         approvalThreshold = _approvalThreshold;
         _addRecoveryMethod(RECOVERY_TYPE_SOCIAL, _recoveryTimeLock);
-        // _setTimeLock(2, _recoveryTimeLock);
-        // isSocialRecoverEnabled = true;
     }
 
     function removeSocialRecover() public onlySafe {
-        // require(isSocialRecoverEnabled, "NOT_ENABLED");
         guardiansRoot = bytes32(0);
         approvalThreshold = 0;
         _removeRecoveryMethod(RECOVERY_TYPE_SOCIAL);
-        // _setTimeLock(2, 0);
-        // isSocialRecoverEnabled = false;
     }
 
     function _incrementApprovalCount(
