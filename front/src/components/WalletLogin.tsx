@@ -95,7 +95,7 @@ const WalletLogin: React.FC = () => {
 	};
 
 	return (
-		<Box>
+		<Box maxW={"580px"}>
 			<Text
 				mt={7}
 				variant="h2"
@@ -103,18 +103,24 @@ const WalletLogin: React.FC = () => {
 				textAlign="center"
 				color={useColorModeValue("white", "")}
 			>
-				Safe Recovery Plugin powered by Noir ZKP
+				A zk-powered recovery plugin for Safe
+			</Text>
+			<Text mt={7} textAlign="center">
+				A safe plugin that allows Safe owners to recover account ownership
+				securely and privately in the event that they lose access to their Safe.
+				All of the recovery methods leverage Noir, a DSL for writing
+				zero-knowledge proof circuits.
 			</Text>
 			<Box
 				p={8}
 				mx="auto"
-				mt={20}
+				mt={10}
 				borderRadius="lg"
 				boxShadow="lg"
 				backgroundColor={"#2e2e2e"}
 			>
-				<Text textAlign={"center"} fontSize="xl" fontWeight="bold" mb={3}>
-					Connect wallet and enter your Safe Address!
+				<Text textAlign={"center"} fontSize={22} fontWeight="bold" mb={3}>
+					Connect wallet and enter your Safe Address
 				</Text>
 				<VStack justifyContent={"center"} display={"flex"} gap={2}>
 					<Text fontSize="15" mb={1}>
@@ -123,8 +129,8 @@ const WalletLogin: React.FC = () => {
 						3. Press 'Enter the app' button <br />
 					</Text>
 					<Text fontSize={14} mb={5} color={"yellow.200"}>
-						Note: please use signle-signer Safe, as this app hasn't <br />
-						added support for multi-signer Safe yet.
+						Note: please use Safe with a single owner, as this app <br />
+						currently doesn't support Safe with multiple owners yet.
 					</Text>
 				</VStack>
 				<Box mb={4}>

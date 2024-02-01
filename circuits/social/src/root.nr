@@ -8,6 +8,8 @@ pub fn compute_root_flexible_path_len(leaf: Field, index: Field, hash_path: [Fie
 
     let mut computed_root :Field = 0;
 
+    // https://github.com/noir-lang/noir/pull/4116
+    // index > 1 would fail no matter what length 
     if (length == 1) {
         let path = [hash_path[0]];
         computed_root = std::merkle::compute_merkle_root(leaf, index, path);
@@ -18,10 +20,11 @@ pub fn compute_root_flexible_path_len(leaf: Field, index: Field, hash_path: [Fie
         let path = [hash_path[0], hash_path[1], hash_path[2]];
         computed_root = std::merkle::compute_merkle_root(leaf, index, path);
     } else {
+        // length == 4 or 5
         computed_root = std::merkle::compute_merkle_root(leaf, index, hash_path);
     }
 
-    //std::println(computed_root);
+    // std::println(computed_root);
     computed_root
 }
 

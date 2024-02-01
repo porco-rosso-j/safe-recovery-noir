@@ -1,7 +1,6 @@
 use dep::std;
 use dep::ecrecover;
 mod root;
-// nargo 0.19.2 (git version hash: 4646a93f5e95604b5710353764b2c4295efaef6b, is dirty: true)
 
 fn main(
     root: pub Field,
@@ -22,7 +21,6 @@ fn main(
     let leaf = std::hash::pedersen_hash([address]);
     // std::println(leaf);
 
-    // let computed_root = std::merkle::compute_merkle_root(leaf, index, hash_path);
     let computed_root = root::compute_root_flexible_path_len(leaf, index, hash_path);
     // std::println(computed_root);
     assert(computed_root == root);
@@ -33,16 +31,58 @@ fn main(
     assert(nullifierHash == nullifier);
 }
 
+// #[test]
+// fn test_main() {
+//     let root = 0x22fab3d87de44f44f3356520958d0684a5b327e37e0a0dde1a9f3f13c5a07f7e;
+
+//     let proposal_id = 3;
+
+//     let nullifierHash = 0x0c695a74173659d121f2264c036fc65f6e59cd5907154d41dd5a5e895cf7520d;
+
+//     let hashed_message = [
+//         254, 4, 178, 55, 182, 20, 133, 27, 54, 59, 132, 217, 75, 246, 157, 107, 49, 161, 99, 72, 15, 190, 232, 130, 233, 246, 13, 168, 119, 173, 127, 20
+//     ];
+
+//     let pub_key = [
+//         144, 42, 126, 243, 197, 224, 171, 52, 111, 185, 89, 58, 124, 43, 67, 145, 33, 52, 201, 163, 3, 120, 8, 32, 182, 45, 118, 44, 81, 48, 209, 100, 136, 241, 183, 136, 148, 34, 109, 75, 246, 179, 41, 2, 37, 29, 213, 190, 100, 221, 225, 102, 45, 225, 143, 179, 239, 173, 143, 29, 155, 153, 192, 194
+//     ];
+
+//     let signature = [
+//         241, 111, 57, 193, 69, 145, 191, 82, 170, 184, 87, 25, 53, 162, 128, 113, 244, 192, 112, 214, 251, 116, 127, 161, 119, 84, 248, 62, 102, 81, 68, 65, 75, 4, 24, 252, 54, 119, 116, 207, 117, 218, 38, 205, 75, 122, 174, 83, 16, 105, 1, 119, 205, 1, 244, 98, 196, 116, 55, 75, 121, 137, 30, 71
+//     ];
+
+//     let index = 0;
+
+//     let hash_path: [Field; 4] = [
+//         0x137ad2247d8e089ca5dc03f9a70e5bc68392ac2916495968a80c35582c1a3c37,
+//         0x072beba6c02ef2bc3bd7c391ab32e6f0d8ee0a178e95640966e1deb7df1c9f7a,
+//         0,
+//         0
+//     ];
+
+//     main(
+//         root,
+//         proposal_id,
+//         nullifierHash,
+//         hashed_message,
+//         pub_key,
+//         signature,
+//         index,
+//         hash_path
+//     );
+// }
+
+// test: Failed constraint self.__to_le_bits(bit_size) -> test doesn' fail
 #[test]
 fn test_main() {
-    let root = 0x22fab3d87de44f44f3356520958d0684a5b327e37e0a0dde1a9f3f13c5a07f7e;
+    let root = 0x023638ddba920357c53e12048334fe24212f2f5a89a53b8e5661273d18f155c7;
 
-    let proposal_id = 3;
+    let proposal_id = 2;
 
-    let nullifierHash = 0x0c695a74173659d121f2264c036fc65f6e59cd5907154d41dd5a5e895cf7520d;
+    let nullifierHash = 0x21c783c21a93cc1886b8ab55a7d4e0965730ba0561ef5ede4998b19278393aa9;
 
     let hashed_message = [
-        254, 4, 178, 55, 182, 20, 133, 27, 54, 59, 132, 217, 75, 246, 157, 107, 49, 161, 99, 72, 15, 190, 232, 130, 233, 246, 13, 168, 119, 173, 127, 20
+        141, 92, 40, 97, 237, 84, 92, 118, 130, 145, 70, 254, 77, 199, 177, 8, 101, 168, 65, 177, 69, 138, 87, 204, 67, 223, 86, 224, 158, 191, 203, 205
     ];
 
     let pub_key = [
@@ -50,15 +90,15 @@ fn test_main() {
     ];
 
     let signature = [
-        241, 111, 57, 193, 69, 145, 191, 82, 170, 184, 87, 25, 53, 162, 128, 113, 244, 192, 112, 214, 251, 116, 127, 161, 119, 84, 248, 62, 102, 81, 68, 65, 75, 4, 24, 252, 54, 119, 116, 207, 117, 218, 38, 205, 75, 122, 174, 83, 16, 105, 1, 119, 205, 1, 244, 98, 196, 116, 55, 75, 121, 137, 30, 71
+        70, 122, 250, 90, 55, 108, 142, 160, 70, 241, 92, 85, 187, 205, 79, 79, 11, 95, 86, 129, 181, 141, 138, 244, 187, 201, 79, 58, 121, 2, 239, 148, 73, 69, 243, 253, 205, 166, 203, 55, 171, 102, 160, 202, 222, 0, 101, 213, 43, 5, 241, 201, 200, 44, 133, 243, 63, 124, 153, 78, 142, 234, 131, 228
     ];
 
-    let index = 0;
+    let index = 3;
 
     let hash_path: [Field; 4] = [
-        0x137ad2247d8e089ca5dc03f9a70e5bc68392ac2916495968a80c35582c1a3c37,
-        0x072beba6c02ef2bc3bd7c391ab32e6f0d8ee0a178e95640966e1deb7df1c9f7a,
-        0,
+        0x23837a9ebc584a363a5be3a80b441b18f75b4d6e9c5c1d4ca0b16eb879d68d9b,
+        0x07f8406da77159ec532e8452ab3bf227a748f991409d26f1e7c582990ad7a1c3,
+        0x2f3fa558696cb3a31d5f62a6d6e5de658fa5b0950e0c8c0823a33832f9c2d774,
         0
     ];
 
