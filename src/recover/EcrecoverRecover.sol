@@ -2,10 +2,11 @@
 pragma solidity ^0.8.17;
 
 import "./RecoverBase.sol";
+import {RECOVERY_TYPE_K256} from "../Common/Constants.sol";
 
 contract EcrecoverRecover is RecoverBase {
-    address public ecrecoverVerifier;
-    bool public isEcrecoverRecoverEnabled;
+    // address public ecrecoverVerifier;
+    // bool public isEcrecoverRecoverEnabled;
     bytes32 public hashed_address;
 
     function addEcrecoverRecover(
@@ -14,13 +15,16 @@ contract EcrecoverRecover is RecoverBase {
     ) public onlySafe {
         require(_hashed_address != bytes32(0), "INVALID_HASH");
         hashed_address = _hashed_address;
-        _setTimeLock(_recoveryTimeLock);
-        isEcrecoverRecoverEnabled = true;
+        // _setTimeLock(1, _recoveryTimeLock);
+        // isEcrecoverRecoverEnabled = true;
+        _addRecoveryMethod(RECOVERY_TYPE_K256, _recoveryTimeLock);
     }
 
     function removeEcrecoverRecover() public onlySafe {
-        require(isEcrecoverRecoverEnabled, "NOT_ENABLED");
-        isEcrecoverRecoverEnabled = false;
+        hashed_address = bytes32(0);
+        _removeRecoveryMethod(RECOVERY_TYPE_K256);
+        // require(isEcrecoverRecoverEnabled, "NOT_ENABLED");
+        // isEcrecoverRecoverEnabled = false;
     }
 
     function _getPublicInputEcrecover(

@@ -18,7 +18,10 @@ import EnabledModal from "../Modals/EnabledModal";
 import { Timelock, TimelockInput } from "./Common";
 import { useIsMethodEnabled, useAddRecover } from "src/hooks";
 import UserDataContext from "src/contexts/userData";
-import { getGuardiansRoot, recoveryTimeLock } from "src/scripts/plugins/view";
+import {
+	getGuardiansRoot,
+	getRecoveryTimelock,
+} from "src/scripts/plugins/view";
 import { getTimeFromTimestamp } from "src/scripts/utils/helper";
 import { shortenAddress } from "src/scripts/utils/address";
 
@@ -67,7 +70,10 @@ const SocialRecovery = (props: { methodIndex: number }) => {
 					setMerkleRoot(merkleRoot);
 				}
 
-				const timelock = await recoveryTimeLock(pluginAddress);
+				const timelock = await getRecoveryTimelock(
+					pluginAddress,
+					props.methodIndex
+				);
 				if (timelock !== 0) {
 					setTimelock(Number(timelock));
 				}

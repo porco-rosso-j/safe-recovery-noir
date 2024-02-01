@@ -12,7 +12,7 @@ import MethodRemoval from "./Removal";
 import EnabledModal from "../Modals/EnabledModal";
 import { Timelock, TimelockInput } from "./Common";
 import { useIsMethodEnabled, useAddRecover } from "src/hooks";
-import { recoveryTimeLock } from "src/scripts/plugins/view";
+import { getRecoveryTimelock } from "src/scripts/plugins/view";
 import UserDataContext from "src/contexts/userData";
 import { getTimeFromTimestamp } from "src/scripts/utils/helper";
 
@@ -29,7 +29,10 @@ const EnableFingerPrint = (props) => {
 	useEffect(() => {
 		(async () => {
 			if (isMethodEnabled && pluginAddress) {
-				const timelock = await recoveryTimeLock(pluginAddress);
+				const timelock = await getRecoveryTimelock(
+					pluginAddress,
+					props.methodIndex
+				);
 				if (timelock !== 0) {
 					setTimelock(Number(timelock));
 				}

@@ -2,11 +2,12 @@
 pragma solidity ^0.8.17;
 import {WebAuthnHelper} from "../helper/WebAuthnHelper.sol";
 import "./RecoverBase.sol";
+import {RECOVERY_TYPE_P256} from "../Common/Constants.sol";
 
 contract WebAuthnRecover is RecoverBase {
     using WebAuthnHelper for bytes;
-    address public webAuthnVerifier;
-    bool public isWebAuthnRecoverEnabled;
+    // address public webAuthnVerifier;
+    // bool public isWebAuthnRecoverEnabled;
     bytes32 public pubkey_x;
     bytes32 public pubkey_y;
     string public credentialId;
@@ -30,13 +31,14 @@ contract WebAuthnRecover is RecoverBase {
         pubkey_x = _pubkey_x;
         pubkey_y = _pubkey_y;
         credentialId = _credentialId;
-        _setTimeLock(_recoveryTimeLock);
-        isWebAuthnRecoverEnabled = true;
+        _addRecoveryMethod(RECOVERY_TYPE_P256, _recoveryTimeLock);
     }
 
     function removeWebAuthnRecover() public onlySafe {
-        require(isWebAuthnRecoverEnabled, "NOT_ENABLED");
-        isWebAuthnRecoverEnabled = false;
+        pubkey_x = bytes32(0);
+        pubkey_y = bytes32(0);
+        credentialId = "";
+        _removeRecoveryMethod(RECOVERY_TYPE_P256);
     }
 
     function _computeMessage(

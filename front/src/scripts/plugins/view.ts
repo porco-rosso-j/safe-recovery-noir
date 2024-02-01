@@ -14,19 +14,19 @@ export async function _isMethodEnabled(
 	moduleId: number,
 	pluginAddr: string
 ): Promise<boolean> {
-	let ret;
-	if (moduleId === 1) {
-		ret = await recoveryPluginContract(pluginAddr).isEcrecoverRecoverEnabled();
-	} else if (moduleId === 2) {
-		ret = await recoveryPluginContract(pluginAddr).isWebAuthnRecoverEnabled();
-	} else if (moduleId === 3) {
-		ret = await recoveryPluginContract(pluginAddr).isSecretRecoverEnabled();
-	} else if (moduleId === 4) {
-		ret = await recoveryPluginContract(pluginAddr).isSocialRecoverEnabled();
-	} else {
-		return false;
-	}
-	return ret;
+	// let ret;
+	// if (moduleId === 1) {
+	// 	ret = await recoveryPluginContract(pluginAddr).isEcrecoverRecoverEnabled();
+	// } else if (moduleId === 2) {
+	// 	ret = await recoveryPluginContract(pluginAddr).isWebAuthnRecoverEnabled();
+	// } else if (moduleId === 3) {
+	// 	ret = await recoveryPluginContract(pluginAddr).isSecretRecoverEnabled();
+	// } else if (moduleId === 4) {
+	// 	ret = await recoveryPluginContract(pluginAddr).isSocialRecoverEnabled();
+	// } else {
+	// 	return false;
+	// }
+	return await recoveryPluginContract(pluginAddr).getIsMethodEnabled(moduleId);
 }
 
 export async function getNewOwnerForPoposal(
@@ -76,7 +76,7 @@ export async function _getIsRecoveryExecutable(
 export async function getProposals(
 	pluginAddr: string
 ): Promise<ProposalType[]> {
-	const count = await getRecoveryCount(pluginAddr);
+	const count = await getProposalCount(pluginAddr);
 	console.log("count: ", count);
 	let proposals: ProposalType[] = [];
 	for (let i = 1; i <= Number(count); i++) {
@@ -98,13 +98,15 @@ export async function getProposal(
 	console.log("_isExecutable: ", _isExecutable);
 
 	let _approvealThreshold = 0;
-	if (res[0] === 3n) {
+	// if (res[0] === 3n) {
+	if (res[0] === 4n) {
 		_approvealThreshold = await getSocialRecoveryThreshold(pluginAddr);
 	}
 
 	const proposal: ProposalType = {
 		id: Number(proposalId),
-		type: Number(res[0]) + 1,
+		// type: Number(res[0]) + 1,
+		type: Number(res[0]),
 		newOwners: res[1],
 		oldOwners: res[2],
 		threshold: Number(res[3]),
@@ -120,7 +122,7 @@ export async function getProposal(
 	return proposal;
 }
 
-export async function getProposalCount(pluginAddr: string): Promise<string> {
+export async function getProposalCount(pluginAddr: string): Promise<number> {
 	return await recoveryPluginContract(pluginAddr).proposalCount();
 }
 
@@ -131,11 +133,6 @@ export async function getHashedAddr(pluginAddr: string): Promise<string> {
 export async function getHashededSecret(pluginAddr: string): Promise<string> {
 	return await recoveryPluginContract(pluginAddr).hashed_secret();
 }
-
-export async function getRecoveryCount(pluginAddr: string): Promise<number> {
-	return Number(await recoveryPluginContract(pluginAddr).recoveryCount());
-}
-
 export async function getCredentialID(pluginAddr: string): Promise<string> {
 	return await recoveryPluginContract(pluginAddr).credentialId();
 }
@@ -159,8 +156,14 @@ export async function getGuardiansRoot(pluginAddr: string): Promise<string> {
 	return await recoveryPluginContract(pluginAddr).guardiansRoot();
 }
 
-export async function recoveryTimeLock(pluginAddr: string): Promise<number> {
-	return Number(await recoveryPluginContract(pluginAddr).recoveryTimeLock());
+export async function getRecoveryTimelock(
+	pluginAddr: string,
+	type: number
+): Promise<number> {
+	return Number(
+		// await recoveryPluginContract(pluginAddr).getRecoveryTimelock(type)
+		await recoveryPluginContract(pluginAddr).recoveryTimelocks(type)
+	);
 }
 
 export async function getSocialRecoveryThreshold(

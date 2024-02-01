@@ -9,7 +9,7 @@ import {
 	_isMethodEnabled,
 	getNewOwnerForPoposal,
 	_getIsRecoveryExecutable,
-	getRecoveryCount,
+	getProposalCount,
 	getProposals,
 	getSocialRecoveryThreshold,
 } from "./view";
@@ -23,7 +23,7 @@ export {
 	_removeRecover,
 	getNewOwnerForPoposal,
 	_getIsRecoveryExecutable,
-	getRecoveryCount,
+	getProposalCount,
 	getProposals,
 	getSocialRecoveryThreshold,
 };

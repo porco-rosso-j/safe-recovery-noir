@@ -16,7 +16,10 @@ import EnabledModal from "../Modals/EnabledModal";
 import { Timelock, TimelockInput } from "./Common";
 import { useIsMethodEnabled, useAddRecover } from "src/hooks";
 import UserDataContext from "src/contexts/userData";
-import { getHashededSecret, recoveryTimeLock } from "src/scripts/plugins/view";
+import {
+	getHashededSecret,
+	getRecoveryTimelock,
+} from "src/scripts/plugins/view";
 import { pedersenHash } from "src/scripts/utils/pedersen";
 import { getTimeFromTimestamp } from "src/scripts/utils/helper";
 import { shortenAddress } from "src/scripts/utils/address";
@@ -44,7 +47,10 @@ const SecretWord = (props) => {
 					setSecretHash(hashedSecret);
 				}
 
-				const timelock = await recoveryTimeLock(pluginAddress);
+				const timelock = await getRecoveryTimelock(
+					pluginAddress,
+					props.methodIndex
+				);
 				if (timelock !== 0) {
 					setTimelock(Number(timelock));
 				}

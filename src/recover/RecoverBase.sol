@@ -4,7 +4,7 @@ pragma solidity ^0.8.17;
 import {ProposalStatus} from "../common/Constants.sol";
 
 contract RecoverBase {
-    struct Recovery {
+    struct Proposal {
         uint8 recoveryType;
         address[] pendingNewOwners;
         address[] ownersReplaced;
@@ -22,12 +22,19 @@ contract RecoverBase {
     // uint256 public constant MIN_TIMELOCK = 30 days;
     // set to 0 for testing
     uint256 public constant MIN_TIMELOCK = 0;
-    uint256 public recoveryTimeLock;
+    // uint256 public recoveryTimeLock;
+    mapping(uint => uint) public recoveryTimelocks;
+
+    // enabled
+    mapping(uint => bool) public isMethodEnabled;
+
+    // veifier
+    mapping(uint => address) public verifiers;
 
     uint public lastExecutionTimestamp;
 
-    uint public recoveryCount;
-    mapping(uint => Recovery) public recoveries;
+    uint public proposalCount;
+    mapping(uint => Proposal) public recoveryProposals;
     mapping(uint8 => mapping(bytes32 => bool)) public recoveryNullifiers;
 
     modifier onlySafe() {
@@ -35,9 +42,29 @@ contract RecoverBase {
         _;
     }
 
-    function _setTimeLock(uint _recoveryTimeLock) internal {
+    function _setVerifier(uint _recoveryType, address _verifier) internal {
+        require(_verifier != address(0), "INVALID_VERIFIER_ADDRESS");
+        verifiers[_recoveryType] = _verifier;
+    }
+
+    function _addRecoveryMethod(
+        uint _recoveryType,
+        uint _recoveryTimeLock
+    ) internal {
+        require(!isMethodEnabled[_recoveryType], "ALREADY_ENABLED");
+        _setTimeLock(_recoveryType, _recoveryTimeLock);
+        isMethodEnabled[_recoveryType] = true;
+    }
+
+    function _removeRecoveryMethod(uint _recoveryType) internal {
+        require(isMethodEnabled[_recoveryType], "NOT_ENABLED");
+        _setTimeLock(_recoveryType, 0);
+        isMethodEnabled[_recoveryType] = false;
+    }
+
+    function _setTimeLock(uint _recoveryType, uint _recoveryTimeLock) internal {
         require(_recoveryTimeLock >= MIN_TIMELOCK, "TIMELOCK_TOO_SHORT");
-        recoveryTimeLock = _recoveryTimeLock;
+        recoveryTimelocks[_recoveryType] = _recoveryTimeLock;
     }
 
     function _proposeRecovery(
@@ -46,21 +73,23 @@ contract RecoverBase {
         address[] memory _newAddresses,
         uint _newThreshold
     ) internal returns (uint, uint) {
-        uint newRecoveryCount = recoveryCount + 1;
-        recoveryCount = newRecoveryCount;
+        uint newProposalCount = proposalCount + 1;
+        proposalCount = newProposalCount;
 
-        Recovery storage recovery = recoveries[newRecoveryCount];
+        Proposal storage proposal = recoveryProposals[newProposalCount];
 
-        recovery.recoveryType = _recoveryType;
-        recovery.ownersReplaced = _oldAddresses;
-        recovery.pendingNewOwners = _newAddresses;
-        recovery.newThreshold = _newThreshold;
-        recovery.timeLockEnd = block.timestamp + recoveryTimeLock;
-        recovery.proposedTimestamp = block.timestamp;
-        recovery.status = ProposalStatus.PROPOSED;
+        proposal.recoveryType = _recoveryType;
+        proposal.ownersReplaced = _oldAddresses;
+        proposal.pendingNewOwners = _newAddresses;
+        proposal.newThreshold = _newThreshold;
+        proposal.timeLockEnd =
+            block.timestamp +
+            recoveryTimelocks[_recoveryType];
+        proposal.proposedTimestamp = block.timestamp;
+        proposal.status = ProposalStatus.PROPOSED;
 
         // should emit an event to notify owner
-        return (newRecoveryCount, recovery.timeLockEnd);
+        return (newProposalCount, proposal.timeLockEnd);
     }
 
     // view
@@ -81,25 +110,29 @@ contract RecoverBase {
             uint
         )
     {
-        require(_proposalId != 0 && _proposalId <= recoveryCount, "INVALID_ID");
-        Recovery storage recovery = recoveries[_proposalId];
+        require(_proposalId != 0 && _proposalId <= proposalCount, "INVALID_ID");
+        Proposal storage proposal = recoveryProposals[_proposalId];
         return (
-            recovery.recoveryType,
-            recovery.pendingNewOwners,
-            recovery.ownersReplaced,
-            recovery.newThreshold,
-            recovery.timeLockEnd,
-            recovery.proposedTimestamp,
-            recovery.status,
-            recovery.approvalCount
+            proposal.recoveryType,
+            proposal.pendingNewOwners,
+            proposal.ownersReplaced,
+            proposal.newThreshold,
+            proposal.timeLockEnd,
+            proposal.proposedTimestamp,
+            proposal.status,
+            proposal.approvalCount
         );
     }
 
     function getPendingNewOwners(
         uint _proposalId
     ) public view returns (address[] memory) {
-        require(_proposalId != 0 && _proposalId <= recoveryCount, "INVALID_ID");
-        Recovery storage recovery = recoveries[_proposalId];
-        return recovery.pendingNewOwners;
+        require(_proposalId != 0 && _proposalId <= proposalCount, "INVALID_ID");
+        Proposal storage proposal = recoveryProposals[_proposalId];
+        return proposal.pendingNewOwners;
+    }
+
+    function getIsMethodEnabled(uint _recoveryType) public view returns (bool) {
+        return isMethodEnabled[_recoveryType];
     }
 }

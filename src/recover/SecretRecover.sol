@@ -2,26 +2,25 @@
 pragma solidity ^0.8.17;
 
 import "./RecoverBase.sol";
+import {RECOVERY_TYPE_SECRET} from "../Common/Constants.sol";
 
 contract SecretRecover is RecoverBase {
-    address public secretVerifier;
-    bool public isSecretRecoverEnabled;
+    // address public secretVerifier;
+    // bool public isSecretRecoverEnabled;
     bytes32 public hashed_secret;
 
-    // should call basic recovery setup func that determines pending period, etc...
     function addSecretRecover(
         uint _recoveryTimeLock,
         bytes32 _hashed_secret
     ) public onlySafe {
         require(_hashed_secret != bytes32(0), "INVALID_HASH");
         hashed_secret = _hashed_secret;
-        _setTimeLock(_recoveryTimeLock);
-        isSecretRecoverEnabled = true;
+        _addRecoveryMethod(RECOVERY_TYPE_SECRET, _recoveryTimeLock);
     }
 
     function removeSecretRecover() public onlySafe {
-        require(isSecretRecoverEnabled, "NOT_ENABLED");
-        isSecretRecoverEnabled = false;
+        hashed_secret = bytes32(0);
+        _removeRecoveryMethod(RECOVERY_TYPE_SECRET);
     }
 
     function _convertBytes32ToBytes32Array(

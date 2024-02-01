@@ -18,7 +18,7 @@ import {
 	getCredentialID,
 	getGuardiansRoot,
 	getHashedAddr,
-	getRecoveryCount,
+	getProposalCount,
 	getWebAuthnPubkey,
 } from "src/scripts/plugins/view";
 import { sendSafeTx } from "src/scripts/utils/safe";
@@ -229,8 +229,8 @@ const useProposeRecover = (setProposeStatus: (index: number) => void) => {
 		try {
 			const msgHash: string = ethers.hashMessage(msg);
 			const pubkey: string = SigningKey.recoverPublicKey(msgHash, signature);
-			const _proposalId = (await getRecoveryCount(pluginAddress)) + 1;
-			const proposalId = `0x${_proposalId.toString(16).padStart(2, "0")}`;
+			const _proposalId = (await getProposalCount(pluginAddress)) + 1;
+			const proposalId = `0x${_proposalId.toString().padStart(2, "0")}`;
 			console.log("padded proposalid: ", proposalId);
 
 			const root = await getGuardiansRoot(pluginAddress);

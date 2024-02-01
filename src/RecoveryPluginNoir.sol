@@ -56,10 +56,14 @@ contract RecoveryPluginNoir is
         );
         safe = _safe;
         safeProtocolManager = ISafeProtocolManager(_safeProtocolManager);
-        ecrecoverVerifier = _ecrecoverVerifier;
-        webAuthnVerifier = _webAuthnVerifier;
-        secretVerifier = _secretVerifier;
-        socialRecoverVerifier = _socialRecoverVerifier;
+        // ecrecoverVerifier = _ecrecoverVerifier;
+        // webAuthnVerifier = _webAuthnVerifier;
+        // secretVerifier = _secretVerifier;
+        // socialRecoverVerifier = _socialRecoverVerifier;
+        _setVerifier(RECOVERY_TYPE_K256, _ecrecoverVerifier);
+        _setVerifier(RECOVERY_TYPE_P256, _webAuthnVerifier);
+        _setVerifier(RECOVERY_TYPE_SECRET, _secretVerifier);
+        _setVerifier(RECOVERY_TYPE_SOCIAL, _socialRecoverVerifier);
     }
 
     function proposeEcrecoverRecover(
@@ -70,7 +74,8 @@ contract RecoveryPluginNoir is
         bytes32[] memory _message
     ) public returns (uint, uint) {
         require(msg.sender != safe, "INVALID_SENDER");
-        require(isEcrecoverRecoverEnabled, "NOT_ENABLED");
+        // require(isEcrecoverRecoverEnabled, "NOT_ENABLED");
+        require(isMethodEnabled[RECOVERY_TYPE_K256], "NOT_ENABLED");
         bytes32 proofNullifier = keccak256(_proof);
         require(
             !recoveryNullifiers[RECOVERY_TYPE_K256][proofNullifier],
@@ -87,8 +92,15 @@ contract RecoveryPluginNoir is
 
         publicInputs = _getPublicInputEcrecover(publicInputs, _message);
 
-        if (!IUltraVerifier(ecrecoverVerifier).verify(_proof, publicInputs))
-            revert PROOF_VERIFICATION_FAILED();
+        // if (!IUltraVerifier(ecrecoverVerifier).verify(_proof, publicInputs))
+        //     revert PROOF_VERIFICATION_FAILED();
+
+        if (
+            !IUltraVerifier(verifiers[RECOVERY_TYPE_K256]).verify(
+                _proof,
+                publicInputs
+            )
+        ) revert PROOF_VERIFICATION_FAILED();
 
         recoveryNullifiers[RECOVERY_TYPE_K256][proofNullifier] = true;
 
@@ -109,7 +121,8 @@ contract RecoveryPluginNoir is
         bytes memory _webAuthnInputs
     ) public returns (uint, uint) {
         require(msg.sender != safe, "INVALID_SENDER");
-        require(isWebAuthnRecoverEnabled, "NOT_ENABLED");
+        // require(isWebAuthnRecoverEnabled, "NOT_ENABLED");
+        require(isMethodEnabled[RECOVERY_TYPE_SECRET], "NOT_ENABLED");
         bytes32 proofNullifier = keccak256(_proof);
         require(
             !recoveryNullifiers[RECOVERY_TYPE_P256][proofNullifier],
@@ -127,8 +140,14 @@ contract RecoveryPluginNoir is
         bytes32[] memory publicInputs = new bytes32[](32);
         publicInputs = _getPublicInputWebAuthn(message);
 
-        if (!IUltraVerifier(webAuthnVerifier).verify(_proof, publicInputs))
-            revert PROOF_VERIFICATION_FAILED();
+        // if (!IUltraVerifier(webAuthnVerifier).verify(_proof, publicInputs))
+        //     revert PROOF_VERIFICATION_FAILED();
+        if (
+            !IUltraVerifier(verifiers[RECOVERY_TYPE_SECRET]).verify(
+                _proof,
+                publicInputs
+            )
+        ) revert PROOF_VERIFICATION_FAILED();
 
         recoveryNullifiers[RECOVERY_TYPE_P256][proofNullifier] = true;
 
@@ -148,7 +167,8 @@ contract RecoveryPluginNoir is
         bytes memory _proof
     ) public returns (uint, uint) {
         require(msg.sender != safe, "INVALID_SENDER");
-        require(isSecretRecoverEnabled, "NOT_ENABLED");
+        // require(isSecretRecoverEnabled, "NOT_ENABLED");
+        require(isMethodEnabled[RECOVERY_TYPE_SECRET], "NOT_ENABLED");
 
         bytes32 proofNullifier = keccak256(_proof);
         require(
@@ -165,8 +185,15 @@ contract RecoveryPluginNoir is
         bytes32[] memory publicInputs = new bytes32[](1);
         publicInputs[0] = hashed_secret;
 
-        if (!IUltraVerifier(secretVerifier).verify(_proof, publicInputs))
-            revert PROOF_VERIFICATION_FAILED();
+        // if (!IUltraVerifier(secretVerifier).verify(_proof, publicInputs))
+        //     revert PROOF_VERIFICATION_FAILED();
+
+        if (
+            !IUltraVerifier(verifiers[RECOVERY_TYPE_SECRET]).verify(
+                _proof,
+                publicInputs
+            )
+        ) revert PROOF_VERIFICATION_FAILED();
 
         recoveryNullifiers[RECOVERY_TYPE_SECRET][proofNullifier] = true;
 
@@ -188,7 +215,8 @@ contract RecoveryPluginNoir is
         bytes32[] memory _message
     ) public returns (uint, uint) {
         require(msg.sender != safe, "INVALID_SENDER");
-        require(isSocialRecoverEnabled, "NOT_ENABLED");
+        // require(isSocialRecoverEnabled, "NOT_ENABLED");
+        require(isMethodEnabled[RECOVERY_TYPE_SOCIAL], "NOT_ENABLED");
         bytes32 proofNullifier = keccak256(_proof);
         require(
             !recoveryNullifiers[RECOVERY_TYPE_SOCIAL][proofNullifier],
@@ -202,7 +230,7 @@ contract RecoveryPluginNoir is
         );
 
         bytes32[] memory publicInputs = new bytes32[](35);
-        uint _proposalId = recoveryCount + 1;
+        uint _proposalId = proposalCount + 1;
 
         publicInputs = _getPublicInputSocial(
             _proposalId,
@@ -211,8 +239,14 @@ contract RecoveryPluginNoir is
             _nullifierHash
         );
 
-        if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
-            revert PROOF_VERIFICATION_FAILED();
+        // if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
+        //     revert PROOF_VERIFICATION_FAILED();
+        if (
+            !IUltraVerifier(verifiers[RECOVERY_TYPE_SOCIAL]).verify(
+                _proof,
+                publicInputs
+            )
+        ) revert PROOF_VERIFICATION_FAILED();
 
         recoveryNullifiers[RECOVERY_TYPE_SOCIAL][proofNullifier] = true;
 
@@ -234,6 +268,9 @@ contract RecoveryPluginNoir is
         bytes32 nullifierHash,
         bytes32[] memory _message
     ) public returns (uint) {
+        require(msg.sender != safe, "INVALID_SENDER");
+        require(isMethodEnabled[RECOVERY_TYPE_SOCIAL], "NOT_ENABLED");
+
         bytes32[] memory publicInputs = new bytes32[](35);
 
         bytes32 proofNullifier = keccak256(_proof);
@@ -249,8 +286,14 @@ contract RecoveryPluginNoir is
             nullifierHash
         );
 
-        if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
-            revert PROOF_VERIFICATION_FAILED();
+        // if (!IUltraVerifier(socialRecoverVerifier).verify(_proof, publicInputs))
+        //     revert PROOF_VERIFICATION_FAILED();
+        if (
+            !IUltraVerifier(verifiers[RECOVERY_TYPE_SOCIAL]).verify(
+                _proof,
+                publicInputs
+            )
+        ) revert PROOF_VERIFICATION_FAILED();
 
         recoveryNullifiers[RECOVERY_TYPE_SOCIAL][proofNullifier] = true;
 
@@ -263,23 +306,23 @@ contract RecoveryPluginNoir is
     }
 
     function rejectRecovery(uint _proposalId) public onlySafe {
-        Recovery storage recovery = recoveries[_proposalId];
-        if (recovery.status == ProposalStatus.REJECTED) {
+        Proposal storage proposal = recoveryProposals[_proposalId];
+        if (proposal.status == ProposalStatus.REJECTED) {
             revert("ALREADY_REJECTED");
-        } else if (recovery.status == ProposalStatus.EXECUTED) {
+        } else if (proposal.status == ProposalStatus.EXECUTED) {
             revert("ALREADY_EXECUTED");
         }
-        recovery.status = ProposalStatus.REJECTED;
+        proposal.status = ProposalStatus.REJECTED;
     }
 
     function execRecovery(uint _proposalId) public returns (bool) {
         getIsRecoveryExecutable(_proposalId);
-        Recovery storage recovery = recoveries[_proposalId];
+        Proposal storage proposal = recoveryProposals[_proposalId];
 
         bool isNewThreshold = IGnosisSafe(safe).getThreshold() !=
-            recovery.newThreshold;
+            proposal.newThreshold;
 
-        uint swapTimes = recovery.ownersReplaced.length;
+        uint swapTimes = proposal.ownersReplaced.length;
         uint length = isNewThreshold ? swapTimes + 1 : swapTimes;
 
         SafeProtocolAction[] memory actions = new SafeProtocolAction[](length);
@@ -289,12 +332,12 @@ contract RecoveryPluginNoir is
             _data = abi.encodeWithSelector(
                 IGnosisSafe.swapOwner.selector,
                 _getPrevOwner(
-                    recovery.ownersReplaced[i],
-                    recovery.ownersReplaced,
-                    recovery.pendingNewOwners
+                    proposal.ownersReplaced[i],
+                    proposal.ownersReplaced,
+                    proposal.pendingNewOwners
                 ),
-                recovery.ownersReplaced[i],
-                recovery.pendingNewOwners[i]
+                proposal.ownersReplaced[i],
+                proposal.pendingNewOwners[i]
             );
             actions[i].to = payable(safe);
             actions[i].data = _data;
@@ -304,7 +347,7 @@ contract RecoveryPluginNoir is
             actions[length - 1].to = payable(safe);
             actions[length - 1].data = abi.encodeWithSelector(
                 IGnosisSafe.changeThreshold.selector,
-                recovery.newThreshold
+                proposal.newThreshold
             );
         }
 
@@ -321,60 +364,60 @@ contract RecoveryPluginNoir is
         }
 
         lastExecutionTimestamp = block.timestamp;
-        recovery.status = ProposalStatus.EXECUTED;
+        proposal.status = ProposalStatus.EXECUTED;
         return true;
     }
 
     function getIsRecoveryExecutable(
         uint _proposalId
     ) public view returns (bool) {
-        require(_proposalId != 0 && _proposalId <= recoveryCount, "INVALID_ID");
-        Recovery storage recovery = recoveries[_proposalId];
+        require(_proposalId != 0 && _proposalId <= proposalCount, "INVALID_ID");
+        Proposal storage proposal = recoveryProposals[_proposalId];
 
         if (
-            recovery.recoveryType == RECOVERY_TYPE_K256 &&
-            !isEcrecoverRecoverEnabled
+            proposal.recoveryType == RECOVERY_TYPE_K256 &&
+            !isMethodEnabled[RECOVERY_TYPE_K256]
         ) {
             revert("K256_RECOVERY_NOT_ENABLED");
         } else if (
-            recovery.recoveryType == RECOVERY_TYPE_P256 &&
-            !isWebAuthnRecoverEnabled
+            proposal.recoveryType == RECOVERY_TYPE_P256 &&
+            !isMethodEnabled[RECOVERY_TYPE_P256]
         ) {
             revert("P256_RECOVERY_NOT_ENABLED");
         } else if (
-            recovery.recoveryType == RECOVERY_TYPE_SECRET &&
-            !isSecretRecoverEnabled
+            proposal.recoveryType == RECOVERY_TYPE_SECRET &&
+            !isMethodEnabled[RECOVERY_TYPE_SECRET]
         ) {
             revert("SECRET_RECOVERY_NOT_ENABLED");
         } else if (
-            recovery.recoveryType == RECOVERY_TYPE_SOCIAL &&
-            !isSocialRecoverEnabled
+            proposal.recoveryType == RECOVERY_TYPE_SOCIAL &&
+            !isMethodEnabled[RECOVERY_TYPE_SOCIAL]
         ) {
             revert("SOCIAL_RECOVERY_NOT_ENABLED");
         }
 
         _validateAddressesAndThreshold(
-            recovery.ownersReplaced,
-            recovery.pendingNewOwners,
-            recovery.newThreshold
+            proposal.ownersReplaced,
+            proposal.pendingNewOwners,
+            proposal.newThreshold
         );
 
-        if (recovery.status == ProposalStatus.REJECTED) {
+        if (proposal.status == ProposalStatus.REJECTED) {
             revert("ALREADY_REJECTED");
-        } else if (recovery.status == ProposalStatus.EXECUTED) {
+        } else if (proposal.status == ProposalStatus.EXECUTED) {
             revert("ALREADY_EXECUTED");
         }
 
-        require(block.timestamp >= recovery.timeLockEnd, "TIMELOCK_NOT_ENDED");
+        require(block.timestamp >= proposal.timeLockEnd, "TIMELOCK_NOT_ENDED");
 
         require(
-            recovery.proposedTimestamp >= lastExecutionTimestamp,
+            proposal.proposedTimestamp >= lastExecutionTimestamp,
             "PROPOSAL_EXPIRED"
         );
 
         if (
-            recovery.recoveryType == RECOVERY_TYPE_SOCIAL &&
-            recovery.approvalCount < approvalThreshold
+            proposal.recoveryType == RECOVERY_TYPE_SOCIAL &&
+            proposal.approvalCount < approvalThreshold
         ) revert("INSUFFICIENT_APPROVAL_COUNT");
 
         return true;

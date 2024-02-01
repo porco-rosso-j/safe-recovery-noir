@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { useContext, useState, useEffect, useCallback } from "react";
 import UserDataContext from "src/contexts/userData";
-import { getProposals, getRecoveryCount } from "src/scripts/plugins/index";
+import { getProposals, getProposalCount } from "src/scripts/plugins/index";
 import { ProposalType } from "src/scripts/plugins/types";
 import ProposalDetail from "./ProposalDetail";
 import { typeName } from "src/scripts/utils/helper";
@@ -24,7 +24,7 @@ const ProposalList = () => {
 	const [proposalsFound, setProposalsFound] = useState<boolean>(false);
 
 	const fetchProposals = useCallback(async () => {
-		const proposalLen = Number(await getRecoveryCount(pluginAddress));
+		const proposalLen = Number(await getProposalCount(pluginAddress));
 
 		if (proposalLen !== 0) {
 			setProposalsFound(true);

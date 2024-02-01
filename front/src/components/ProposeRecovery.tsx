@@ -10,7 +10,7 @@ import {
 import { inputStyle } from "src/theme";
 import { useContext, useEffect, useState } from "react";
 import UserDataContext from "src/contexts/userData";
-import { getRecoveryCount } from "../scripts/plugins/index";
+import { getProposalCount } from "../scripts/plugins/index";
 import { getProposal } from "src/scripts/plugins/view";
 import ProposedModal from "./Modals/ProposedModal";
 import ProposalDetail from "./Proposal/ProposalDetail";
@@ -182,7 +182,7 @@ const ProposeRecovery = (props: {
 										);
 										console.log("ret: ", ret);
 										if (ret.result) {
-											const _recoveryCount = await getRecoveryCount(
+											const _recoveryCount = await getProposalCount(
 												pluginAddress
 											);
 											setRecoveryCount(_recoveryCount);

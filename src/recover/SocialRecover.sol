@@ -2,10 +2,11 @@
 pragma solidity ^0.8.17;
 
 import "./RecoverBase.sol";
+import {RECOVERY_TYPE_SOCIAL} from "../Common/Constants.sol";
 
 contract SocialRecover is RecoverBase {
-    address public socialRecoverVerifier;
-    bool public isSocialRecoverEnabled;
+    // address public socialRecoverVerifier;
+    // bool public isSocialRecoverEnabled;
     bytes32 public guardiansRoot;
     uint public approvalThreshold;
 
@@ -16,29 +17,33 @@ contract SocialRecover is RecoverBase {
         bytes32 _guardiansRoot
     ) public onlySafe {
         require(_guardiansRoot != bytes32(0), "INVALID_HASH");
+        require(_approvalThreshold != 0, "INVALID_APP_THRESHOLD");
         guardiansRoot = _guardiansRoot;
         approvalThreshold = _approvalThreshold;
-        _setTimeLock(_recoveryTimeLock);
-        isSocialRecoverEnabled = true;
+        _addRecoveryMethod(RECOVERY_TYPE_SOCIAL, _recoveryTimeLock);
+        // _setTimeLock(2, _recoveryTimeLock);
+        // isSocialRecoverEnabled = true;
     }
 
     function removeSocialRecover() public onlySafe {
-        require(isSocialRecoverEnabled, "NOT_ENABLED");
+        // require(isSocialRecoverEnabled, "NOT_ENABLED");
         guardiansRoot = bytes32(0);
         approvalThreshold = 0;
-        isSocialRecoverEnabled = false;
+        _removeRecoveryMethod(RECOVERY_TYPE_SOCIAL);
+        // _setTimeLock(2, 0);
+        // isSocialRecoverEnabled = false;
     }
 
     function _incrementApprovalCount(
         uint _proposalId,
         bytes32 _nullifierHash
     ) internal returns (uint) {
-        Recovery storage recovery = recoveries[_proposalId];
-        require(!recovery.nullifierHash[_nullifierHash], "INVALID_NULLIFIER");
-        recovery.nullifierHash[_nullifierHash] = true;
-        recovery.approvalCount += 1;
+        Proposal storage proposal = recoveryProposals[_proposalId];
+        require(!proposal.nullifierHash[_nullifierHash], "INVALID_NULLIFIER");
+        proposal.nullifierHash[_nullifierHash] = true;
+        proposal.approvalCount += 1;
 
-        return recovery.approvalCount;
+        return proposal.approvalCount;
     }
 
     function _getPublicInputSocial(
