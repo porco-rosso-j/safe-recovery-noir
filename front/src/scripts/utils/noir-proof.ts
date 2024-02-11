@@ -80,13 +80,12 @@ export async function generateProofP256(
 		const proof: ProofData = await noir.generateFinalProof(input);
 		console.log("proof: ", proof);
 		console.log("proof: ", proof.publicInputs);
+		// const result = await noir.verifyFinalProof(proof);
+		// console.log("result: ", result);
 		return proof;
 	} catch (e) {
 		console.log("proof generation failed: ", e);
 	}
-
-	// const result = await noir.verifyFinalProof(proof);
-	// console.log("result: ", result);
 }
 
 export async function generateProofSecret(_secret: string): Promise<ProofData> {

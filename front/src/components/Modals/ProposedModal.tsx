@@ -72,7 +72,7 @@ function ProposedModal(props: ProposeResultModalType) {
 											<Text>{props.recoveryCount}</Text>
 											<Link
 												ml={2}
-												href={"https://goerli.etherscan.io/tx/" + props.txHash}
+												href={"https://sepolia.etherscan.io/tx/" + props.txHash}
 												isExternal
 												textDecoration="underline"
 											>
@@ -111,7 +111,7 @@ function ProposedModal(props: ProposeResultModalType) {
 										<VStack spacing={1} fontSize={16} align="end">
 											<Link
 												ml={2}
-												href={"https://goerli.etherscan.io/tx/" + props.txHash}
+												href={"https://sepolia.etherscan.io/tx/" + props.txHash}
 												isExternal
 												textDecoration="underline"
 											>

@@ -8,12 +8,13 @@ import {
 } from "../artifacts/contracts/index";
 import { contracts, privatekeys } from "../constants/addresses";
 
-const ALCHEMY_GOERLI = process.env.REACT_APP_ALCHEMY_GOERLI;
+// const ALCHEMY_GOERLI = process.env.REACT_APP_ALCHEMY_GOERLI;
+const ALCHEMY_SEPOLIA = process.env.REACT_APP_ALCHEMY_SEPOLIA;
 const PRIVATE_KEY = process.env.REACT_APP_PRIVATE_KEY;
 export const provider = new ethers.JsonRpcProvider(
 	process.env.REACT_APP_ENV === "LOCAL"
 		? "http://127.0.0.1:8545"
-		: ALCHEMY_GOERLI
+		: ALCHEMY_SEPOLIA
 );
 
 export const nonce = async (address: string): Promise<number> => {

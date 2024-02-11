@@ -21,5 +21,6 @@ remappings = [
 [rpc_endpoints]
 localhost="http://127.0.0.1:8545"
 goerli="https://ethereum-goerli.publicnode.com"
+sepolia="https://ethereum-sepolia.publicnode.com"
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

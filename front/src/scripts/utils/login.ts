@@ -9,12 +9,19 @@ if (!projectId) {
 
 const chains = [
 	{
-		chainId: 5,
-		name: "Goerli",
+		chainId: 11155111,
+		name: "Sepolia",
 		currency: "ETH",
-		explorerUrl: "https://goerli.etherscan.io",
-		rpcUrl: "https://goerli.gateway.tenderly.co",
+		explorerUrl: "https://sepolia.etherscan.io/",
+		rpcUrl: "https://sepolia.gateway.tenderly.co",
 	},
+	// {
+	// 	chainId: 5,
+	// 	name: "Goerli",
+	// 	currency: "ETH",
+	// 	explorerUrl: "https://goerli.etherscan.io",
+	// 	rpcUrl: "https://goerli.gateway.tenderly.co",
+	// },
 ];
 
 const ethersConfig = defaultConfig({
@@ -24,7 +31,8 @@ const ethersConfig = defaultConfig({
 		url: "https://web3modal.com",
 		icons: ["https://avatars.githubusercontent.com/u/37784886"],
 	},
-	defaultChainId: 5,
+	// defaultChainId: 5,
+	defaultChainId: 11155111,
 	rpcUrl: "https://cloudflare-eth.com",
 });
 
@@ -36,7 +44,8 @@ createWeb3Modal({
 	enableAnalytics: true,
 });
 
-export const supportedChainID = 5;
+// export const supportedChainID = 5;
+export const supportedChainID = 11155111;
 
 export const getSigner = async (walletProvider: any): Promise<Signer> => {
 	console.log("getSigner walletProvider: ", walletProvider);
@@ -59,14 +68,14 @@ export const switchNetwork = async (walletProvider: any) => {
 				method: "wallet_addEthereumChain",
 				params: [
 					{
-						chainName: "Goerli",
+						chainName: "Sepolia",
 						chainId: ethers.toQuantity(supportedChainID),
 						nativeCurrency: {
 							name: "ETH",
 							decimals: 18,
 							symbol: "ETH",
 						},
-						rpcUrls: ["https://goerli.infura.io/v3/"],
+						rpcUrls: ["https://sepolia.gateway.tenderly.co"],
 					},
 				],
 			});

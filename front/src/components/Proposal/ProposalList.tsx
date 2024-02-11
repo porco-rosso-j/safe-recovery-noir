@@ -72,14 +72,14 @@ const ProposalList = () => {
 		if (proposal.status === 0) {
 			if (proposal.isExecutable.result) {
 				return (
-					<Text mr={3} color={"green"}>
+					<Text fontSize={13} mr={3} color={"green"}>
 						{" "}
 						Executable
 					</Text>
 				);
 			} else {
 				return (
-					<Text mr={3} color={"red.400"}>
+					<Text fontSize={13} mr={3} color={"red.400"}>
 						{" "}
 						Non Executable
 					</Text>
@@ -87,14 +87,14 @@ const ProposalList = () => {
 			}
 		} else if (proposal.status === 1) {
 			return (
-				<Text mr={3} color={"blue.400"}>
+				<Text fontSize={13} mr={3} color={"blue.400"}>
 					{" "}
 					Executed
 				</Text>
 			);
 		} else {
 			return (
-				<Text mr={3} color={"red.400"}>
+				<Text fontSize={13} mr={3} color={"red.400"}>
 					{" "}
 					Rejected
 				</Text>

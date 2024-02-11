@@ -113,7 +113,7 @@ contract RecoveryPluginNoir is
         bytes memory _webAuthnInputs
     ) public returns (uint, uint) {
         require(msg.sender != safe, "INVALID_SENDER");
-        require(isMethodEnabled[RECOVERY_TYPE_SECRET], "NOT_ENABLED");
+        require(isMethodEnabled[RECOVERY_TYPE_P256], "NOT_ENABLED");
         bytes32 proofNullifier = keccak256(_proof);
         require(
             !recoveryNullifiers[RECOVERY_TYPE_P256][proofNullifier],
@@ -132,7 +132,7 @@ contract RecoveryPluginNoir is
         publicInputs = _getPublicInputWebAuthn(message);
 
         if (
-            !IUltraVerifier(verifiers[RECOVERY_TYPE_SECRET]).verify(
+            !IUltraVerifier(verifiers[RECOVERY_TYPE_P256]).verify(
                 _proof,
                 publicInputs
             )
@@ -474,3 +474,4 @@ contract RecoveryPluginNoir is
         return PLUGIN_PERMISSION_CALL_TO_SELF;
     }
 }
+

@@ -20,6 +20,7 @@ const EnableFingerPrint = (props) => {
 	const { pluginAddress } = useContext(UserDataContext);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const { isMethodEnabled } = useIsMethodEnabled(props.methodIndex);
+	console.log("isMethodEnabled: ", isMethodEnabled);
 
 	const { loading, errorMessage, txHash, result, addRecover } =
 		useAddRecover(onOpen);

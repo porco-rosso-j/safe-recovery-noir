@@ -192,7 +192,7 @@ const SocialRecovery = (props: { methodIndex: number }) => {
 									</Tooltip>
 									<Text>2. Guardian threshold :</Text>
 								</Flex>
-								<Timelock index={2} />
+								<Timelock index={3} />
 							</VStack>
 							<VStack spacing={3.5} fontSize={14} align="end" w="300px" ml={2}>
 								<Input

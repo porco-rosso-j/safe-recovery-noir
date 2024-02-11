@@ -66,7 +66,7 @@ function EnabledModal(props: EnabledResultModalType) {
 								<VStack spacing={1} fontSize={16} align="end">
 									<Link
 										ml={2}
-										href={"https://goerli.etherscan.io/tx/" + props.txHash}
+										href={"https://sepolia.etherscan.io/tx/" + props.txHash}
 										isExternal
 										textDecoration="underline"
 									>

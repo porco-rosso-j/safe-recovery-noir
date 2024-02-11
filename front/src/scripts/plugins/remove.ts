@@ -15,8 +15,9 @@ export async function _removeRecover(
 	pluginAddress: string,
 	method: number
 ): Promise<txResult> {
+	console.log("method: ", method);
 	const removeRecoverTx = pluginIface.encodeFunctionData(
-		methodToSelector[method]
+		methodToSelector[method - 1]
 	);
 
 	const safeTxData = {

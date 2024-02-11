@@ -10,6 +10,8 @@ const useIsMethodEnabled = (methodIndex: number) => {
 		(async () => {
 			if (isPluginEnabled) {
 				const isEnabled = await _isMethodEnabled(methodIndex, pluginAddress);
+				console.log("methodIndex: ", methodIndex);
+				console.log("isEnabled: ", isEnabled);
 				if (isEnabled) {
 					setIsMethodEnabled(isEnabled);
 				} else {
